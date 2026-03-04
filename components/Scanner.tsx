@@ -253,6 +253,18 @@ export function Scanner() {
     stopCamera();
   }, [stopCamera]);
   useEffect(() => {
+    const shouldUseCamera =
+      mode === "camera" && (step === "capture-face" || step === "capture-hair");
+
+    if (!shouldUseCamera) {
+      return;
+    }
+
+    void startCamera();
+
+    return () => {
+      stopCamera();
+    };
   }, [step, mode, startCamera, stopCamera]);
   const routine = analysis ? getRecommendations(analysis) : null;
   const targetTags = analysis ?

@@ -48,9 +48,9 @@ export function PrivacyModal({ onAccept, accepted }: PrivacyModalProps) {
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-dash-text-secondary">
           GlowAI uses your camera or photo uploads only to analyze your skin and hair
-          and recommend products. We do not store your images on our servers. Analysis
-          may be processed by our partners to provide results. By continuing, you agree
-          to this use.
+          and recommend products. We do not store any of your pictures on our servers
+          or reuse them for other purposes. Analysis may be processed by our partners
+          to provide results. By continuing, you agree to this use.
         </p>
         <Button
           variant="primary"
