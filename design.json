@@ -1,0 +1,334 @@
+
+{
+  "$schema": "GlowAI Design System v1",
+  "name": "GlowAI Dash Design System",
+  "codename": "GlowAI Dash",
+  "description": "High-level design guidelines and component specifications for the GlowAI application. Use this file as the single source of truth when building or styling UI: apply these tokens, principles, and component rules to replicate the dashboard look consistently.",
+  "vision": "Clarity through Simplicity. Present complex data with effortless elegance. Users should feel informed, not overwhelmed. The aesthetic is bright, professional, and subtly dynamic, using visual cues to guide attention and highlight insights.",
+  "principles": [
+    "Data-First Focus: Every UI element serves to enhance data readability and comprehension. Visualizations are primary.",
+    "Modular & Scalable: Card-based system ensures flexibility and easy expansion; components combine and reuse effectively.",
+    "Clean & Uncluttered: Prioritize whitespace and minimal UI chrome. Only essential elements compete for attention.",
+    "Subtle Depth & Professionalism: Modern flat design with subtle shadows and rounded corners for sophisticated depth and tactile feel.",
+    "Intuitive Hierarchy: Use typography, color, and spacing to establish clear visual hierarchy and guide the eye through information.",
+    "Approachable & Engaging: Soft accent colors and subtle graphic elements make the interface inviting without sacrificing professionalism."
+  ],
+  "global": {
+    "colors": {
+      "background": {
+        "primary": "#F8F9FA",
+        "gradientBottom": "linear-gradient(to top, #EDF2F9, #F8F9FA)"
+      },
+      "surface": {
+        "primary": "#FFFFFF"
+      },
+      "text": {
+        "primary": "#343A40",
+        "secondary": "#6C757D",
+        "tertiary": "#ADB5BD",
+        "positive": "#6DD47B",
+        "negative": "#D0021B",
+        "link": "#5C8FFC"
+      },
+      "accents": {
+        "brandBlue": "#5C8FFC",
+        "brandGreen": "#6DD47B",
+        "brandOrange": "#F5A623",
+        "brandRed": "#D0021B",
+        "brandLightBlue": "#4A90E2",
+        "brandYellow": "#FFC107"
+      },
+      "chartSegments": [
+        "#5C8FFC",
+        "#6DD47B",
+        "#F5A623",
+        "#4A90E2",
+        "#FFC107",
+        "#D0021B"
+      ],
+      "borders": {
+        "light": "#DEE2E6"
+      },
+      "shadows": {
+        "soft": "0px 4px 12px rgba(0, 0, 0, 0.08)",
+        "card": "0px 2px 8px rgba(0, 0, 0, 0.06)"
+      }
+    },
+    "typography": {
+      "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      "weights": {
+        "regular": 400,
+        "semiBold": 600,
+        "bold": 700
+      },
+      "lineHeights": {
+        "body": 1.5,
+        "heading": 1.2,
+        "tight": 1.1
+      },
+      "scale": {
+        "xs": "12px",
+        "sm": "14px",
+        "base": "16px",
+        "lg": "18px",
+        "xl": "24px",
+        "2xl": "28px",
+        "3xl": "38px"
+      }
+    },
+    "spacing": {
+      "unit": "8px",
+      "gapXs": "4px",
+      "gapSm": "8px",
+      "gapMd": "16px",
+      "gapLg": "24px",
+      "gapXl": "32px",
+      "paddingCard": "24px",
+      "marginCard": "24px",
+      "paddingCardCompact": "20px"
+    },
+    "borderRadii": {
+      "sm": "6px",
+      "button": "8px",
+      "input": "8px",
+      "card": "12px",
+      "iconContainer": "50%"
+    },
+    "icons": {
+      "style": "outline",
+      "strokeWidth": "1.5px",
+      "defaultColor": "text.primary",
+      "sizes": {
+        "sm": "16px",
+        "md": "20px",
+        "lg": "24px"
+      }
+    }
+  },
+  "components": {
+    "Card": {
+      "description": "Foundational container for all dashboard content. Use for every major content block.",
+      "rules": [
+        "Always use white background and soft shadow.",
+        "Maintain consistent padding and spacing between sibling cards."
+      ],
+      "background": "#FFFFFF",
+      "borderRadius": "12px",
+      "boxShadow": "0px 4px 12px rgba(0, 0, 0, 0.08)",
+      "padding": "24px",
+      "spacingBetweenCards": "24px"
+    },
+    "HeaderNavigation": {
+      "description": "Top bar with menu, search, and user actions. Stays minimal and out of the way.",
+      "background": "transparent",
+      "height": "56px",
+      "searchBar": {
+        "icon": "magnifying-glass",
+        "placeholderColor": "#ADB5BD",
+        "border": "none",
+        "background": "transparent",
+        "fontSize": "14px"
+      },
+      "icons": {
+        "notification": "bell-outline with optional red badge dot",
+        "profile": "circular avatar"
+      },
+      "textColor": "#343A40"
+    },
+    "MetricsDisplay": {
+      "description": "KPI blocks with large number, title, trend indicator, and optional comparison text. Primary pattern for key numbers.",
+      "title": {
+        "fontSize": "18px",
+        "fontWeight": 700,
+        "color": "#343A40"
+      },
+      "mainValue": {
+        "fontSize": "38px",
+        "fontWeight": 700,
+        "color": "#343A40",
+        "letterSpacing": "-0.02em"
+      },
+      "changeIndicator": {
+        "fontSize": "14px",
+        "fontWeight": 600,
+        "positiveColor": "#6DD47B",
+        "negativeColor": "#D0021B",
+        "icon": "arrow-up / arrow-down next to percentage"
+      },
+      "comparisonText": {
+        "fontSize": "12px",
+        "color": "#6C757D"
+      },
+      "iconButton": {
+        "size": "40px",
+        "background": "#5C8FFC",
+        "iconColor": "#FFFFFF",
+        "borderRadius": "8px"
+      }
+    },
+    "ChartContainer": {
+      "description": "Wrapper for all chart types. Provides consistent title, subtitle, legend, and axis styling.",
+      "title": {
+        "fontSize": "18px",
+        "fontWeight": 700,
+        "color": "#343A40"
+      },
+      "subTitle": {
+        "fontSize": "14px",
+        "color": "#6C757D"
+      },
+      "legend": {
+        "dotSize": "8px",
+        "gap": "8px",
+        "labelColor": "#6C757D",
+        "labelFontSize": "14px"
+      },
+      "axisLabels": {
+        "fontSize": "12px",
+        "color": "#ADB5BD"
+      },
+      "axisLines": {
+        "color": "#DEE2E6",
+        "strokeWidth": "1px"
+      }
+    },
+    "BarChart": {
+      "description": "Vertical or horizontal bars. Use for comparing categories (e.g. Online vs Offline sales).",
+      "barColors": {
+        "primary": "#5C8FFC",
+        "secondary": "#6DD47B"
+      },
+      "barWidthRatio": 0.4,
+      "gapRatio": 0.2,
+      "borderRadius": "4px"
+    },
+    "LineChart": {
+      "description": "Line series for trends over time. Clear lines with visible data points.",
+      "lineColors": ["#5C8FFC", "#6DD47B"],
+      "lineStrokeWidth": "2px",
+      "dataPointRadius": "4px",
+      "gridLines": "#DEE2E6",
+      "tooltip": {
+        "background": "#FFFFFF",
+        "boxShadow": "0px 4px 12px rgba(0, 0, 0, 0.08)",
+        "borderRadius": "8px",
+        "padding": "8px 12px",
+        "fontSize": "12px",
+        "color": "#343A40"
+      }
+    },
+    "DonutChart": {
+      "description": "Donut or pie with optional center label. Use for composition (e.g. sales by channel).",
+      "segmentColors": ["#6DD47B", "#F5A623", "#5C8FFC", "#D0021B", "#4A90E2", "#FFC107"],
+      "stroke": "#FFFFFF",
+      "strokeWidth": "2px",
+      "centerText": {
+        "mainValue": { "fontSize": "24px", "fontWeight": 700, "color": "#343A40" },
+        "description": { "fontSize": "12px", "color": "#6C757D" }
+      }
+    },
+    "MapComponent": {
+      "description": "World or region map with density or value-based coloring.",
+      "regionColors": {
+        "highlighted": "#5C8FFC",
+        "high": "#F5A623",
+        "medium": "#FFC107",
+        "low": "#DEE2E6"
+      },
+      "zoomControls": {
+        "background": "#FFFFFF",
+        "borderRadius": "8px",
+        "iconColor": "#6C757D",
+        "boxShadow": "0px 4px 12px rgba(0, 0, 0, 0.08)"
+      }
+    },
+    "ProgressCircle": {
+      "description": "Circular progress (e.g. percentage). Track light, fill in brand blue or green.",
+      "trackColor": "#DEE2E6",
+      "fillColor": "#5C8FFC",
+      "percentageText": {
+        "fontSize": "28px",
+        "fontWeight": 700,
+        "color": "#343A40"
+      },
+      "labelText": {
+        "fontSize": "14px",
+        "color": "#6C757D"
+      }
+    },
+    "InfoTextBlock": {
+      "description": "Explanatory copy with optional info icon. Use for hints and descriptions.",
+      "icon": {
+        "type": "info-circle",
+        "color": "#6C757D",
+        "size": "16px"
+      },
+      "textColor": "#6C757D",
+      "fontSize": "12px",
+      "lineHeight": 1.5
+    },
+    "ListItem": {
+      "description": "Row with colored bullet, label, and value. Align values for scanability.",
+      "bulletPoint": {
+        "size": "8px",
+        "shape": "circle",
+        "colors": "match chart segment or category"
+      },
+      "label": { "fontSize": "14px", "color": "#343A40" },
+      "value": { "fontSize": "14px", "fontWeight": 600, "color": "#343A40" },
+      "rowGap": "12px"
+    },
+    "Button": {
+      "description": "Primary actions use brand blue; secondary use outline or ghost.",
+      "primary": {
+        "background": "#5C8FFC",
+        "color": "#FFFFFF",
+        "borderRadius": "8px",
+        "fontWeight": 600
+      },
+      "secondary": {
+        "background": "transparent",
+        "border": "1px solid #DEE2E6",
+        "color": "#343A40",
+        "borderRadius": "8px"
+      }
+    },
+    "DecorativeElements": {
+      "description": "Optional non-functional elements for warmth. Use sparingly.",
+      "dottedPattern": { "color": "#FEEBC8", "opacity": 0.6, "size": "6px" },
+      "geometricShapes": {
+        "yellowCube": { "color": "#FFD700", "opacity": 0.8 },
+        "greenPrism": { "color": "#50E3C2", "opacity": 0.8 }
+      }
+    }
+  },
+  "layout": {
+    "description": "Page and grid rules for dashboard screens.",
+    "pageBackground": "#F8F9FA",
+    "pagePadding": "24px",
+    "gridGap": "24px",
+    "maxContentWidth": "1400px",
+    "alignment": "left for text; right-align numbers in tables and lists"
+  },
+  "aiInstructions": {
+    "whenBuildingUI": [
+      "Use global.colors, global.typography, global.spacing, and global.borderRadii for all new components.",
+      "Wrap content in Card when it is a distinct block (metrics, charts, lists).",
+      "Use MetricsDisplay for any prominent KPI with a big number and optional trend.",
+      "Use chart segment colors from global.colors.chartSegments or component-specific bar/line/donut colors.",
+      "Keep shadows soft (global.colors.shadows.soft), corners rounded (card 12px, button 8px).",
+      "Respect hierarchy: bold 18px for card titles, 38px bold for hero metrics, 14px for secondary text, 12px for tertiary.",
+      "Prefer Inter (or fallback system font) and weights 400, 600, 700 only."
+    ],
+    "whenStylingCharts": [
+      "Bar charts: blue #5C8FFC and green #6DD47B for two series.",
+      "Line charts: same blue/green; add tooltips with white background and soft shadow.",
+      "Donut/pie: use chartSegments array in order; white stroke between segments."
+    ],
+    "avoid": [
+      "Heavy borders; use borders.light #DEE2E6 only when needed.",
+      "More than one accent per card; keep focus clear.",
+      "Cluttered layouts; maintain gapLg/gapXl between sections."
+    ]
+  }
+}
