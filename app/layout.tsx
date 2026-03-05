@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} min-h-screen font-sans antialiased`}>
+      <body className={`${inter.className} min-h-screen font-sans antialiased bg-ivory text-brown`}>
         <HeaderNavigation />
         <div className="min-h-[calc(100vh-56px)]">{children}</div>
         <Footer />

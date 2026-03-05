@@ -115,7 +115,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
   return (
     <div className="space-y-4">
       {/* Mode toggle */}
-      <div className="flex gap-1 rounded-dash-button bg-dash-border/40 p-1">
+      <div className="flex gap-1 rounded-btn bg-nude/40 p-1">
         <button
           type="button"
           onClick={() => {
@@ -125,10 +125,10 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
             setHairPreview(null);
             setStep("face");
           }}
-          className={`flex-1 rounded-dash-button py-2.5 text-sm font-semibold transition ${
+          className={`flex-1 rounded-btn py-2.5 text-sm font-semibold transition ${
             mode === "camera"
-              ? "bg-dash-brand-blue text-white shadow-dash-card"
-              : "text-dash-text-secondary hover:text-dash-text-primary"
+              ? "bg-blush text-white shadow-card"
+              : "text-brown/80 hover:text-brown"
           }`}
         >
           Camera
@@ -142,10 +142,10 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
             setHairPreview(null);
             setStep("face");
           }}
-          className={`flex-1 rounded-dash-button py-2.5 text-sm font-semibold transition ${
+          className={`flex-1 rounded-btn py-2.5 text-sm font-semibold transition ${
             mode === "upload"
-              ? "bg-dash-brand-blue text-white shadow-dash-card"
-              : "text-dash-text-secondary hover:text-dash-text-primary"
+              ? "bg-blush text-white shadow-card"
+              : "text-brown/80 hover:text-brown"
           }`}
         >
           Upload
@@ -155,7 +155,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
       {/* Face step */}
       {step === "face" && (
         <Card>
-          <p className="mb-3 text-sm text-dash-text-secondary">
+          <p className="mb-3 text-sm text-brown/80">
             Capture a selfie (face and visible hair) for best results.
           </p>
           {mode === "camera" && (
@@ -165,12 +165,12 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
                 autoPlay
                 playsInline
                 muted
-                className="aspect-[4/3] w-full rounded-dash-input bg-dash-border/30 object-cover"
+                className="aspect-[4/3] w-full rounded-input bg-nude/30 object-cover"
               />
               <button
                 type="button"
                 onClick={startCamera}
-                className="mt-2 text-sm font-medium text-dash-text-link hover:underline"
+                className="mt-2 text-sm font-medium text-blush hover:underline"
               >
                 Start camera
               </button>
@@ -196,7 +196,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full rounded-dash-input border-2 border-dashed border-dash-border py-8 text-sm text-dash-text-tertiary transition hover:border-dash-brand-blue hover:text-dash-text-secondary"
+                className="w-full rounded-input border-2 border-dashed border-nude py-8 text-sm text-brown/60 transition hover:border-blush hover:text-brown/80"
               >
                 Choose face/selfie image
               </button>
@@ -204,7 +204,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
                 <img
                   src={facePreview}
                   alt="Face preview"
-                  className="mt-3 aspect-square w-24 rounded-dash-sm object-cover"
+                  className="mt-3 aspect-square w-24 rounded-btn object-cover"
                 />
               )}
             </>
@@ -215,7 +215,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
       {/* Optional hair step */}
       {step === "hair" && askHair && facePreview && (
         <Card>
-          <p className="mb-3 text-sm text-dash-text-secondary">
+          <p className="mb-3 text-sm text-brown/80">
             Add a hair-focused photo for better hair recommendations (optional).
           </p>
           {mode === "camera" && (
@@ -225,7 +225,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
                 autoPlay
                 playsInline
                 muted
-                className="aspect-[4/3] w-full rounded-dash-input bg-dash-border/30 object-cover"
+                className="aspect-[4/3] w-full rounded-input bg-nude/30 object-cover"
               />
               <div className="mt-4 flex gap-2">
                 <Button variant="secondary" className="flex-1 py-3" onClick={handleSkipHair}>
@@ -250,7 +250,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
                 <button
                   type="button"
                   onClick={() => hairFileInputRef.current?.click()}
-                  className="flex-1 rounded-dash-input border-2 border-dashed border-dash-border py-4 text-sm text-dash-text-tertiary transition hover:border-dash-brand-blue hover:text-dash-text-secondary"
+                  className="flex-1 rounded-input border-2 border-dashed border-nude py-4 text-sm text-brown/60 transition hover:border-blush hover:text-brown/80"
                 >
                   Add hair photo
                 </button>

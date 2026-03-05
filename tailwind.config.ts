@@ -11,44 +11,27 @@ const config: Config = {
         sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
       },
       colors: {
-        /* Design system – design.json */
-        glow: {
-          rose: "#e8a4b8",
-          mauve: "#c9a0b8",
-          cream: "#f5e6e0",
-          deep: "#2d1b2e",
-          soft: "#faf5f7",
-        },
-        dash: {
-          "bg-primary": "#f8f9fa",
-          surface: "#ffffff",
-          "text-primary": "#343a40",
-          "text-secondary": "#6c757d",
-          "text-tertiary": "#adb5bd",
-          "text-positive": "#6dd47b",
-          "text-negative": "#d0021b",
-          "text-link": "#5c8ffc",
-          "brand-blue": "#5c8ffc",
-          "brand-green": "#6dd47b",
-          "brand-orange": "#f5a623",
-          "brand-red": "#d0021b",
-          "brand-light-blue": "#4a90e2",
-          "brand-yellow": "#ffc107",
-          border: "#dee2e6",
-        },
+        /* GlowAI rebrand – strict 5-color palette */
+        blush: "#F4ACB7",   // Primary CTA, scanner laser, active states, progress bars
+        white: "#FFFFFF",   // Glass cards, inputs, button text on dark
+        ivory: "#FFF5E4",   // Main site background, section dividers
+        nude: "#FFD6BA",   // Secondary buttons, hover, soft borders, highlights
+        brown: "#6B4F4F",   // Primary text, headings, icons, footer, high-contrast (no black)
       },
       boxShadow: {
-        "dash-soft": "0 4px 12px rgba(0, 0, 0, 0.08)",
-        "dash-card": "0 2px 8px rgba(0, 0, 0, 0.06)",
+        "blush-glow": "0 0 20px rgba(244, 172, 183, 0.6), 0 0 40px rgba(244, 172, 183, 0.3)",
+        "blush-soft": "0 4px 12px rgba(244, 172, 183, 0.2)",
+        "card": "0 2px 8px rgba(107, 79, 79, 0.08)",
+        "glass": "0 8px 32px rgba(107, 79, 79, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+      },
+      backdropBlur: {
+        glass: "12px",
+        "glass-lg": "20px",
       },
       borderRadius: {
-        "dash-sm": "6px",
-        "dash-button": "8px",
-        "dash-input": "8px",
-        "dash-card": "12px",
-      },
-      spacing: {
-        "dash-card": "24px",
+        "btn": "8px",
+        "input": "8px",
+        "card": "12px",
       },
     },
   },

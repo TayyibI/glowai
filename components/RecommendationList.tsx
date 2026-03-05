@@ -43,41 +43,41 @@ function AnimatedProductCard({ rec, showBuyNow }: { rec: RecommendedProduct; sho
     <motion.div
       variants={itemVariants}
       whileHover={{ y: -4, scale: 1.01, boxShadow: "0px 10px 20px rgba(0,0,0,0.06)" }}
-      className="relative flex h-full flex-col rounded-2xl border border-dash-border/60 bg-white/70 backdrop-blur-sm overflow-hidden transition-colors hover:border-dash-brand-blue/30"
+      className="relative flex h-full flex-col rounded-2xl border border-nude/60 bg-white/90 backdrop-blur-sm overflow-hidden transition-colors hover:border-blush/40"
     >
-      <div className="relative w-full overflow-hidden bg-gray-50 shrink-0 aspect-[4/5]">
+      <div className="relative w-full overflow-hidden bg-ivory/60 shrink-0 aspect-[4/5]">
         <img
           src={product.image || "/placeholder-product.jpg"}
           alt={product.name}
           className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
         />
-        <div className="absolute top-3 right-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-dash-text-primary shadow-sm backdrop-blur-md">
+        <div className="absolute top-3 right-3 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-brown shadow-card backdrop-blur-md">
           {product.category.replace(/_/g, " ")}
         </div>
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <p className="mb-1 text-xs font-bold uppercase tracking-widest text-dash-text-tertiary">
+        <p className="mb-1 text-xs font-bold uppercase tracking-widest text-brown/60">
           {brandName}
         </p>
-        <h3 className="font-semibold text-lg leading-tight text-dash-text-primary mb-2">
+        <h3 className="font-semibold text-lg leading-tight text-brown mb-2">
           {product.name}
         </h3>
 
         {product.description && (
-          <p className="text-sm text-dash-text-secondary leading-relaxed mb-4">
+          <p className="text-sm text-brown/80 leading-relaxed mb-4">
             {product.description}
           </p>
         )}
 
-        <div className="mt-auto pt-4 border-t border-dash-border/40">
-          <div className="flex items-start gap-2 mb-4 bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-1 shrink-0" />
-            <div className="text-sm text-dash-text-primary leading-relaxed">
-              <span className="font-semibold text-emerald-700 block mb-0.5">Why this product for YOU</span>
+        <div className="mt-auto pt-4 border-t border-nude/50">
+          <div className="flex items-start gap-2 mb-4 bg-nude/30 p-3 rounded-xl border border-nude/60">
+            <CheckCircle2 className="w-4 h-4 text-blush mt-1 shrink-0" />
+            <div className="text-sm text-brown leading-relaxed">
+              <span className="font-semibold text-brown block mb-0.5">Why this product for YOU</span>
               <ReactMarkdown
                 components={{
-                  strong: ({ node, ...props }) => <span className="font-bold text-dash-text-primary" {...props} />
+                  strong: ({ node, ...props }) => <span className="font-bold text-brown" {...props} />
                 }}
               >
                 {reason}
@@ -92,7 +92,7 @@ function AnimatedProductCard({ rec, showBuyNow }: { rec: RecommendedProduct; sho
               href={product.purchaseLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-dash-text-primary px-4 py-3 text-sm font-semibold text-white shadow-md transition-colors hover:bg-black/90"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blush px-4 py-3 text-sm font-semibold text-white shadow-blush-soft transition-colors hover:bg-blush/90"
             >
               Buy on Daraz
               <ExternalLink className="w-4 h-4" />
@@ -117,8 +117,8 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
     <div className="space-y-10">
       <section>
         <div className="mb-6">
-          <h2 className="text-2xl font-bold tracking-tight text-dash-text-primary">Morning Routine</h2>
-          <p className="text-sm text-dash-text-secondary">Start your day protected and fresh</p>
+          <h2 className="text-2xl font-bold tracking-tight text-brown">Morning Routine</h2>
+          <p className="text-sm text-brown/80">Start your day protected and fresh</p>
         </div>
         <motion.div
           variants={containerVariants}
@@ -134,8 +134,8 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
 
       <section>
         <div className="mb-6">
-          <h2 className="text-2xl font-bold tracking-tight text-dash-text-primary">Evening Routine</h2>
-          <p className="text-sm text-dash-text-secondary">Repair and nourish overnight</p>
+          <h2 className="text-2xl font-bold tracking-tight text-brown">Evening Routine</h2>
+          <p className="text-sm text-brown/80">Repair and nourish overnight</p>
         </div>
         <motion.div
           variants={containerVariants}
@@ -152,8 +152,8 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
       {routine.hair.length > 0 && (
         <section>
           <div className="mb-6">
-            <h2 className="text-2xl font-bold tracking-tight text-dash-text-primary">Hair Care</h2>
-            <p className="text-sm text-dash-text-secondary">Tailored for your scalp and strands</p>
+            <h2 className="text-2xl font-bold tracking-tight text-brown">Hair Care</h2>
+            <p className="text-sm text-brown/80">Tailored for your scalp and strands</p>
           </div>
           <motion.div
             variants={containerVariants}

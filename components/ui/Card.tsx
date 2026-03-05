@@ -11,7 +11,7 @@ interface CardProps {
 export function Card({ children, className = "", compact }: CardProps) {
   return (
     <div
-      className={`rounded-dash-card bg-dash-surface shadow-dash-soft ${compact ? "p-5" : "p-6"} ${className}`}
+      className={`rounded-card bg-white shadow-card border border-nude/40 ${compact ? "p-5" : "p-6"} ${className}`}
     >
       {children}
     </div>
@@ -26,7 +26,7 @@ interface CardTitleProps {
 export function CardTitle({ children, className = "" }: CardTitleProps) {
   return (
     <h3
-      className={`text-lg font-bold text-dash-text-primary ${className}`}
+      className={`text-lg font-bold text-brown ${className}`}
       style={{ fontSize: "18px" }}
     >
       {children}

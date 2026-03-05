@@ -1,122 +1,77 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
-import { PrivacyModal, getPrivacyAccepted } from "@/components/PrivacyModal";
-import { ImageCapture } from "@/components/ImageCapture";
-import { Scanner } from "@/components/Scanner";
-import { AnalysisDisplay } from "@/components/AnalysisDisplay";
-import { RecommendationList } from "@/components/RecommendationList";
-import { FaceDetectionError } from "@/components/FaceDetectionError";
-import { Button } from "@/components/ui/Button";
-import { analyzeImages } from "@/services/analysisService";
-import { getRecommendations } from "@/logic/recommendationLogic";
-import type { AnalysisResult } from "@/types/AnalysisResult";
-import type { ImageCaptureResult } from "@/components/ImageCapture";
-type Step = "capture" | "analyzing" | "results" | "error" | "no_face";
-export default function Home() {
-  const [privacyAccepted, setAccepted] = useState(false);
-  const [step, setStep] = useState<Step>("capture");
-  const [useScanner, setUseScanner] = useState(false);
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const handlePrivacyAccept = useCallback(() => setAccepted(true), []);
-  const handleCapture = useCallback(async (result: ImageCaptureResult) => {
-    setStep("analyzing");
-    setErrorMessage(null);
-    try {
-      const analysisResult = await analyzeImages({
-        faceImage: result.faceImage,
-        hairImage: result.hairImage ?? undefined,
-      });
-      setAnalysis(analysisResult);
-      setStep("results");
-    } catch (e) {
-      const err = e as { code?: string };
-      if (err.code === "NO_FACE") {
-        setStep("no_face");
-      } else {
-        setErrorMessage(err instanceof Error ? err.message : "Analysis failed. Please try again.");
-        setStep("error");
-      }
-    }
-  }, []);
-  const handleRetry = useCallback(() => {
-    setStep("capture");
-    setAnalysis(null);
-    setErrorMessage(null);
-  }, []);
-  useEffect(() => {
-    if (getPrivacyAccepted()) setAccepted(true);
-  }, []);
+
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useDeviceDetect } from "@/hooks/useDeviceDetect";
+import { ScanMotionGraphic } from "@/components/landing/ScanMotionGraphic";
+import { ScanLine } from "lucide-react";
+import { motion } from "framer-motion";
+
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1200&q=80";
+
+export default function LandingPage() {
+  const router = useRouter();
+  const { mounted } = useDeviceDetect();
+
   return (
-    <>
-      <PrivacyModal onAccept={handlePrivacyAccept} accepted={privacyAccepted} />
-      <main className="mx-auto min-h-full max-w-[1400px] px-4 py-8 pb-12 sm:px-6 lg:px-8">
-        {/* Hero / product strip */}
-        <header className="mb-8 text-center md:mb-10">
-          <h1 className="text-3xl font-bold tracking-tight text-dash-text-primary sm:text-4xl">
-            Personal Beauty Recommendations
-          </h1>
-          <p className="mx-auto mt-2 max-w-xl text-base text-dash-text-secondary sm:text-lg">
-            Capture your skin and hair—get AI-powered, personalized product insights in seconds.
-          </p>
-          {/* Trust strip – multinational */}
-          <div className="mx-auto mt-6 flex max-w-2xl flex-wrap items-center justify-center gap-6 border-y border-dash-border/60 py-4 text-center">
-            <span className="text-xs font-semibold uppercase tracking-wider text-dash-text-tertiary">
-              Available globally
-            </span>
-            <span className="text-xs text-dash-text-tertiary">•</span>
-            <span className="text-xs text-dash-text-secondary">
-              Trusted by teams in 50+ countries
-            </span>
-            <span className="text-xs text-dash-text-tertiary">•</span>
-            <span className="text-xs text-dash-text-secondary">
-              Enterprise-grade privacy
-            </span>
+    <main className="relative min-h-screen overflow-x-hidden bg-ivory">
+      {/* Full-viewport hero */}
+      <section className="relative flex min-h-[100vh] flex-col items-center justify-center px-4 py-12 sm:px-6">
+        <motion.div
+          className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-2xl shadow-blush-glow"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="relative aspect-[3/4] w-full">
+            <Image
+              src={HERO_IMAGE}
+              alt="AI skin and hair analysis – premium beauty tech"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 672px"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-brown/60 via-transparent to-brown/20" />
+            <ScanMotionGraphic />
           </div>
-        </header>
-        {step === "capture" && (
-          <section className="mx-auto max-w-lg space-y-4">
-            <Scanner />
-          </section>
+        </motion.div>
+
+        {/* Headline */}
+        <motion.div
+          className="mt-8 text-center"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          <h1 className="text-3xl font-semibold tracking-tight text-brown sm:text-4xl">
+            AI Skin &amp; Hair Analysis
+          </h1>
+          <p className="mt-2 text-brown/80 text-sm sm:text-base">
+            Personalized insights. Clinical precision. Your device.
+          </p>
+        </motion.div>
+
+        {/* CTA – visible on all devices */}
+        {mounted && (
+          <motion.div
+            className="mt-8 w-full max-w-md px-4 pb-6 pt-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <button
+              type="button"
+              onClick={() => router.push("/scanner")}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-nude bg-blush px-6 py-4 font-semibold text-white shadow-blush-glow backdrop-blur-glass transition hover:bg-blush/90 active:scale-[0.98]"
+            >
+              <ScanLine className="h-5 w-5" />
+              Start Skin &amp; Hair Analysis
+            </button>
+          </motion.div>
         )}
-        {step === "analyzing" && (
-          <section className="mx-auto max-w-lg">
-            <div className="rounded-dash-card bg-dash-surface p-8 text-center shadow-dash-soft">
-              <p className="text-dash-text-secondary">Analyzing your skin and hair…</p>
-              <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-dash-border">
-                <div
-                  className="h-full w-2/3 animate-pulse rounded-full bg-dash-brand-blue"
-                  style={{ animationDuration: "1.5s" }}
-                />
-              </div>
-            </div>
-          </section>
-        )}
-        {step === "results" && analysis && (
-          <section className="mx-auto max-w-2xl space-y-6">
-            <AnalysisDisplay result={analysis} />
-            <RecommendationList routine={getRecommendations(analysis)} />
-            <Button variant="secondary" fullWidth onClick={handleRetry} className="py-3">
-              New analysis
-            </Button>
-          </section>
-        )}
-        {step === "error" && (
-          <section className="mx-auto max-w-md space-y-4">
-            <div className="rounded-dash-card border border-dash-brand-red/30 bg-red-50/80 p-4 text-dash-text-negative">
-              <p>{errorMessage ?? "Something went wrong."}</p>
-            </div>
-            <Button variant="primary" fullWidth onClick={handleRetry} className="py-3">
-              Try again
-            </Button>
-          </section>
-        )}
-        {step === "no_face" && (
-          <section className="mx-auto max-w-md">
-            <FaceDetectionError onRetry={handleRetry} />
-          </section>
-        )}
-      </main>
-    </>
+      </section>
+    </main>
   );
 }

@@ -21,21 +21,21 @@ const LEGAL = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-dash-border bg-white">
+    <footer className="border-t border-nude/60 bg-brown">
       <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand column */}
           <div className="lg:col-span-1">
-            <Link href="/" className="text-xl font-bold text-dash-brand-blue">
+            <Link href="/" className="text-xl font-bold text-white">
               GlowAI
             </Link>
-            <p className="mt-3 text-sm text-dash-text-secondary">
+            <p className="mt-3 text-sm text-white/80">
               AI-powered beauty and wellness insights for everyone, everywhere.
             </p>
             <div className="mt-4 flex gap-4">
               <a
                 href="#linkedin"
-                className="text-dash-text-tertiary transition hover:text-dash-brand-blue"
+                className="text-white/60 transition hover:text-blush"
                 aria-label="LinkedIn"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -44,7 +44,7 @@ export function Footer() {
               </a>
               <a
                 href="#twitter"
-                className="text-dash-text-tertiary transition hover:text-dash-brand-blue"
+                className="text-white/60 transition hover:text-blush"
                 aria-label="Twitter"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ export function Footer() {
           {/* Link columns */}
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.title}>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-dash-text-primary">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
                 {col.title}
               </h3>
               <ul className="mt-4 space-y-3">
@@ -65,7 +65,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-dash-text-secondary transition hover:text-dash-text-link"
+                      className="text-sm text-white/80 transition hover:text-blush"
                     >
                       {link.label}
                     </Link>
@@ -77,19 +77,19 @@ export function Footer() {
         </div>
 
         {/* Bottom bar: legal + copyright */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-dash-border pt-8 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/20 pt-8 sm:flex-row">
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-1">
             {LEGAL.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-dash-text-tertiary transition hover:text-dash-text-primary"
+                className="text-sm text-white/60 transition hover:text-white"
               >
                 {link.label}
               </Link>
             ))}
           </div>
-          <p className="text-sm text-dash-text-tertiary">
+          <p className="text-sm text-white/60">
             © {new Date().getFullYear()} GlowAI. All rights reserved.
           </p>
         </div>

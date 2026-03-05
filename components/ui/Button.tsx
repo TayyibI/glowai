@@ -17,11 +17,11 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "rounded-dash-button font-semibold transition focus:outline-none focus:ring-2 focus:ring-dash-brand-blue focus:ring-offset-2 disabled:opacity-50";
+    "rounded-btn font-semibold transition focus:outline-none focus:ring-2 focus:ring-blush focus:ring-offset-2 disabled:opacity-50";
   const primary =
-    "bg-dash-brand-blue text-white hover:opacity-90 active:opacity-95";
+    "bg-blush text-white hover:bg-blush/90 active:opacity-95";
   const secondary =
-    "border border-dash-border bg-transparent text-dash-text-primary hover:bg-dash-border/30";
+    "border border-nude bg-transparent text-brown hover:bg-nude/40";
 
   return (
     <button

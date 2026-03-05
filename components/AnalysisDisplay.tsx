@@ -8,10 +8,10 @@ function formatLabel(s: string): string {
   return s.replace(/_/g, " ");
 }
 function getHydrationColor(score: number): string {
-  if (score >= 80) return "text-emerald-500 stroke-emerald-500";
-  if (score >= 60) return "text-blue-500 stroke-blue-500";
-  if (score >= 40) return "text-amber-500 stroke-amber-500";
-  return "text-red-500 stroke-red-500";
+  if (score >= 80) return "text-blush stroke-blush";
+  if (score >= 60) return "text-nude stroke-nude";
+  if (score >= 40) return "text-brown/80 stroke-brown/80";
+  return "text-brown stroke-brown";
 }
 function CircularProgress({ percentage }: { percentage: number }) {
   const radius = 36;
@@ -28,7 +28,7 @@ function CircularProgress({ percentage }: { percentage: number }) {
           stroke="currentColor"
           strokeWidth="8"
           fill="transparent"
-          className="text-gray-100"
+          className="text-nude/40"
         />
         <motion.circle
           cx="50"
@@ -41,12 +41,12 @@ function CircularProgress({ percentage }: { percentage: number }) {
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset }}
           transition={{ duration: 1.5, ease: "easeOut" }}
-          className={colorClass.split(' ')[1]}
+          className={colorClass.split(" ")[1]}
           strokeLinecap="round"
         />
       </svg>
       <div className="absolute flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-dash-text-primary">{percentage}</span>
+        <span className="text-3xl font-bold text-brown">{percentage}</span>
       </div>
     </div>
   );
@@ -59,20 +59,20 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <Card className="overflow-hidden border-dash-border/60 bg-white/80 backdrop-blur-md shadow-xl sm:p-8">
+      <Card className="overflow-hidden border-nude/60 bg-white/95 backdrop-blur-md shadow-card sm:p-8">
         <div className="flex flex-col items-start gap-3 mb-6 sm:flex-row sm:items-center sm:mb-8">
-          <div className="p-2 bg-gradient-to-br from-dash-brand-blue/20 to-purple-500/10 rounded-xl">
-            <Sparkles className="w-6 h-6 text-dash-brand-blue" />
+          <div className="p-2 bg-gradient-to-br from-blush/20 to-nude/20 rounded-xl">
+            <Sparkles className="w-6 h-6 text-blush" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold m-0 tracking-tight text-dash-text-primary">Your AI Skin & Hair Profile</CardTitle>
-            <p className="text-sm text-dash-text-secondary mt-1">Personalized decoding of your unique attributes</p>
+            <CardTitle className="text-2xl font-bold m-0 tracking-tight text-brown">Your AI Skin & Hair Profile</CardTitle>
+            <p className="text-sm text-brown/80 mt-1">Personalized decoding of your unique attributes</p>
           </div>
         </div>
         {isLowConfidence && (
           <motion.div
             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-            className="mb-6 flex gap-3 rounded-2xl border border-amber-200/50 bg-amber-50 p-4 text-sm text-amber-800 shadow-sm items-start"
+            className="mb-6 flex gap-3 rounded-2xl border border-nude bg-nude/30 p-4 text-sm text-brown shadow-card items-start"
           >
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
             <p>
@@ -83,8 +83,8 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
         )}
         <div className="flex flex-col gap-6 md:flex-row md:gap-8">
           {/* Hydration Score Column */}
-          <div className="flex flex-col items-center justify-center bg-gray-50/50 p-5 rounded-3xl border border-dash-border/40 min-w-[0] md:min-w-[220px]">
-            <div className="flex items-center gap-2 mb-4 text-dash-text-tertiary">
+          <div className="flex flex-col items-center justify-center bg-ivory/60 p-5 rounded-3xl border border-nude/50 min-w-[0] md:min-w-[220px]">
+            <div className="flex items-center gap-2 mb-4 text-brown/60">
               <Droplets className="w-4 h-4" />
               <h3 className="text-sm font-bold uppercase tracking-widest">Hydration</h3>
             </div>
@@ -92,7 +92,7 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
             <CircularProgress percentage={result.face.hydrationScore} />
 
             <div className="mt-4 text-center">
-              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white border border-dash-border/50 ${getHydrationColor(result.face.hydrationScore).split(' ')[0]}`}>
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white border border-nude/50 ${getHydrationColor(result.face.hydrationScore).split(" ")[0]}`}>
                 {result.face.hydrationLevel}
               </span>
             </div>
@@ -105,13 +105,13 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
                 whileHover={{ scale: 1.02 }}
-                className="bg-white p-5 rounded-2xl border border-dash-border/60 shadow-sm"
+                className="bg-white p-5 rounded-2xl border border-nude/60 shadow-card"
               >
-                <p className="text-[10px] font-bold uppercase tracking-widest text-dash-text-tertiary mb-2 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-dash-brand-blue"></span>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-brown/60 mb-2 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blush"></span>
                   Skin Tone
                 </p>
-                <p className="text-lg font-bold text-dash-text-primary capitalize bg-clip-text">
+                <p className="text-lg font-bold text-brown capitalize bg-clip-text">
                   {formatLabel(result.face.skinTone)}
                 </p>
               </motion.div>
@@ -120,18 +120,18 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
                 whileHover={{ scale: 1.02 }}
-                className="bg-white p-5 rounded-2xl border border-dash-border/60 shadow-sm"
+                className="bg-white p-5 rounded-2xl border border-nude/60 shadow-card"
               >
-                <p className="text-[10px] font-bold uppercase tracking-widest text-dash-text-tertiary mb-2 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-brown/60 mb-2 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-nude"></span>
                   Skin Type
                 </p>
                 <div className="flex items-center">
-                  <span className="text-lg font-bold text-dash-text-primary capitalize">
+                  <span className="text-lg font-bold text-brown capitalize">
                     {formatLabel(result.face.skinType)}
                   </span>
-                  {result.face.skinType === 'dry' && <div className="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-amber-100 text-amber-700">Needs Care</div>}
-                  {result.face.skinType === 'oily' && <div className="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-blue-100 text-blue-700">Prone to Shine</div>}
+                  {result.face.skinType === 'dry' && <div className="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-nude/50 text-brown">Needs Care</div>}
+                  {result.face.skinType === 'oily' && <div className="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-blush/20 text-brown">Prone to Shine</div>}
                 </div>
               </motion.div>
 
@@ -139,9 +139,9 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
-                className="bg-white p-6 rounded-2xl border border-dash-border/60 shadow-sm"
+                className="bg-white p-6 rounded-2xl border border-nude/60 shadow-card"
               >
-                <p className="text-xs font-bold uppercase tracking-widest text-dash-text-tertiary mb-4 border-b border-dash-border/40 pb-2">
+                <p className="text-xs font-bold uppercase tracking-widest text-brown/60 mb-4 border-b border-nude/50 pb-2">
                   Detected Concerns
                 </p>
                 <div className="flex flex-wrap gap-2.5">
@@ -152,13 +152,13 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ delay: i * 0.1, type: "spring", stiffness: 200 }}
                         key={c}
-                        className="px-4 py-2 bg-gradient-to-br from-red-50 to-orange-50/50 border border-red-100/80 text-red-700 text-sm font-bold rounded-xl capitalize shadow-sm flex items-center gap-1.5"
+                        className="px-4 py-2 bg-blush/15 border border-blush/40 text-brown text-sm font-bold rounded-xl capitalize shadow-card flex items-center gap-1.5"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-blush"></span>
                         {formatLabel(c)}
                       </motion.span>
                     ))
-                    : <span className="text-sm font-medium text-dash-text-tertiary italic">Healthy profile detected</span>}
+                    : <span className="text-sm font-medium text-brown/60 italic">Healthy profile detected</span>}
                 </div>
               </motion.div>
             </div>
@@ -168,20 +168,20 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="pt-4 grid gap-4 sm:grid-cols-2"
               >
-                <div className="bg-white p-5 rounded-2xl border border-dash-border/60 shadow-sm hover:border-dash-brand-blue/30 transition-colors">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-dash-text-tertiary mb-2">
+                <div className="bg-white p-5 rounded-2xl border border-nude/60 shadow-card hover:border-blush/40 transition-colors">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-brown/60 mb-2">
                     Hair Color
                   </p>
-                  <p className="text-lg font-bold text-dash-text-primary capitalize flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full border border-black/10 inline-block shadow-sm" style={{ backgroundColor: result.hair.color.replace('_', '') === 'darkbrown' ? '#3e2723' : result.hair.color.includes('blonde') ? '#f3e5ab' : result.hair.color.includes('black') ? '#111' : '#795548' }} />
+                  <p className="text-lg font-bold text-brown capitalize flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full border border-brown/20 inline-block shadow-sm" style={{ backgroundColor: result.hair.color.replace('_', '') === 'darkbrown' ? '#6B4F4F' : result.hair.color.includes('blonde') ? '#FFD6BA' : result.hair.color.includes('black') ? '#6B4F4F' : '#6B4F4F' }} />
                     {formatLabel(result.hair.color)}
                   </p>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-dash-border/60 shadow-sm hover:border-dash-brand-blue/30 transition-colors">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-dash-text-tertiary mb-2">
+                <div className="bg-white p-5 rounded-2xl border border-nude/60 shadow-card hover:border-blush/40 transition-colors">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-brown/60 mb-2">
                     Hair Type
                   </p>
-                  <p className="text-lg font-bold text-dash-text-primary capitalize">
+                  <p className="text-lg font-bold text-brown capitalize">
                     {formatLabel(result.hair.type)}
                   </p>
                 </div>
@@ -190,7 +190,7 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
           </div>
         </div>
         <div className="mt-6 flex justify-end">
-          <p className="text-[10px] text-dash-text-tertiary uppercase tracking-wider font-semibold">
+          <p className="text-[10px] text-brown/60 uppercase tracking-wider font-semibold">
             AI Confidence: {Math.round(result.overallConfidence * 100)}%
           </p>
         </div>
