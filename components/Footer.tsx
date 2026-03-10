@@ -21,12 +21,12 @@ const LEGAL = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-nude/60 bg-brown">
-      <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+    <footer className="border-t border-charcoal bg-charcoal">
+      <div className="mx-auto max-w-[1400px] px-4 py-24 sm:px-6 lg:px-8">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand column */}
           <div className="lg:col-span-1">
-            <Link href="/" className="text-xl font-bold text-white">
+            <Link href="/" className="text-2xl font-serif uppercase tracking-widest text-white">
               GlowAI
             </Link>
             <p className="mt-3 text-sm text-white/80">
@@ -35,7 +35,7 @@ export function Footer() {
             <div className="mt-4 flex gap-4">
               <a
                 href="#linkedin"
-                className="text-white/60 transition hover:text-blush"
+                className="text-white/60 transition hover:text-champagne"
                 aria-label="LinkedIn"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -44,7 +44,7 @@ export function Footer() {
               </a>
               <a
                 href="#twitter"
-                className="text-white/60 transition hover:text-blush"
+                className="text-white/60 transition hover:text-champagne"
                 aria-label="Twitter"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -65,7 +65,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-white/80 transition hover:text-blush"
+                      className="text-sm text-white/80 transition hover:text-champagne"
                     >
                       {link.label}
                     </Link>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 const BADGE_LABELS = [
   "Analyzing Texture...",
@@ -11,86 +12,69 @@ const BADGE_LABELS = [
 
 export function ScanMotionGraphic() {
   return (
-    <div className="absolute inset-0 overflow-hidden rounded-2xl">
-      {/* Glowing horizontal laser line – Blush Pink with matching glow */}
-      <motion.div
-        className="absolute left-0 right-0 h-px w-full origin-center"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent 0%, rgba(244, 172, 183, 0.3) 20%, rgba(244, 172, 183, 0.95) 50%, rgba(244, 172, 183, 0.3) 80%, transparent 100%)",
-          boxShadow:
-            "0 0 20px rgba(244, 172, 183, 0.6), 0 0 40px rgba(244, 172, 183, 0.3)",
-        }}
-        animate={{ y: ["0%", "100%"] }}
-        transition={{
-          duration: 2.8,
-          repeat: Infinity,
-          repeatType: "reverse",
-          ease: "easeInOut",
-        }}
+    <div className="absolute inset-0 overflow-hidden rounded-none border border-charcoal/20 bg-alabaster">
+
+      {/* 1. Your model photo */}
+      <Image
+        src="/images/scanner-model.jpg"
+        alt="Facial Scan Model"
+        fill
+        quality={100}
+        className="object-cover"
+        priority
       />
 
-      {/* Futuristic facial tracking dots – SVG pulse */}
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
+      {/* 2. YOUR EXACT SVG MESH – now separate, fully controllable, and enhanced */}
+      {/* Save the entire <svg>...</svg> you sent as: public/images/hero-mesh.svg */}
+      <div
+        className="absolute inset-0 flex items-center justify-center z-10"
+        style={{ transform: "translateY(+1%)" }}   // moved UP
       >
-        {[
-          [50, 30],
-          [35, 38],
-          [65, 38],
-          [30, 52],
-          [70, 52],
-          [50, 58],
-          [42, 68],
-          [58, 68],
-        ].map(([x, y], i) => (
-          <motion.circle
-            key={i}
-            cx={x}
-            cy={y}
-            r="1.2"
-            fill="rgba(255, 255, 255, 0.7)"
-            stroke="rgba(244, 172, 183, 0.9)"
-            strokeWidth="0.4"
-            initial={{ opacity: 0.4, scale: 0.8 }}
-            animate={{
-              opacity: [0.4, 1, 0.4],
-              scale: [0.8, 1.2, 0.8],
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              delay: i * 0.12,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </svg>
+        <motion.img
+          src="/images/hero-mesh.svg"
+          alt="Champagne Mesh"
+          className="w-[78%] md:w-[48%] pointer-events-none"   // bigger
+          style={{
+            mixBlendMode: "screen",
+            filter: "drop-shadow(0 0 25px rgba(74, 28, 39, 0.4))",
+          }}
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: [0.72, 0.96, 0.72],
+            scale: [0.96, 1.04, 0.96],
+          }}
+          transition={{
+            duration: 4.6,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </div>
 
-      {/* Subtle target frame */}
+      {/* 3. Sweeping Champagne Laser (stronger glow) */}
       <motion.div
-        className="absolute inset-[15%] rounded-full border border-blush/50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        style={{
-          boxShadow: "inset 0 0 30px rgba(244, 172, 183, 0.2)",
+        className="absolute left-0 right-0 h-[2.5px] w-full bg-[#C2A878] z-20"
+        style={{ boxShadow: "0 0 15px 2px rgba(194, 168, 120, 0.6)" }}
+        animate={{ top: ["0%", "100%"] }}
+        transition={{
+          duration: 2.35,
+          repeat: Infinity,
+          repeatType: "loop",
+          ease: "linear",
         }}
       />
 
-      {/* Floating UI badge – drifts and cycles text */}
+      {/* 4. Floating UI badge */}
       <motion.div
-        className="absolute bottom-[18%] left-1/2 flex -translate-x-1/2 items-center justify-center rounded-full border border-nude/60 bg-white/90 px-4 py-2.5 backdrop-blur-glass text-sm font-medium text-brown shadow-glass"
-        animate={{ y: [0, -8, 0] }}
+        className="absolute bottom-[8%] right-[2%] flex w-max -translate-x-1/2 items-center justify-center rounded-none border border-charcoal/20 bg-alabaster/90 backdrop-blur-sm px-6 py-3 text-xs font-bold uppercase tracking-widest text-charcoal z-30"
+        animate={{ y: [0, -7, 0] }}
         transition={{
-          duration: 4,
+          duration: 4.8,
           repeat: Infinity,
           ease: "easeInOut",
         }}
       >
-        <span className="min-w-[180px] text-center">
+        <span className="min-w-[150px] text-center">
           <CycleBadgeLabels labels={BADGE_LABELS} />
         </span>
       </motion.div>
@@ -103,7 +87,7 @@ function CycleBadgeLabels({ labels }: { labels: string[] }) {
   useEffect(() => {
     const id = setInterval(
       () => setIndex((i) => (i + 1) % labels.length),
-      2200
+      2100
     );
     return () => clearInterval(id);
   }, [labels.length]);
@@ -112,10 +96,10 @@ function CycleBadgeLabels({ labels }: { labels: string[] }) {
     <AnimatePresence mode="wait">
       <motion.span
         key={labels[index]}
-        initial={{ opacity: 0, y: 6 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        transition={{ duration: 0.25 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: 0.3 }}
         className="inline-block"
       >
         {labels[index]}

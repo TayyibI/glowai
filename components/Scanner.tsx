@@ -274,22 +274,22 @@ export function Scanner() {
   const isCapturingHair = step === "capture-hair";
   const isCapturing = isCapturingFace || isCapturingHair;
   return (
-    <div className="relative w-full max-w-4xl mx-auto min-h-[600px] overflow-hidden rounded-3xl bg-ivory shadow-2xl border border-nude/60">
+    <div className="relative w-full max-w-4xl mx-auto min-h-[600px] overflow-hidden rounded-none bg-champagne/10 border border-charcoal/20">
       <AnimatePresence mode="wait">
 
         {step === "start" && (
           <motion.div key="start" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center">
-            <Sparkles className="w-12 h-12 text-blush mb-6" />
-            <h1 className="text-4xl font-extrabold tracking-tight text-brown mb-3">Skin & Hair Analysis</h1>
-            <p className="text-lg text-brown/80 max-w-md mx-auto mb-10">
-              Advanced AI analysis personalized to your unique skin and hair profile.
+            <Sparkles className="w-12 h-12 text-charcoal mb-6" />
+            <h1 className="font-serif text-5xl uppercase tracking-widest text-charcoal mb-6">Skin & Hair Analysis</h1>
+            <p className="text-sm text-charcoal/80 uppercase tracking-widest max-w-md mx-auto mb-12">
+              Advanced AI analysis personalized to your unique profile.
             </p>
             <div className="flex flex-col gap-4 w-full max-w-sm mx-auto">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => { setMode("camera"); setStep("capture-face"); }}
-                className="bg-blush text-white font-semibold py-4 px-8 rounded-full shadow-blush-soft hover:bg-blush/90 transition-colors text-lg flex items-center justify-center gap-2"
+                className="bg-bordeaux text-white font-bold uppercase tracking-widest py-5 px-8 rounded-none border border-charcoal/20 hover:bg-alabaster hover:text-charcoal transition-colors text-sm flex items-center justify-center gap-3"
               >
                 <Camera className="w-5 h-5" />
                 Start Camera Scan
@@ -298,7 +298,7 @@ export function Scanner() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => { setMode("upload"); setStep("capture-face"); }}
-                className="bg-white border-2 border-nude text-brown font-semibold py-4 px-8 rounded-full shadow-card hover:bg-nude/20 transition-colors text-base flex items-center justify-center gap-2"
+                className="bg-transparent border border-charcoal/20 text-charcoal font-bold uppercase tracking-widest py-5 px-8 rounded-none hover:bg-alabaster transition-colors text-sm flex items-center justify-center gap-3"
               >
                 <Upload className="w-5 h-5" />
                 Upload Image Instead
@@ -307,14 +307,14 @@ export function Scanner() {
           </motion.div>
         )}
         {isCapturingFace && mode === "upload" && (
-          <motion.div key="upload-face" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-ivory/80">
-            <div className="flex justify-between items-center w-full mb-8 absolute top-0 left-0 p-4">
-              <button onClick={handleRetry} className="text-brown/80 hover:text-brown p-2 bg-white rounded-full shadow-card transition-colors">
-                <X className="w-5 h-5" />
+          <motion.div key="upload-face" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-champagne/10/80">
+            <div className="flex justify-between items-center w-full mb-8 absolute top-0 left-0 p-6">
+              <button onClick={handleRetry} className="text-charcoal/80 hover:text-charcoal p-3 bg-alabaster border border-charcoal/20 rounded-none transition-colors">
+                <X className="w-6 h-6" />
               </button>
             </div>
-            <h2 className="text-2xl font-bold text-brown mb-2">Upload Face Image</h2>
-            <p className="text-brown/80 mb-8">Please upload a clear selfie showing your face and hair.</p>
+            <h2 className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-4">Upload Face Image</h2>
+            <p className="text-sm font-bold tracking-widest uppercase text-charcoal/80 mb-10">Please upload a clear selfie showing your face and hair.</p>
 
             <input
               ref={fileInputRef}
@@ -327,32 +327,32 @@ export function Scanner() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => fileInputRef.current?.click()}
-              className="w-full max-w-md rounded-2xl border-2 border-dashed border-nude hover:border-blush bg-white py-16 flex flex-col items-center justify-center gap-4 transition-colors"
+              className="w-full max-w-md rounded-none border border-dashed border-charcoal/20 hover:bg-alabaster bg-transparent py-16 flex flex-col items-center justify-center gap-4 transition-colors"
             >
-              <div className="w-16 h-16 bg-nude/40 rounded-full flex items-center justify-center">
-                <Upload className="w-8 h-8 text-blush" />
+              <div className="w-16 h-16 bg-champagne/10 border border-charcoal/20 rounded-none flex items-center justify-center">
+                <Upload className="w-8 h-8 text-charcoal" />
               </div>
-              <span className="text-brown font-semibold">Click to browse your device</span>
-              <span className="text-sm text-brown/60">PNG, JPG up to 10MB</span>
+              <span className="text-charcoal font-bold uppercase tracking-widest text-sm">Click to browse your device</span>
+              <span className="text-xs text-charcoal/60 uppercase tracking-widest">PNG, JPG up to 10MB</span>
             </motion.button>
           </motion.div>
         )}
         {step === "hair-prompt" && (
-          <motion.div key="hair-prompt" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="absolute inset-0 z-20 flex flex-col items-center justify-center p-8 md:p-12 text-center bg-ivory/95 backdrop-blur-sm">
-            <div className="w-20 h-20 bg-nude/50 rounded-full flex items-center justify-center mb-6">
-              <Sparkles className="w-10 h-10 text-blush" />
+          <motion.div key="hair-prompt" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="absolute inset-0 z-20 flex flex-col items-center justify-center p-8 md:p-12 text-center bg-alabaster/95 backdrop-blur-sm">
+            <div className="w-20 h-20 bg-champagne/10 border border-charcoal/20 rounded-none flex items-center justify-center mb-6">
+              <Sparkles className="w-10 h-10 text-charcoal" />
             </div>
-            <h2 className="text-3xl font-bold tracking-tight text-brown mb-3">Face Captured!</h2>
-            <p className="text-lg text-brown/80 max-w-md mx-auto mb-10">
+            <h2 className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-4">Face Captured!</h2>
+            <p className="text-sm uppercase tracking-widest text-charcoal/80 max-w-md mx-auto mb-10 leading-relaxed">
               Would you also like an AI hair analysis for a complete routine, or skip to your skin results?
-              {mode === "upload" && <span className="block mt-2 text-sm text-brown/60">(Requires 3 photos: front, left, right)</span>}
+              {mode === "upload" && <span className="block mt-4 text-xs font-bold text-charcoal/60">(Requires 3 photos: front, left, right)</span>}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md mx-auto">
               <motion.button
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => { setStep("capture-hair"); setHairPhase("front"); setHairCollected([]); }}
-                className="flex-1 py-4 px-6 rounded-2xl bg-blush text-white font-semibold hover:bg-blush/90 transition-all shadow-blush-soft flex justify-center items-center gap-2"
+                className="flex-1 py-4 px-6 rounded-none bg-bordeaux text-white border border-charcoal/20 text-xs font-bold uppercase tracking-widest hover:bg-alabaster hover:text-charcoal transition-colors flex justify-center items-center gap-2"
               >
                 {mode === "camera" ? <Camera className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
                 {mode === "camera" ? "Scan Hair" : "Upload Hair Photos"}
@@ -361,7 +361,7 @@ export function Scanner() {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleAnalyze(skinBase64, [])}
-                className="flex-1 py-4 px-6 rounded-2xl border-2 border-nude bg-white text-brown font-semibold hover:bg-nude/20 transition-all"
+                className="flex-1 py-4 px-6 rounded-none border border-charcoal/20 bg-alabaster text-charcoal text-xs font-bold uppercase tracking-widest hover:bg-champagne/10 transition-colors"
               >
                 Skip Hair
               </motion.button>
@@ -369,14 +369,14 @@ export function Scanner() {
           </motion.div>
         )}
         {isCapturingHair && mode === "upload" && (
-          <motion.div key="upload-hair" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-ivory/80">
-            <div className="flex justify-between items-center w-full mb-8 absolute top-0 left-0 p-4">
-              <button onClick={() => setStep("hair-prompt")} className="text-brown/80 hover:text-brown p-2 bg-white rounded-full shadow-card transition-colors">
-                <X className="w-5 h-5" />
+          <motion.div key="upload-hair" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-champagne/10/80">
+            <div className="flex justify-between items-center w-full mb-8 absolute top-0 left-0 p-6">
+              <button onClick={() => setStep("hair-prompt")} className="text-charcoal/80 hover:text-charcoal p-3 bg-alabaster border border-charcoal/20 rounded-none transition-colors">
+                <X className="w-6 h-6" />
               </button>
             </div>
-            <h2 className="text-2xl font-bold text-brown mb-2">Upload Hair Photos</h2>
-            <p className="text-brown/80 mb-8">Please select exactly 3 photos of your hair (Front, Left, Right).</p>
+            <h2 className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-4">Upload Hair Photos</h2>
+            <p className="text-sm font-bold tracking-widest uppercase text-charcoal/80 mb-10">Please select exactly 3 photos of your hair (Front, Left, Right).</p>
 
             <input
               ref={hairFileInputRef}
@@ -390,28 +390,28 @@ export function Scanner() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => hairFileInputRef.current?.click()}
-              className="w-full max-w-md rounded-2xl border-2 border-dashed border-nude hover:border-blush bg-white py-16 flex flex-col items-center justify-center gap-4 transition-colors"
+              className="w-full max-w-md rounded-none border border-dashed border-charcoal/20 hover:bg-alabaster bg-transparent py-16 flex flex-col items-center justify-center gap-4 transition-colors"
             >
-              <div className="w-16 h-16 bg-nude/40 rounded-full flex items-center justify-center">
-                <Upload className="w-8 h-8 text-blush" />
+              <div className="w-16 h-16 bg-champagne/10 border border-charcoal/20 rounded-none flex items-center justify-center">
+                <Upload className="w-8 h-8 text-charcoal" />
               </div>
-              <span className="text-brown font-semibold">Select 3 Photos</span>
-              <span className="text-sm text-brown/60">Hold Ctrl/Cmd to select multiple</span>
+              <span className="text-charcoal font-bold uppercase tracking-widest text-sm">Select 3 Photos</span>
+              <span className="text-xs text-charcoal/60 uppercase tracking-widest">Hold Ctrl/Cmd to select multiple</span>
             </motion.button>
           </motion.div>
         )}
         {isCapturing && mode === "camera" && (
-          <motion.div key="capture-camera" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="absolute inset-0 bg-brown flex flex-col z-10">
-            <div className="p-4 flex justify-between items-center bg-gradient-to-b from-brown/90 to-transparent z-10 absolute top-0 left-0 right-0">
-              <button onClick={() => isCapturingHair ? setStep("hair-prompt") : setStep("start")} className="text-white/80 hover:text-white p-2 backdrop-blur-md bg-white/10 rounded-full transition-colors">
+          <motion.div key="capture-camera" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="absolute inset-0 bg-charcoal flex flex-col z-10">
+            <div className="p-6 flex justify-between items-center bg-gradient-to-b from-charcoal/90 to-transparent z-10 absolute top-0 left-0 right-0">
+              <button onClick={() => isCapturingHair ? setStep("hair-prompt") : setStep("start")} className="text-white/80 hover:text-white p-3 backdrop-blur-md bg-alabaster/10 rounded-none border border-white/20 transition-colors">
                 <X className="w-6 h-6" />
               </button>
-              <span className="text-white font-medium tracking-wide">
+              <span className="text-white font-bold uppercase tracking-widest text-xs">
                 {step === "capture-face" ? "Skin Scan" : `Hair Scan: ${hairPhase}`}
               </span>
               <div className="w-10"></div>
             </div>
-            <div className="relative flex-1 bg-brown flex items-center justify-center overflow-hidden">
+            <div className="relative flex-1 bg-charcoal flex items-center justify-center overflow-hidden">
               <video
                 ref={videoRef}
                 autoPlay
@@ -421,7 +421,7 @@ export function Scanner() {
               />
               {/* Overlay guides for user */}
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                <div className="w-[65%] sm:w-[50%] md:w-[40%] lg:w-[35%] aspect-[3/4] border-2 border-white/40 rounded-[100px] shadow-[0_0_0_9999px_rgba(107,79,79,0.5)] transition-all"></div>
+                <div className="w-[65%] sm:w-[50%] md:w-[40%] lg:w-[35%] aspect-[3/4] border border-white/40 rounded-none shadow-[0_0_0_9999px_rgba(26,28,25,0.7)] transition-all"></div>
               </div>
               <AnimatePresence>
                 {qualityWarning && step === "capture-face" && (
@@ -429,16 +429,16 @@ export function Scanner() {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="absolute top-24 left-1/2 -translate-x-1/2 bg-nude/95 backdrop-blur-md text-brown px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-blush-soft w-[80%] max-w-sm text-center border border-blush/40"
+                    className="absolute top-24 left-1/2 -translate-x-1/2 bg-alabaster/95 backdrop-blur-md text-charcoal px-6 py-3 rounded-none text-xs uppercase tracking-widest font-bold flex items-center gap-3 w-[80%] max-w-sm text-center border border-charcoal/20"
                   >
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    {qualityWarning}
+                    <span className="leading-snug">{qualityWarning}</span>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-brown/95 via-brown/60 to-transparent flex flex-col items-center justify-end pb-12">
-              <p className="text-white/80 text-sm mb-6 text-center max-w-xs font-medium">
+            <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-charcoal/95 via-charcoal/60 to-transparent flex flex-col items-center justify-end pb-12">
+              <p className="text-white/80 text-xs uppercase tracking-widest mb-6 text-center max-w-xs font-bold leading-relaxed">
                 {step === "capture-face"
                   ? "Center your face in good lighting for the best results."
                   : `Please capture the ${hairPhase} of your hair.`}
@@ -447,41 +447,41 @@ export function Scanner() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={step === "capture-face" ? handleCaptureFaceCamera : handleCaptureHairCamera}
-                className={`w-20 h-20 rounded-full relative flex items-center justify-center shadow-xl ${isQualityBad && step === "capture-face" ? "bg-nude" : "bg-white"}`}
+                className={`w-20 h-20 rounded-none relative flex items-center justify-center ${isQualityBad && step === "capture-face" ? "bg-champagne/10" : "bg-alabaster"}`}
               >
-                <div className="w-16 h-16 rounded-full border-[3px] border-brown/20"></div>
+                <div className="w-16 h-16 rounded-none border-[3px] border-charcoal/20"></div>
               </motion.button>
             </div>
           </motion.div>
         )}
         {step === "analyzing" && (
-          <motion.div key="analyzing" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-gradient-to-b from-ivory to-blush/10">
+          <motion.div key="analyzing" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-alabaster">
             <div className="relative w-32 h-32 mb-8 flex items-center justify-center">
               <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 rounded-full border-[3px] border-dashed border-blush/40"
+                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 rounded-none border border-dashed border-charcoal/20"
               />
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="w-16 h-16 rounded-full bg-blush/20 flex items-center justify-center"
+                className="w-16 h-16 rounded-none bg-champagne/10 border border-charcoal/20 flex items-center justify-center"
               >
-                <Sparkles className="w-8 h-8 text-blush" />
+                <Sparkles className="w-8 h-8 text-charcoal" />
               </motion.div>
             </div>
-            <h2 className="text-2xl font-bold text-brown mb-2">Analyzing your profile</h2>
+            <h2 className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-4">Analyzing your profile</h2>
             <motion.p
               key={loadingLabel}
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-brown/80 font-medium mb-10 h-6"
+              className="text-charcoal/80 text-sm font-bold uppercase tracking-widest mb-10 h-6"
             >
               {loadingLabel}
             </motion.p>
-            <div className="w-full max-w-sm bg-nude/50 rounded-full h-3 overflow-hidden relative">
+            <div className="w-full max-w-sm bg-champagne/10 rounded-none h-4 overflow-hidden relative border border-charcoal/20">
               <motion.div
-                className="absolute top-0 left-0 bottom-0 bg-blush rounded-full"
+                className="absolute top-0 left-0 bottom-0 bg-bordeaux rounded-none"
                 initial={{ width: 0 }}
                 animate={{ width: `${loadingProgress}%` }}
                 transition={{ ease: "easeInOut", duration: 0.3 }}
@@ -490,35 +490,35 @@ export function Scanner() {
           </motion.div>
         )}
         {step === "results" && analysis && routine && (
-          <motion.div key="results" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-6 md:p-10 min-h-[600px] bg-ivory/80">
-            <div className="flex items-center justify-between mb-8">
+          <motion.div key="results" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-6 md:p-10 min-h-[600px] bg-champagne/10/80">
+            <div className="flex items-center justify-between mb-12">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight text-brown mb-1">Your Personal Routine</h1>
-                <p className="text-brown/80">Based on our detailed AI analysis</p>
+                <h1 className="font-serif text-4xl uppercase tracking-widest text-charcoal mb-2">Your Personal Routine</h1>
+                <p className="text-sm text-charcoal/80 uppercase tracking-widest">Based on our detailed AI analysis</p>
               </div>
-              <Button variant="secondary" onClick={handleRetry} className="hidden sm:flex rounded-full">
+              <Button variant="secondary" onClick={handleRetry} className="hidden sm:flex max-w-[150px] py-3 text-xs uppercase tracking-widest">
                 New Scan
               </Button>
             </div>
-            <div className="mb-10 max-w-4xl mx-auto w-full">
+            <div className="mb-12 max-w-4xl mx-auto w-full">
               <AnalysisDisplay result={analysis} />
             </div>
-            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-card border border-nude/60">
+            <div className="bg-alabaster rounded-none p-8 md:p-12 border border-charcoal/20">
               <RecommendationList routine={routine} showBuyNow userTags={targetTags} />
             </div>
-            <Button variant="secondary" onClick={handleRetry} className="w-full mt-8 sm:hidden py-4 rounded-xl text-lg">
+            <Button variant="secondary" onClick={handleRetry} className="w-full mt-10 sm:hidden py-5 text-sm uppercase tracking-widest font-bold">
               New Scan
             </Button>
           </motion.div>
         )}
         {step === "error" && (
-          <motion.div key="error" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center">
-            <div className="w-20 h-20 bg-blush/20 rounded-full flex items-center justify-center mb-6">
-              <AlertCircle className="w-10 h-10 text-brown" />
+          <motion.div key="error" variants={fadeVariants} initial="hidden" animate="show" exit="exit" className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-alabaster border border-charcoal/20">
+            <div className="w-20 h-20 bg-champagne/10 border border-charcoal/20 rounded-none flex items-center justify-center mb-8">
+              <AlertCircle className="w-10 h-10 text-charcoal" />
             </div>
-            <h2 className="text-2xl font-bold text-brown mb-3">Analysis Interrupted</h2>
-            <p className="text-brown/80 max-w-sm mb-8">{errorMessage ?? "Something went wrong during analysis."}</p>
-            <Button variant="primary" onClick={handleRetry} className="px-8 py-3 rounded-xl shadow-blush-soft">
+            <h2 className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-4">Analysis Interrupted</h2>
+            <p className="text-sm uppercase tracking-widest text-charcoal/80 font-bold max-w-sm mb-12 leading-relaxed">{errorMessage ?? "Something went wrong during analysis."}</p>
+            <Button variant="primary" onClick={handleRetry} className="py-4 text-xs font-bold uppercase tracking-widest">
               Try again
             </Button>
           </motion.div>

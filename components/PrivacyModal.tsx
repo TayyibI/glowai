@@ -37,16 +37,16 @@ export function PrivacyModal({ onAccept, accepted }: PrivacyModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-brown/90 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/90 p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="privacy-title"
     >
-      <div className="max-w-md rounded-card bg-white p-6 shadow-card border border-nude/40">
-        <h2 id="privacy-title" className="text-xl font-bold text-brown">
+      <div className="max-w-md rounded-none bg-alabaster p-8 border border-charcoal/20">
+        <h2 id="privacy-title" className="font-serif text-2xl uppercase tracking-widest text-charcoal mb-4">
           Privacy &amp; Camera
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-brown/80">
+        <p className="mt-3 text-sm leading-relaxed text-charcoal/80">
           GlowAI uses your camera or photo uploads only to analyze your skin and hair
           and recommend products. We do not store any of your pictures on our servers
           or reuse them for other purposes. Analysis may be processed by our partners
@@ -55,7 +55,7 @@ export function PrivacyModal({ onAccept, accepted }: PrivacyModalProps) {
         <Button
           variant="primary"
           fullWidth
-          className="mt-6 py-3"
+          className="mt-8 py-4"
           onClick={handleAccept}
         >
           I understand, continue

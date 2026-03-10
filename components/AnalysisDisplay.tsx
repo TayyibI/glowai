@@ -8,10 +8,10 @@ function formatLabel(s: string): string {
   return s.replace(/_/g, " ");
 }
 function getHydrationColor(score: number): string {
-  if (score >= 80) return "text-blush stroke-blush";
-  if (score >= 60) return "text-nude stroke-nude";
-  if (score >= 40) return "text-brown/80 stroke-brown/80";
-  return "text-brown stroke-brown";
+  if (score >= 80) return "text-champagne stroke-champagne";
+  if (score >= 60) return "text-charcoal/80 stroke-charcoal/80";
+  if (score >= 40) return "text-charcoal/60 stroke-charcoal/60";
+  return "text-charcoal stroke-charcoal";
 }
 function CircularProgress({ percentage }: { percentage: number }) {
   const radius = 36;
@@ -28,7 +28,7 @@ function CircularProgress({ percentage }: { percentage: number }) {
           stroke="currentColor"
           strokeWidth="8"
           fill="transparent"
-          className="text-nude/40"
+          className="text-champagne/10"
         />
         <motion.circle
           cx="50"
@@ -46,7 +46,7 @@ function CircularProgress({ percentage }: { percentage: number }) {
         />
       </svg>
       <div className="absolute flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-brown">{percentage}</span>
+        <span className="text-3xl font-bold text-charcoal">{percentage}</span>
       </div>
     </div>
   );
@@ -59,22 +59,22 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <Card className="overflow-hidden border-nude/60 bg-white/95 backdrop-blur-md shadow-card sm:p-8">
+      <Card className="overflow-hidden border-charcoal/20 bg-alabaster sm:p-12 rounded-none">
         <div className="flex flex-col items-start gap-3 mb-6 sm:flex-row sm:items-center sm:mb-8">
-          <div className="p-2 bg-gradient-to-br from-blush/20 to-nude/20 rounded-xl">
-            <Sparkles className="w-6 h-6 text-blush" />
+          <div className="p-3 border border-charcoal/20 bg-champagne/10 rounded-none">
+            <Sparkles className="w-6 h-6 text-charcoal" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold m-0 tracking-tight text-brown">Your AI Skin & Hair Profile</CardTitle>
-            <p className="text-sm text-brown/80 mt-1">Personalized decoding of your unique attributes</p>
+            <CardTitle className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-1">Your AI Profile</CardTitle>
+            <p className="text-sm text-charcoal/80 uppercase tracking-widest">Personalized decoding of your attributes</p>
           </div>
         </div>
         {isLowConfidence && (
           <motion.div
             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-            className="mb-6 flex gap-3 rounded-2xl border border-nude bg-nude/30 p-4 text-sm text-brown shadow-card items-start"
+            className="mb-8 flex gap-3 rounded-none border border-charcoal/20 bg-champagne/10 p-6 text-sm text-charcoal items-start"
           >
-            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-charcoal" />
             <p>
               Results are less certain. We recommend gentler, general products. For best
               results, use a clear, well-lit selfie next time.
@@ -83,16 +83,16 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
         )}
         <div className="flex flex-col gap-6 md:flex-row md:gap-8">
           {/* Hydration Score Column */}
-          <div className="flex flex-col items-center justify-center bg-ivory/60 p-5 rounded-3xl border border-nude/50 min-w-[0] md:min-w-[220px]">
-            <div className="flex items-center gap-2 mb-4 text-brown/60">
+          <div className="flex flex-col items-center justify-center bg-champagne/10 p-8 rounded-none border border-charcoal/20 min-w-[0] md:min-w-[220px]">
+            <div className="flex items-center gap-2 mb-6 text-charcoal">
               <Droplets className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-widest">Hydration</h3>
+              <h3 className="text-sm font-bold uppercase tracking-widest text-charcoal">Hydration</h3>
             </div>
 
             <CircularProgress percentage={result.face.hydrationScore} />
 
-            <div className="mt-4 text-center">
-              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white border border-nude/50 ${getHydrationColor(result.face.hydrationScore).split(" ")[0]}`}>
+            <div className="mt-6 text-center">
+              <span className={`inline-block px-4 py-2 rounded-none text-xs font-bold uppercase tracking-widest bg-alabaster border border-charcoal/20 ${getHydrationColor(result.face.hydrationScore).split(" ")[0]}`}>
                 {result.face.hydrationLevel}
               </span>
             </div>
@@ -105,13 +105,13 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
                 whileHover={{ scale: 1.02 }}
-                className="bg-white p-5 rounded-2xl border border-nude/60 shadow-card"
+                className="bg-alabaster p-6 rounded-none border border-charcoal/20"
               >
-                <p className="text-[10px] font-bold uppercase tracking-widest text-brown/60 mb-2 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blush"></span>
+                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60 mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-none border border-charcoal/20 bg-charcoal"></span>
                   Skin Tone
                 </p>
-                <p className="text-lg font-bold text-brown capitalize bg-clip-text">
+                <p className="font-serif text-2xl text-charcoal capitalize">
                   {formatLabel(result.face.skinTone)}
                 </p>
               </motion.div>
@@ -120,18 +120,18 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
                 whileHover={{ scale: 1.02 }}
-                className="bg-white p-5 rounded-2xl border border-nude/60 shadow-card"
+                className="bg-alabaster p-6 rounded-none border border-charcoal/20"
               >
-                <p className="text-[10px] font-bold uppercase tracking-widest text-brown/60 mb-2 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-nude"></span>
+                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60 mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-none border border-charcoal/20 bg-alabaster"></span>
                   Skin Type
                 </p>
-                <div className="flex items-center">
-                  <span className="text-lg font-bold text-brown capitalize">
+                <div className="flex flex-col gap-2 items-start">
+                  <span className="font-serif text-2xl text-charcoal capitalize">
                     {formatLabel(result.face.skinType)}
                   </span>
-                  {result.face.skinType === 'dry' && <div className="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-nude/50 text-brown">Needs Care</div>}
-                  {result.face.skinType === 'oily' && <div className="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-blush/20 text-brown">Prone to Shine</div>}
+                  {result.face.skinType === 'dry' && <div className="px-3 py-1 text-xs font-bold uppercase tracking-widest border border-charcoal/20 bg-champagne/10 text-charcoal">Needs Care</div>}
+                  {result.face.skinType === 'oily' && <div className="px-3 py-1 text-xs font-bold uppercase tracking-widest border border-charcoal/20 bg-champagne/10 text-charcoal">Prone to Shine</div>}
                 </div>
               </motion.div>
 
@@ -139,12 +139,12 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
-                className="bg-white p-6 rounded-2xl border border-nude/60 shadow-card"
+                className="bg-alabaster p-8 rounded-none border border-charcoal/20"
               >
-                <p className="text-xs font-bold uppercase tracking-widest text-brown/60 mb-4 border-b border-nude/50 pb-2">
+                <p className="text-sm font-bold uppercase tracking-widest text-charcoal mb-6 border-b border-charcoal/20 pb-4">
                   Detected Concerns
                 </p>
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-wrap gap-3">
                   {result.face.concerns.length > 0
                     ? result.face.concerns.map((c, i) => (
                       <motion.span
@@ -152,13 +152,13 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ delay: i * 0.1, type: "spring", stiffness: 200 }}
                         key={c}
-                        className="px-4 py-2 bg-blush/15 border border-blush/40 text-brown text-sm font-bold rounded-xl capitalize shadow-card flex items-center gap-1.5"
+                        className="px-5 py-3 bg-alabaster border border-charcoal/20 text-charcoal text-sm font-bold uppercase tracking-widest rounded-none flex items-center gap-2 hover:bg-champagne/10 transition-colors"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-blush"></span>
+                        <span className="w-2 h-2 rounded-none bg-charcoal"></span>
                         {formatLabel(c)}
                       </motion.span>
                     ))
-                    : <span className="text-sm font-medium text-brown/60 italic">Healthy profile detected</span>}
+                    : <span className="text-sm font-bold uppercase tracking-widest text-charcoal/60 italic">Healthy profile detected</span>}
                 </div>
               </motion.div>
             </div>
@@ -168,20 +168,20 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="pt-4 grid gap-4 sm:grid-cols-2"
               >
-                <div className="bg-white p-5 rounded-2xl border border-nude/60 shadow-card hover:border-blush/40 transition-colors">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-brown/60 mb-2">
+                <div className="bg-alabaster p-6 rounded-none border border-charcoal/20 hover:bg-champagne/10 transition-colors">
+                  <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60 mb-3">
                     Hair Color
                   </p>
-                  <p className="text-lg font-bold text-brown capitalize flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full border border-brown/20 inline-block shadow-sm" style={{ backgroundColor: result.hair.color.replace('_', '') === 'darkbrown' ? '#6B4F4F' : result.hair.color.includes('blonde') ? '#FFD6BA' : result.hair.color.includes('black') ? '#6B4F4F' : '#6B4F4F' }} />
+                  <p className="font-serif text-2xl text-charcoal capitalize flex items-center gap-3">
+                    <span className="w-4 h-4 rounded-none border border-charcoal/20 inline-block" style={{ backgroundColor: result.hair.color.replace('_', '') === 'darkbrown' ? '#0A0A0A' : result.hair.color.includes('blonde') ? '#F4F4F5' : result.hair.color.includes('black') ? '#0A0A0A' : '#0A0A0A' }} />
                     {formatLabel(result.hair.color)}
                   </p>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-nude/60 shadow-card hover:border-blush/40 transition-colors">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-brown/60 mb-2">
+                <div className="bg-alabaster p-6 rounded-none border border-charcoal/20 hover:bg-champagne/10 transition-colors">
+                  <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60 mb-3">
                     Hair Type
                   </p>
-                  <p className="text-lg font-bold text-brown capitalize">
+                  <p className="font-serif text-2xl text-charcoal capitalize">
                     {formatLabel(result.hair.type)}
                   </p>
                 </div>
@@ -189,8 +189,8 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
             )}
           </div>
         </div>
-        <div className="mt-6 flex justify-end">
-          <p className="text-[10px] text-brown/60 uppercase tracking-wider font-semibold">
+        <div className="mt-8 pt-6 border-t border-charcoal/20 flex justify-end">
+          <p className="text-xs text-charcoal/60 uppercase tracking-widest font-bold">
             AI Confidence: {Math.round(result.overallConfidence * 100)}%
           </p>
         </div>

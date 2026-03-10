@@ -15,16 +15,15 @@ export function HeaderNavigation() {
 
   return (
     <header
-      className="sticky top-0 z-40 h-14 border-b border-nude/60 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80"
-      style={{ boxShadow: "0 1px 0 rgba(107, 79, 79, 0.06)" }}
+      className="sticky top-0 z-40 h-16 border-b border-charcoal/20 bg-alabaster/95 backdrop-blur supports-[backdrop-filter]:bg-alabaster/80"
     >
       <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 text-brown no-underline"
+          className="flex shrink-0 items-center gap-2 text-charcoal no-underline"
         >
-          <span className="text-xl font-bold tracking-tight text-brown">
+          <span className="text-2xl font-serif uppercase tracking-widest text-charcoal">
             GlowAI
           </span>
         </Link>
@@ -35,7 +34,7 @@ export function HeaderNavigation() {
             <Link
               key={href}
               href={href}
-              className="rounded-btn px-3 py-2 text-sm font-medium text-brown/80 transition hover:bg-nude/30 hover:text-brown"
+              className="rounded-none px-4 py-2 text-sm font-medium text-charcoal/80 transition uppercase tracking-widest hover:bg-champagne/10 hover:text-charcoal"
             >
               {label}
             </Link>
@@ -44,11 +43,11 @@ export function HeaderNavigation() {
 
         {/* Search – minimal */}
         <div
-          className={`hidden shrink-0 items-center gap-2 rounded-input border border-transparent bg-transparent px-3 py-2 transition sm:flex ${searchFocused ? "border-nude bg-white shadow-blush-soft" : ""
+          className={`hidden shrink-0 items-center gap-2 rounded-none border border-transparent bg-transparent px-3 py-2 transition sm:flex ${searchFocused ? "border-charcoal bg-alabaster" : ""
             }`}
         >
           <svg
-            className="h-4 w-4 text-brown/50"
+            className="h-4 w-4 text-charcoal/50"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -66,14 +65,14 @@ export function HeaderNavigation() {
             aria-label="Search"
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
-            className="w-28 border-0 bg-transparent text-sm text-brown placeholder:text-brown/50 focus:outline-none focus:ring-0"
+            className="w-28 border-0 bg-transparent text-sm text-charcoal placeholder:text-charcoal/50 focus:outline-none focus:ring-0"
           />
         </div>
 
         {/* Mobile menu toggle */}
         <button
           type="button"
-          className="rounded-btn p-2 text-brown md:hidden"
+          className="rounded-none p-2 text-charcoal md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-expanded={mobileMenuOpen}
           aria-label="Menu"
@@ -90,13 +89,13 @@ export function HeaderNavigation() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-nude/60 bg-white px-4 py-4 md:hidden">
-          <nav className="flex flex-col gap-1" aria-label="Main mobile">
+        <div className="border-t border-charcoal/20 bg-alabaster px-4 py-6 md:hidden">
+          <nav className="flex flex-col gap-2" aria-label="Main mobile">
             {NAV_LINKS.map(({ label, href }) => (
               <Link
                 key={href}
                 href={href}
-                className="rounded-btn px-3 py-2 text-sm font-medium text-brown"
+                className="rounded-none px-4 py-3 text-sm font-medium uppercase tracking-widest text-charcoal hover:bg-champagne/10 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {label}

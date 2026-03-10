@@ -115,7 +115,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
   return (
     <div className="space-y-4">
       {/* Mode toggle */}
-      <div className="flex gap-1 rounded-btn bg-nude/40 p-1">
+      <div className="flex gap-1 rounded-none border border-charcoal/20 bg-champagne/10 p-1">
         <button
           type="button"
           onClick={() => {
@@ -125,11 +125,10 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
             setHairPreview(null);
             setStep("face");
           }}
-          className={`flex-1 rounded-btn py-2.5 text-sm font-semibold transition ${
-            mode === "camera"
-              ? "bg-blush text-white shadow-card"
-              : "text-brown/80 hover:text-brown"
-          }`}
+          className={`flex-1 rounded-none py-3 text-sm font-bold uppercase tracking-widest transition-colors ${mode === "camera"
+            ? "bg-bordeaux text-white"
+            : "text-charcoal/80 hover:text-charcoal"
+            }`}
         >
           Camera
         </button>
@@ -142,11 +141,10 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
             setHairPreview(null);
             setStep("face");
           }}
-          className={`flex-1 rounded-btn py-2.5 text-sm font-semibold transition ${
-            mode === "upload"
-              ? "bg-blush text-white shadow-card"
-              : "text-brown/80 hover:text-brown"
-          }`}
+          className={`flex-1 rounded-none py-3 text-sm font-bold uppercase tracking-widest transition-colors ${mode === "upload"
+            ? "bg-bordeaux text-white"
+            : "text-charcoal/80 hover:text-charcoal"
+            }`}
         >
           Upload
         </button>
@@ -154,8 +152,8 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
 
       {/* Face step */}
       {step === "face" && (
-        <Card>
-          <p className="mb-3 text-sm text-brown/80">
+        <Card compact>
+          <p className="mb-4 text-sm font-medium text-charcoal/80">
             Capture a selfie (face and visible hair) for best results.
           </p>
           {mode === "camera" && (
@@ -165,12 +163,12 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
                 autoPlay
                 playsInline
                 muted
-                className="aspect-[4/3] w-full rounded-input bg-nude/30 object-cover"
+                className="aspect-[4/3] w-full rounded-none bg-champagne/10 object-cover border border-charcoal/20"
               />
               <button
                 type="button"
                 onClick={startCamera}
-                className="mt-2 text-sm font-medium text-blush hover:underline"
+                className="mt-4 text-xs font-bold uppercase tracking-widest text-charcoal hover:underline"
               >
                 Start camera
               </button>
@@ -196,7 +194,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full rounded-input border-2 border-dashed border-nude py-8 text-sm text-brown/60 transition hover:border-blush hover:text-brown/80"
+                className="w-full rounded-none border border-dashed border-charcoal/20 py-12 text-sm font-medium uppercase tracking-widest text-charcoal/60 transition-colors hover:bg-champagne/10 hover:text-charcoal"
               >
                 Choose face/selfie image
               </button>
@@ -204,7 +202,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
                 <img
                   src={facePreview}
                   alt="Face preview"
-                  className="mt-3 aspect-square w-24 rounded-btn object-cover"
+                  className="mt-4 aspect-square w-24 rounded-none object-cover border border-charcoal/20"
                 />
               )}
             </>
@@ -214,8 +212,8 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
 
       {/* Optional hair step */}
       {step === "hair" && askHair && facePreview && (
-        <Card>
-          <p className="mb-3 text-sm text-brown/80">
+        <Card compact>
+          <p className="mb-4 text-sm font-medium text-charcoal/80">
             Add a hair-focused photo for better hair recommendations (optional).
           </p>
           {mode === "camera" && (
@@ -225,7 +223,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
                 autoPlay
                 playsInline
                 muted
-                className="aspect-[4/3] w-full rounded-input bg-nude/30 object-cover"
+                className="aspect-[4/3] w-full rounded-none bg-champagne/10 object-cover border border-charcoal/20"
               />
               <div className="mt-4 flex gap-2">
                 <Button variant="secondary" className="flex-1 py-3" onClick={handleSkipHair}>
@@ -250,7 +248,7 @@ export function ImageCapture({ onCapture, onError }: ImageCaptureProps) {
                 <button
                   type="button"
                   onClick={() => hairFileInputRef.current?.click()}
-                  className="flex-1 rounded-input border-2 border-dashed border-nude py-4 text-sm text-brown/60 transition hover:border-blush hover:text-brown/80"
+                  className="flex-1 rounded-none border border-dashed border-charcoal/20 py-6 text-sm font-medium uppercase tracking-widest text-charcoal/60 transition-colors hover:bg-champagne/10 hover:text-charcoal"
                 >
                   Add hair photo
                 </button>
