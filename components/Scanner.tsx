@@ -55,21 +55,39 @@ export function Scanner() {
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
+
+    // Critical for mobile
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+      videoRef.current.style.display = "none";
+      void videoRef.current.offsetHeight; // force reflow
+      videoRef.current.style.display = "block";
+    }
   }, []);
   const startCamera = useCallback(async () => {
+    stopCamera(); // ensure clean state first
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+        video: {
+          facingMode: "user",
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        },
       });
       streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(console.error); // ← this line fixes most blank screens
+      }
       return true;
     } catch {
       setErrorMessage("Camera access denied or unavailable. Please use image upload.");
       setMode("upload");
       return false;
     }
-  }, []);
+  }, [stopCamera]);
   const captureFromVideo = useCallback((): string | null => {
     if (!videoRef.current) return null;
     const canvas = document.createElement("canvas");
@@ -193,8 +211,7 @@ export function Scanner() {
     }
     setSkinBase64(base64);
     setStep("hair-prompt");
-    stopCamera();
-  }, [captureFromVideo, isQualityBad, stopCamera]);
+  }, [captureFromVideo, isQualityBad]);
   const handleCaptureHairCamera = useCallback(() => {
     const base64 = captureFromVideo();
     if (!base64) return;
@@ -253,16 +270,17 @@ export function Scanner() {
     stopCamera();
   }, [stopCamera]);
   useEffect(() => {
-    const shouldUseCamera =
-      mode === "camera" && (step === "capture-face" || step === "capture-hair");
+    const shouldUseCamera = mode === "camera" &&
+      (step === "capture-face" || step === "capture-hair");
 
-    if (!shouldUseCamera) {
-      return;
-    }
+    if (!shouldUseCamera) return;
 
-    void startCamera();
+    const timeout = setTimeout(() => {
+      void startCamera();
+    }, 100); // gives browser time to release previous stream
 
     return () => {
+      clearTimeout(timeout);
       stopCamera();
     };
   }, [step, mode, startCamera, stopCamera]);
@@ -413,6 +431,7 @@ export function Scanner() {
             </div>
             <div className="relative flex-1 bg-charcoal flex items-center justify-center overflow-hidden">
               <video
+                key={step}
                 ref={videoRef}
                 autoPlay
                 playsInline
