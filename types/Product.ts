@@ -7,6 +7,7 @@ export type ProductCategory =
   | "toner"
   | "serum"
   | "moisturizer"
+  | "eye_cream"
   | "sunscreen"
   | "mask"
   | "hair_shampoo"
@@ -26,7 +27,7 @@ export interface Product {
   tags: string[];
   /** Routine this product belongs to */
   routine: RoutineType;
-  /** Placeholder; fill with real Daraz/product links later */
+  /** Placeholder; fill with real product links later */
   purchaseLink: string;
   description?: string;
   /** Product image URL (placeholder or real asset) */

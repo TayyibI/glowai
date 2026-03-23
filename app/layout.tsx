@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { HeaderNavigation } from "@/components/HeaderNavigation";
-import { Footer } from "@/components/Footer";
+import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
+import { MobileGate } from "@/components/MobileGate";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,9 +30,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} min-h-screen font-sans antialiased bg-alabaster text-charcoal selection:bg-champagne/30 selection:text-charcoal`}>
-        <HeaderNavigation />
-        <div className="min-h-[calc(100vh-56px)]">{children}</div>
-        <Footer />
+        <MobileGate>
+          <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+        </MobileGate>
       </body>
     </html>
   );

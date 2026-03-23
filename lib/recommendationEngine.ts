@@ -1,7 +1,12 @@
 /**
  * Recommendation engine: YouCam skin-analysis + hair-type-detection → target tags,
- * then score products by (matching tags count) × priority. Returns 3–4 products per
- * routine with fallback to SAFE_ROUTINE_* when score = 0.
+ * then score products by (matching tags count) × priority.
+ *
+ * Returns 3–4 products per routine with fallback to SAFE_ROUTINE_* when score = 0.
+ *
+ * Updated for L'Oréal Paris (skin) + L'Oréal Elvive (hair) catalogue.
+ * Supports expanded tag vocabulary and new categories:
+ *   eye_cream | mask | hair_treatment | color_treated | dandruff | scalp
  */
 
 import type { Product, RecommendedProduct } from "@/types/Product";
@@ -17,19 +22,30 @@ import {
 const MIN_PER_ROUTINE = 3;
 const MAX_PER_ROUTINE = 4;
 
-/** YouCam skin-analysis result shape (ui_score / raw_score). */
+// ─────────────────────────────────────────────────────────────────────────────
+// INPUT TYPES
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** YouCam skin-analysis result shape (ui_score / raw_score 0–100). */
 export interface YouCamSkinInput {
   oiliness?: { ui_score?: number; raw_score?: number };
   moisture?: { ui_score?: number; raw_score?: number };
   acne?: { ui_score?: number; raw_score?: number };
   radiance?: { ui_score?: number; raw_score?: number };
-  skin_type?: string;
+  wrinkle?: { ui_score?: number; raw_score?: number };
+  dark_circle?: { ui_score?: number; raw_score?: number };
+  spot?: { ui_score?: number; raw_score?: number };
+  skin_type?: string; // e.g. "oily", "dry", "combination", "sensitive", "normal"
 }
 
-/** YouCam hair-type-detection result (term string). */
+/** YouCam hair-type-detection result (term string from SDK). */
 export interface YouCamHairInput {
-  term?: string;
+  term?: string; // e.g. "Straight", "Wavy", "Curls", "Coily", "Kinky"
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INTERNAL HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
 
 const productById = new Map<string, Product>(products.map((p) => [p.id, p]));
 
@@ -41,59 +57,167 @@ function pickByIds(ids: string[]): Product[] {
   return ids.map((id) => getProduct(id)).filter((p): p is Product => Boolean(p));
 }
 
-// ---------- 1. Skin mapping from YouCam skin-analysis results ----------
+// ─────────────────────────────────────────────────────────────────────────────
+// 1. SKIN TAG MAPPING — YouCam raw scores → concern + skin-type tags
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Maps YouCam skin analysis scores to the tag vocabulary used in products.ts.
+ *
+ * Score thresholds are deliberately conservative so the engine recommends
+ * targeted products rather than general ones wherever possible.
+ *
+ * All ui_score values are 0–100 where higher = worse condition
+ * (except moisture where higher = better).
+ */
 function buildSkinTargetTags(skin: YouCamSkinInput | null | undefined): string[] {
-  const targetTags: string[] = [];
-  if (!skin) return targetTags;
+  const tags = new Set<string>();
+  if (!skin) return Array.from(tags);
 
-  const oilinessUi = skin.oiliness?.ui_score ?? 0;
-  const oilinessRaw = skin.oiliness?.raw_score ?? 0;
-  if (oilinessUi > 65 || oilinessRaw > 60) {
-    targetTags.push("oily", "oiliness", "acne");
+  // --- Oiliness ---
+  const oilinessScore = skin.oiliness?.ui_score ?? skin.oiliness?.raw_score ?? 0;
+  if (oilinessScore > 60) {
+    tags.add("oily");
+    tags.add("oiliness");
+    // High oiliness strongly correlates with acne risk
+    if (oilinessScore > 70) tags.add("acne");
   }
 
-  const moistureUi = skin.moisture?.ui_score ?? 100;
-  const moistureRaw = skin.moisture?.raw_score ?? 100;
-  if (moistureUi < 55 || moistureRaw < 50) {
-    targetTags.push("dry", "dryness", "hydration");
+  // --- Moisture / Hydration (inverted — higher score = better hydration) ---
+  const moistureScore = skin.moisture?.ui_score ?? skin.moisture?.raw_score ?? 80;
+  if (moistureScore < 60) {
+    tags.add("dry");
+    tags.add("dryness");
+    tags.add("hydration");
+  }
+  if (moistureScore < 40) {
+    // Very dehydrated — boost sensitive tag as barrier is likely compromised
+    tags.add("sensitive");
   }
 
-  const acneUi = skin.acne?.ui_score ?? 0;
-  if (acneUi > 60) {
-    targetTags.push("acne");
+  // --- Acne ---
+  const acneScore = skin.acne?.ui_score ?? skin.acne?.raw_score ?? 0;
+  if (acneScore > 55) {
+    tags.add("acne");
+    tags.add("oily"); // acne almost always accompanies oiliness
   }
 
-  const radianceUi = skin.radiance?.ui_score ?? 100;
-  if (radianceUi < 55) {
-    targetTags.push("dullness", "brightening");
+  // --- Radiance / Dullness (inverted — higher score = better radiance) ---
+  const radianceScore = skin.radiance?.ui_score ?? skin.radiance?.raw_score ?? 80;
+  if (radianceScore < 60) {
+    tags.add("dullness");
+    tags.add("brightening");
+  }
+  if (radianceScore < 45) {
+    // Very dull skin often has dark spots too
+    tags.add("dark_spots");
   }
 
+  // --- Wrinkles / Fine Lines ---
+  const wrinkleScore = skin.wrinkle?.ui_score ?? skin.wrinkle?.raw_score ?? 0;
+  if (wrinkleScore > 40) {
+    tags.add("fine_lines");
+    tags.add("anti-aging");
+  }
+  if (wrinkleScore > 65) {
+    tags.add("wrinkles");
+    tags.add("mature");
+  }
+
+  // --- Dark Spots ---
+  const spotScore = skin.spot?.ui_score ?? skin.spot?.raw_score ?? 0;
+  if (spotScore > 40) {
+    tags.add("dark_spots");
+    tags.add("brightening");
+  }
+
+  // --- Dark Circles (eye area) ---
+  const darkCircleScore = skin.dark_circle?.ui_score ?? skin.dark_circle?.raw_score ?? 0;
+  if (darkCircleScore > 50) {
+    tags.add("fine_lines"); // Eye cream category maps to fine_lines tag
+    tags.add("anti-aging");
+  }
+
+  // --- Skin type from YouCam string ---
   const skinType = (skin.skin_type ?? "").toLowerCase();
-  if (skinType.includes("sensitive") || skinType.includes("dry")) {
-    targetTags.push("sensitive");
+  if (skinType.includes("sensitive")) {
+    tags.add("sensitive");
+    tags.add("gentle");
   }
-  if (skinType.includes("oily") || skinType.includes("combination")) {
-    targetTags.push("oily", "combination");
+  if (skinType.includes("dry")) {
+    tags.add("dry");
+    tags.add("dryness");
+    tags.add("hydration");
+  }
+  if (skinType.includes("oily")) {
+    tags.add("oily");
+    tags.add("oiliness");
+  }
+  if (skinType.includes("combination")) {
+    tags.add("combination");
+    tags.add("oily"); // combination skin has oily T-zone
+  }
+  if (skinType.includes("normal")) {
+    tags.add("all-skin");
+  }
+  if (skinType.includes("mature")) {
+    tags.add("mature");
+    tags.add("anti-aging");
   }
 
-  return targetTags;
+  // Always add pollution tag — relevant for everyone in urban environments
+  tags.add("pollution");
+
+  // Always add all-skin so universal products are always eligible
+  tags.add("all-skin");
+
+  return Array.from(tags);
 }
 
-// ---------- 2. Hair mapping from YouCam hair-type-detection ----------
+// ─────────────────────────────────────────────────────────────────────────────
+// 2. HAIR TAG MAPPING — YouCam hair term → hair concern tags
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Maps YouCam hair type detection term to product tags.
+ * "all-hair" is always included so universal products always score.
+ */
 function buildHairTargetTags(hair: YouCamHairInput | null | undefined): string[] {
-  const targetTags: string[] = ["all-hair"];
-  if (!hair?.term) return targetTags;
+  const tags = new Set<string>(["all-hair"]);
+  if (!hair?.term) return Array.from(tags);
 
-  const term = hair.term;
-  if (term.includes("Straight")) targetTags.push("straight");
-  if (term.includes("Wavy")) targetTags.push("wavy");
-  if (term.includes("Curls") || term.includes("Coily") || term.includes("Kinky")) {
-    targetTags.push("curly", "coily");
+  const term = hair.term.toLowerCase();
+
+  if (term.includes("straight")) {
+    tags.add("straight");
+    // Straight hair shows frizz and shine issues more visibly
+    tags.add("shine");
   }
-  return targetTags;
+  if (term.includes("wavy")) {
+    tags.add("wavy");
+    tags.add("frizzy");
+    tags.add("frizz");
+  }
+  if (
+    term.includes("curl") ||
+    term.includes("coil") ||
+    term.includes("kinky")
+  ) {
+    tags.add("curly");
+    tags.add("coily");
+    tags.add("frizzy");
+    tags.add("frizz");
+    tags.add("dry"); // Curly/coily hair is structurally drier
+    tags.add("dryness");
+  }
+
+  return Array.from(tags);
 }
 
-// ---------- 3. Filtering: score = (matching tags count) × priority ----------
+// ─────────────────────────────────────────────────────────────────────────────
+// 3. SCORING — (matching tag count) × product priority
+// ─────────────────────────────────────────────────────────────────────────────
+
 function scoreProduct(product: Product, targetTags: Set<string>): number {
   let matchCount = 0;
   for (const tag of product.tags) {
@@ -102,21 +226,65 @@ function scoreProduct(product: Product, targetTags: Set<string>): number {
   return matchCount * product.priority;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 4. CATEGORY DEDUPLICATION
+// Ensures no routine returns two products in the same category.
+// Exception: hair_shampoo + hair_conditioner are always kept as a pair.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const PAIRED_CATEGORIES = new Set(["hair_shampoo", "hair_conditioner"]);
+
+function deduplicateByCategory(products: Product[]): Product[] {
+  const seenCategories = new Set<string>();
+  const result: Product[] = [];
+
+  for (const p of products) {
+    // Allow multiple entries for paired categories (shampoo + conditioner)
+    if (PAIRED_CATEGORIES.has(p.category)) {
+      // But only allow ONE of each within the pair
+      if (!seenCategories.has(p.category)) {
+        seenCategories.add(p.category);
+        result.push(p);
+      }
+    } else {
+      if (!seenCategories.has(p.category)) {
+        seenCategories.add(p.category);
+        result.push(p);
+      }
+    }
+  }
+
+  return result;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. SELECTION — score, deduplicate, pick top N
+// ─────────────────────────────────────────────────────────────────────────────
+
 function selectTopForRoutine(
   pool: Product[],
   targetTags: Set<string>,
   maxCount: number,
   userTagsArray: string[]
 ): RecommendedProduct[] {
-  const scored = pool.map((p) => ({ p, score: scoreProduct(p, targetTags) }));
-  scored.sort((a, b) => b.score - a.score);
-  const top = scored.filter((x) => x.score > 0).map((x) => x.p);
-  const count = Math.min(MAX_PER_ROUTINE, Math.max(MIN_PER_ROUTINE, top.length));
-  if (top.length === 0) return [];
-  const selected = top.slice(0, count);
+  // Score all products in pool
+  const scored = pool
+    .map((p) => ({ p, score: scoreProduct(p, targetTags) }))
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (scored.length === 0) return [];
+
+  // Deduplicate by category (highest-scoring wins per category)
+  const deduplicated = deduplicateByCategory(scored.map((x) => x.p));
+
+  // Enforce min/max count
+  const count = Math.min(maxCount, Math.max(MIN_PER_ROUTINE, deduplicated.length));
+  const selected = deduplicated.slice(0, count);
+
   return selected.map((p) => ({
     product: p,
-    reason: generateReason(p.tags, userTagsArray, p.category)
+    reason: generateReason(p.tags, userTagsArray, p.category),
   }));
 }
 
@@ -125,12 +293,16 @@ function processFallback(
   maxCount: number,
   userTagsArray: string[]
 ): RecommendedProduct[] {
-  const products = pickByIds(ids).slice(0, maxCount);
-  return products.map((p) => ({
+  const fallbackProducts = pickByIds(ids).slice(0, maxCount);
+  return fallbackProducts.map((p) => ({
     product: p,
-    reason: generateReason(p.tags, userTagsArray, p.category)
+    reason: generateReason(p.tags, userTagsArray, p.category),
   }));
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OUTPUT TYPE
+// ─────────────────────────────────────────────────────────────────────────────
 
 export interface RecommendationEngineResult {
   analysisResults: {
@@ -144,9 +316,45 @@ export interface RecommendationEngineResult {
   };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. POOL DEFINITIONS — which products are eligible per routine slot
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getDayPool(): Product[] {
+  return products.filter(
+    (p) =>
+      (p.routine === "day" || p.routine === "both") &&
+      !p.category.startsWith("hair_") &&
+      p.category !== "hair_treatment"
+  );
+}
+
+function getNightPool(): Product[] {
+  return products.filter(
+    (p) =>
+      (p.routine === "night" || p.routine === "both") &&
+      !p.category.startsWith("hair_") &&
+      p.category !== "hair_treatment"
+  );
+}
+
+function getHairPool(): Product[] {
+  return products.filter(
+    (p) =>
+      p.routine === "hair" ||
+      p.category.startsWith("hair_") ||
+      p.category === "hair_treatment"
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. MAIN ENTRY — YouCam raw input
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
- * Main entry: YouCam skin + hair raw input → target tags and recommended routine.
- * Fallback to SAFE_ROUTINE_* when score = 0 for that routine.
+ * Primary entry point: accepts YouCam SDK skin + hair raw results.
+ * Returns scored and deduplicated product recommendations per routine slot.
+ * Falls back to SAFE_ROUTINE_* when no products score > 0 for a slot.
  */
 export function getRecommendedRoutine(
   skin?: YouCamSkinInput | null,
@@ -157,103 +365,190 @@ export function getRecommendedRoutine(
   const skinTagSet = new Set(skinTags);
   const hairTagSet = new Set(hairTags);
 
-  const dayPool = products.filter(
-    (p) =>
-      (p.routine === "day" || p.routine === "both") &&
-      !p.category.startsWith("hair_")
-  );
-  const nightPool = products.filter(
-    (p) =>
-      (p.routine === "night" || p.routine === "both") &&
-      !p.category.startsWith("hair_")
-  );
-  const hairPool = products.filter((p) => p.routine === "hair");
-
-  const day = selectTopForRoutine(dayPool, skinTagSet, MAX_PER_ROUTINE, skinTags);
-  const night = selectTopForRoutine(nightPool, skinTagSet, MAX_PER_ROUTINE, skinTags);
-  const hairSelected = selectTopForRoutine(hairPool, hairTagSet, MAX_PER_ROUTINE, hairTags);
+  const day = selectTopForRoutine(getDayPool(), skinTagSet, MAX_PER_ROUTINE, skinTags);
+  const night = selectTopForRoutine(getNightPool(), skinTagSet, MAX_PER_ROUTINE, skinTags);
+  const hairSelected = selectTopForRoutine(getHairPool(), hairTagSet, MAX_PER_ROUTINE, hairTags);
 
   return {
     analysisResults: { skinTags, hairTags },
     recommendedRoutine: {
-      day: day.length > 0 ? day : processFallback(SAFE_ROUTINE_DAY_IDS, MAX_PER_ROUTINE, skinTags),
-      night: night.length > 0 ? night : processFallback(SAFE_ROUTINE_NIGHT_IDS, MAX_PER_ROUTINE, skinTags),
-      hair: hairSelected.length > 0 ? hairSelected : processFallback(SAFE_ROUTINE_HAIR_IDS, MAX_PER_ROUTINE, hairTags),
+      day:
+        day.length > 0
+          ? day
+          : processFallback(SAFE_ROUTINE_DAY_IDS, MAX_PER_ROUTINE, skinTags),
+      night:
+        night.length > 0
+          ? night
+          : processFallback(SAFE_ROUTINE_NIGHT_IDS, MAX_PER_ROUTINE, skinTags),
+      hair:
+        hairSelected.length > 0
+          ? hairSelected
+          : processFallback(SAFE_ROUTINE_HAIR_IDS, MAX_PER_ROUTINE, hairTags),
     },
   };
 }
 
-/** Map normalized AnalysisResult to YouCam-style tags and run same engine (for API/app that only have AnalysisResult). */
+// ─────────────────────────────────────────────────────────────────────────────
+// 8. SECONDARY ENTRY — Normalised AnalysisResult
+// For callers using the app's internal /api/analyze-skin normalised shape.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Maps normalised AnalysisResult face data to skin tags.
+ * Mirrors the YouCam score thresholds as closely as possible
+ * using the normalised fields available in AnalysisResult.
+ */
 function skinTagsFromAnalysisResult(face: AnalysisResult["face"]): string[] {
-  const targetTags: string[] = [];
+  const tags = new Set<string>(["all-skin", "pollution"]);
   const concerns = new Set<string>((face.concerns ?? []) as string[]);
   const skinType = (face.skinType ?? "").toLowerCase();
 
+  // Hydration score (0–100, higher = better hydrated)
   if (face.hydrationScore < 60) {
-    targetTags.push("dry", "dryness", "hydration");
+    tags.add("dry");
+    tags.add("dryness");
+    tags.add("hydration");
+  }
+  if (face.hydrationScore < 40) {
+    tags.add("sensitive"); // Severely dehydrated = compromised barrier
   }
 
-  if (concerns.has("oiliness") || concerns.has("acne") || skinType === "oily") {
-    targetTags.push("oily", "oiliness", "acne");
+  // Concern tags
+  if (concerns.has("oiliness") || concerns.has("oily")) {
+    tags.add("oily");
+    tags.add("oiliness");
   }
-  if (concerns.has("dryness") || skinType === "dry") {
-    targetTags.push("dry", "dryness", "hydration");
+  if (concerns.has("acne")) {
+    tags.add("acne");
+    tags.add("oily");
   }
-  if (concerns.has("acne")) targetTags.push("acne");
-  if (concerns.has("dullness")) targetTags.push("dullness", "brightening");
-  if (concerns.has("sensitivity") || skinType === "dry") targetTags.push("sensitive");
-  if (skinType === "oily" || skinType === "combination") {
-    targetTags.push("oily", "combination");
+  if (concerns.has("dryness") || concerns.has("dry")) {
+    tags.add("dry");
+    tags.add("dryness");
+    tags.add("hydration");
   }
-  return targetTags;
-}
+  if (concerns.has("dullness")) {
+    tags.add("dullness");
+    tags.add("brightening");
+  }
+  if (concerns.has("dark_spots") || concerns.has("spots")) {
+    tags.add("dark_spots");
+    tags.add("brightening");
+  }
+  if (concerns.has("fine_lines")) {
+    tags.add("fine_lines");
+    tags.add("anti-aging");
+  }
+  if (concerns.has("wrinkles")) {
+    tags.add("wrinkles");
+    tags.add("fine_lines");
+    tags.add("anti-aging");
+    tags.add("mature");
+  }
+  if (concerns.has("sensitivity") || concerns.has("sensitive")) {
+    tags.add("sensitive");
+  }
+  if (concerns.has("redness") || concerns.has("irritation")) {
+    tags.add("sensitive");
+    tags.add("irritation");
+    tags.add("redness");
+  }
+  if (concerns.has("pollution")) {
+    tags.add("pollution");
+    tags.add("dullness");
+  }
 
-function hairTagsFromAnalysisResult(hair: AnalysisResult["hair"]): string[] {
-  const targetTags: string[] = ["all-hair"];
-  if (!hair?.type) return targetTags;
-  const term = String(hair.type);
-  if (term.includes("straight")) targetTags.push("straight");
-  if (term.includes("wavy")) targetTags.push("wavy");
-  if (term.includes("curly") || term.includes("coily")) targetTags.push("curly", "coily");
-  return targetTags;
+  // Skin type tags
+  if (skinType === "oily") {
+    tags.add("oily");
+    tags.add("oiliness");
+  }
+  if (skinType === "dry") {
+    tags.add("dry");
+    tags.add("dryness");
+    tags.add("hydration");
+  }
+  if (skinType === "combination") {
+    tags.add("combination");
+    tags.add("oily");
+  }
+  if (skinType === "sensitive") {
+    tags.add("sensitive");
+  }
+  if (skinType === "mature") {
+    tags.add("mature");
+    tags.add("anti-aging");
+  }
+  if (skinType === "normal") {
+    tags.add("all-skin");
+  }
+
+  return Array.from(tags);
 }
 
 /**
- * Entry for callers that only have normalized AnalysisResult (e.g. from /api/analyze-skin).
- * Returns same shape: { analysisResults, recommendedRoutine }.
+ * Maps normalised AnalysisResult hair data to hair tags.
+ */
+function hairTagsFromAnalysisResult(hair: AnalysisResult["hair"]): string[] {
+  const tags = new Set<string>(["all-hair"]);
+  if (!hair?.type) return Array.from(tags);
+
+  const term = String(hair.type).toLowerCase();
+
+  if (term.includes("straight")) {
+    tags.add("straight");
+    tags.add("shine");
+  }
+  if (term.includes("wavy")) {
+    tags.add("wavy");
+    tags.add("frizzy");
+    tags.add("frizz");
+  }
+  if (term.includes("curly") || term.includes("coily") || term.includes("kinky")) {
+    tags.add("curly");
+    tags.add("coily");
+    tags.add("frizzy");
+    tags.add("frizz");
+    tags.add("dry");
+    tags.add("dryness");
+  }
+
+  return Array.from(tags);
+}
+
+/**
+ * Secondary entry for callers that only have a normalised AnalysisResult
+ * (e.g. from /api/analyze-skin). Returns the same shape as getRecommendedRoutine.
  */
 export function getRecommendedRoutineFromAnalysis(
   analysis: AnalysisResult
 ): RecommendationEngineResult {
   const skinTags = skinTagsFromAnalysisResult(analysis.face);
-  const hairTags = analysis.hair ? hairTagsFromAnalysisResult(analysis.hair) : ["all-hair"];
+  const hairTags = analysis.hair
+    ? hairTagsFromAnalysisResult(analysis.hair)
+    : ["all-hair"];
+
   const skinTagSet = new Set(skinTags);
   const hairTagSet = new Set(hairTags);
 
-  const dayPool = products.filter(
-    (p) =>
-      (p.routine === "day" || p.routine === "both") &&
-      !p.category.startsWith("hair_")
-  );
-  const nightPool = products.filter(
-    (p) =>
-      (p.routine === "night" || p.routine === "both") &&
-      !p.category.startsWith("hair_")
-  );
-  const hairPool = products.filter((p) => p.routine === "hair");
-
-  const day = selectTopForRoutine(dayPool, skinTagSet, MAX_PER_ROUTINE, skinTags);
-  const night = selectTopForRoutine(nightPool, skinTagSet, MAX_PER_ROUTINE, skinTags);
+  const day = selectTopForRoutine(getDayPool(), skinTagSet, MAX_PER_ROUTINE, skinTags);
+  const night = selectTopForRoutine(getNightPool(), skinTagSet, MAX_PER_ROUTINE, skinTags);
   const hairSelected =
     analysis.hair != null
-      ? selectTopForRoutine(hairPool, hairTagSet, MAX_PER_ROUTINE, hairTags)
+      ? selectTopForRoutine(getHairPool(), hairTagSet, MAX_PER_ROUTINE, hairTags)
       : [];
 
   return {
     analysisResults: { skinTags, hairTags },
     recommendedRoutine: {
-      day: day.length > 0 ? day : processFallback(SAFE_ROUTINE_DAY_IDS, MAX_PER_ROUTINE, skinTags),
-      night: night.length > 0 ? night : processFallback(SAFE_ROUTINE_NIGHT_IDS, MAX_PER_ROUTINE, skinTags),
+      day:
+        day.length > 0
+          ? day
+          : processFallback(SAFE_ROUTINE_DAY_IDS, MAX_PER_ROUTINE, skinTags),
+      night:
+        night.length > 0
+          ? night
+          : processFallback(SAFE_ROUTINE_NIGHT_IDS, MAX_PER_ROUTINE, skinTags),
       hair:
         hairSelected.length > 0
           ? hairSelected

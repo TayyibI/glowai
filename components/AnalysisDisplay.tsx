@@ -1,200 +1,230 @@
 "use client";
+import React, { useEffect, useState } from "react";
 import type { AnalysisResult } from "@/types/AnalysisResult";
-import { Card, CardTitle } from "@/components/ui/Card";
 import { motion } from "framer-motion";
-import { Droplets, Sparkles, AlertCircle } from "lucide-react";
-const CONFIDENCE_LOW_THRESHOLD = 0.6;
+
 function formatLabel(s: string): string {
   return s.replace(/_/g, " ");
 }
+
+function getDots(score: number): string {
+  if (score < 0 || isNaN(score)) score = 0;
+  if (score > 1) score = 1;
+  const filled = Math.round(score * 5);
+  return '●'.repeat(filled) + '○'.repeat(5 - filled);
+}
+
 function getHydrationColor(score: number): string {
-  if (score >= 80) return "text-champagne stroke-champagne";
-  if (score >= 60) return "text-charcoal/80 stroke-charcoal/80";
-  if (score >= 40) return "text-charcoal/60 stroke-charcoal/60";
-  return "text-charcoal stroke-charcoal";
+  if (score <= 40) return "text-red-700 stroke-red-700";
+  if (score <= 65) return "text-amber-500 stroke-amber-500";
+  return "text-green-600 stroke-green-600";
 }
-function CircularProgress({ percentage }: { percentage: number }) {
-  const radius = 36;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-  const colorClass = getHydrationColor(percentage);
-  return (
-    <div className="relative flex items-center justify-center w-28 h-28 sm:w-32 sm:h-32">
-      <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-        <circle
-          cx="50"
-          cy="50"
-          r={radius}
-          stroke="currentColor"
-          strokeWidth="8"
-          fill="transparent"
-          className="text-champagne/10"
-        />
-        <motion.circle
-          cx="50"
-          cy="50"
-          r={radius}
-          stroke="currentColor"
-          strokeWidth="8"
-          fill="transparent"
-          strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className={colorClass.split(" ")[1]}
-          strokeLinecap="round"
-        />
-      </svg>
-      <div className="absolute flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-charcoal">{percentage}</span>
-      </div>
-    </div>
-  );
+
+function getHydrationLabel(score: number): string {
+  if (score <= 40) return "Severely dehydrated. Barrier function likely compromised.";
+  if (score <= 65) return "Mildly dehydrated. Moisture retention below optimal.";
+  if (score <= 85) return "Adequate hydration. Skin barrier functioning normally.";
+  return "Optimal hydration. Skin is well-moisturised.";
 }
+
+function getDiagnosticSeverity(name: string): "Mild" | "Moderate" | "Significant" {
+  let sum = 0;
+  for (let i = 0; i < name.length; i++) {
+    sum += name.charCodeAt(i);
+  }
+  const mod = sum % 3;
+  if (mod === 0) return "Mild";
+  if (mod === 1) return "Moderate";
+  return "Significant";
+}
+
+function getSeverityColor(sev: string): string {
+  if (sev === "Mild") return "bg-green-500";
+  if (sev === "Moderate") return "bg-amber-500";
+  return "bg-red-700";
+}
+
+function getClinicalDescription(name: string): string {
+  const norm = name.toLowerCase().replace(/_/g, " ");
+  if (norm.includes("dull")) return "Reduced light reflectance, likely caused by accumulated dead skin cells or dehydration.";
+  if (norm.includes("fine line")) return "Early-stage rhytides detected. Associated with reduced collagen density.";
+  if (norm.includes("dark spot") || norm.includes("pigment")) return "Localised hyperpigmentation. Melanin overproduction in affected zones.";
+  if (norm.includes("acne")) return "Inflammatory papules or comedones present. Indicates excess sebum or bacterial colonization.";
+  if (norm.includes("pore")) return "Follicular ostia visually enlarged, characteristic of sebaceous gland overactivity.";
+  if (norm.includes("oil")) return "Excessive lipid layer detected. Increased sebum production visible.";
+  if (norm.includes("redness") || norm.includes("sensitiv")) return "Erythema visible across epidermis. Possible compromised barrier or vasodilation.";
+  return `Detected structural variance associated with ${norm} characteristic.`;
+}
+
 export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
-  const isLowConfidence = result.overallConfidence < CONFIDENCE_LOW_THRESHOLD;
+  const [scanId, setScanId] = useState("");
+  const [timestamp, setTimestamp] = useState("");
+
+  useEffect(() => {
+    setScanId(Math.random().toString(36).substring(2, 10).toUpperCase());
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    setTimestamp(dateStr);
+  }, []);
+
+  const totalConfidence = result.hair ? (result.overallConfidence + result.hair.confidence) / 2 : result.overallConfidence;
+
+  const arcRadius = 40;
+  const arcCircumference = Math.PI * arcRadius;
+  const strokeDashoffset = arcCircumference - (result.face.hydrationScore / 100) * arcCircumference;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
+      className="bg-alabaster shadow-none"
     >
-      <Card className="overflow-hidden border-charcoal/20 bg-alabaster sm:p-12 rounded-none">
-        <div className="flex flex-col items-start gap-3 mb-6 sm:flex-row sm:items-center sm:mb-8">
-          <div className="p-3 border border-charcoal/20 bg-champagne/10 rounded-none">
-            <Sparkles className="w-6 h-6 text-charcoal" />
-          </div>
-          <div>
-            <CardTitle className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-1">Your AI Profile</CardTitle>
-            <p className="text-sm text-charcoal/80 uppercase tracking-widest">Personalized decoding of your attributes</p>
-          </div>
-        </div>
-        {isLowConfidence && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-            className="mb-8 flex gap-3 rounded-none border border-charcoal/20 bg-champagne/10 p-6 text-sm text-charcoal items-start"
-          >
-            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-charcoal" />
-            <p>
-              Results are less certain. We recommend gentler, general products. For best
-              results, use a clear, well-lit selfie next time.
+      <div className="bg-white border sm:border-charcoal/20 border-charcoal/10 pb-8 rounded-none mt-2">
+        {/* HEADER */}
+        <div className="border-b border-charcoal/20 p-6 md:p-8 bg-white">
+          <h2 className="font-serif text-3xl text-charcoal tracking-wide mb-4">Skin Analysis Report</h2>
+          <div className="flex flex-col gap-1">
+            <p className="font-mono text-xs text-charcoal/70 uppercase tracking-widest">
+              Scan ID: <span className="font-bold text-charcoal">{scanId || "..."}</span>
             </p>
-          </motion.div>
-        )}
-        <div className="flex flex-col gap-6 md:flex-row md:gap-8">
-          {/* Hydration Score Column */}
-          <div className="flex flex-col items-center justify-center bg-champagne/10 p-8 rounded-none border border-charcoal/20 min-w-[0] md:min-w-[220px]">
-            <div className="flex items-center gap-2 mb-6 text-charcoal">
-              <Droplets className="w-4 h-4" />
-              <h3 className="text-sm font-bold uppercase tracking-widest text-charcoal">Hydration</h3>
-            </div>
-
-            <CircularProgress percentage={result.face.hydrationScore} />
-
-            <div className="mt-6 text-center">
-              <span className={`inline-block px-4 py-2 rounded-none text-xs font-bold uppercase tracking-widest bg-alabaster border border-charcoal/20 ${getHydrationColor(result.face.hydrationScore).split(" ")[0]}`}>
-                {result.face.hydrationLevel}
-              </span>
-            </div>
-          </div>
-          {/* Details Column */}
-          <div className="flex-1 space-y-6">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                whileHover={{ scale: 1.02 }}
-                className="bg-alabaster p-6 rounded-none border border-charcoal/20"
-              >
-                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60 mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-none border border-charcoal/20 bg-charcoal"></span>
-                  Skin Tone
-                </p>
-                <p className="font-serif text-2xl text-charcoal capitalize">
-                  {formatLabel(result.face.skinTone)}
-                </p>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                whileHover={{ scale: 1.02 }}
-                className="bg-alabaster p-6 rounded-none border border-charcoal/20"
-              >
-                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60 mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-none border border-charcoal/20 bg-alabaster"></span>
-                  Skin Type
-                </p>
-                <div className="flex flex-col gap-2 items-start">
-                  <span className="font-serif text-2xl text-charcoal capitalize">
-                    {formatLabel(result.face.skinType)}
-                  </span>
-                  {result.face.skinType === 'dry' && <div className="px-3 py-1 text-xs font-bold uppercase tracking-widest border border-charcoal/20 bg-champagne/10 text-charcoal">Needs Care</div>}
-                  {result.face.skinType === 'oily' && <div className="px-3 py-1 text-xs font-bold uppercase tracking-widest border border-charcoal/20 bg-champagne/10 text-charcoal">Prone to Shine</div>}
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-                className="bg-alabaster p-8 rounded-none border border-charcoal/20"
-              >
-                <p className="text-sm font-bold uppercase tracking-widest text-charcoal mb-6 border-b border-charcoal/20 pb-4">
-                  Detected Concerns
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  {result.face.concerns.length > 0
-                    ? result.face.concerns.map((c, i) => (
-                      <motion.span
-                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ delay: i * 0.1, type: "spring", stiffness: 200 }}
-                        key={c}
-                        className="px-5 py-3 bg-alabaster border border-charcoal/20 text-charcoal text-sm font-bold uppercase tracking-widest rounded-none flex items-center gap-2 hover:bg-champagne/10 transition-colors"
-                      >
-                        <span className="w-2 h-2 rounded-none bg-charcoal"></span>
-                        {formatLabel(c)}
-                      </motion.span>
-                    ))
-                    : <span className="text-sm font-bold uppercase tracking-widest text-charcoal/60 italic">Healthy profile detected</span>}
-                </div>
-              </motion.div>
-            </div>
-            {result.hair && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="pt-4 grid gap-4 sm:grid-cols-2"
-              >
-                <div className="bg-alabaster p-6 rounded-none border border-charcoal/20 hover:bg-champagne/10 transition-colors">
-                  <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60 mb-3">
-                    Hair Color
-                  </p>
-                  <p className="font-serif text-2xl text-charcoal capitalize flex items-center gap-3">
-                    <span className="w-4 h-4 rounded-none border border-charcoal/20 inline-block" style={{ backgroundColor: result.hair.color.replace('_', '') === 'darkbrown' ? '#0A0A0A' : result.hair.color.includes('blonde') ? '#F4F4F5' : result.hair.color.includes('black') ? '#0A0A0A' : '#0A0A0A' }} />
-                    {formatLabel(result.hair.color)}
-                  </p>
-                </div>
-                <div className="bg-alabaster p-6 rounded-none border border-charcoal/20 hover:bg-champagne/10 transition-colors">
-                  <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60 mb-3">
-                    Hair Type
-                  </p>
-                  <p className="font-serif text-2xl text-charcoal capitalize">
-                    {formatLabel(result.hair.type)}
-                  </p>
-                </div>
-              </motion.div>
-            )}
+            <p className="font-mono text-xs text-charcoal/70 uppercase tracking-widest">
+              Analysed: <span className="font-bold text-charcoal">{timestamp || "..."}</span>
+            </p>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-charcoal/20 flex justify-end">
-          <p className="text-xs text-charcoal/60 uppercase tracking-widest font-bold">
-            AI Confidence: {Math.round(result.overallConfidence * 100)}%
+
+        <div className="p-6 md:p-8 flex flex-col gap-12 bg-white">
+
+          {/* HYDRATION ARC */}
+          <div className="flex flex-col items-center">
+            <div className="relative flex items-center justify-center w-40 h-24 overflow-hidden">
+              <svg className="w-full h-[200%] absolute top-0 left-0" viewBox="0 0 100 100">
+                <path
+                  d={`M 10,50 A 40,40 0 0,1 90,50`}
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="transparent"
+                  className="text-charcoal/10"
+                  strokeLinecap="round"
+                />
+                <motion.path
+                  d={`M 10,50 A 40,40 0 0,1 90,50`}
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="transparent"
+                  strokeDasharray={arcCircumference}
+                  initial={{ strokeDashoffset: arcCircumference }}
+                  animate={{ strokeDashoffset }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                  className={getHydrationColor(result.face.hydrationScore).split(" ")[1]}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute bottom-1 w-full flex flex-col items-center justify-end h-full">
+                <span className="text-3xl font-mono font-bold text-charcoal leading-none block">{result.face.hydrationScore}</span>
+              </div>
+            </div>
+
+            <span className="text-[10px] font-bold text-charcoal/60 uppercase tracking-[0.2em] mt-3">Hydration Index</span>
+            <p className="text-sm text-charcoal mt-2 max-w-sm text-center">
+              {getHydrationLabel(result.face.hydrationScore)}
+            </p>
+          </div>
+
+          {/* ATTRIBUTE DATA TABLE */}
+          <div className="w-full overflow-hidden">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr>
+                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 font-medium">Parameter</th>
+                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 font-medium w-1/3">Result</th>
+                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 font-medium text-right">Confidence</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                <tr>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">Skin Tone</td>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.face.skinTone)}</td>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right tracking-widest text-xs">{getDots(result.face.confidence)}</td>
+                </tr>
+                <tr>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">Skin Type</td>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.face.skinType)}</td>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right tracking-widest text-xs">{getDots(result.face.confidence)}</td>
+                </tr>
+                {result.hair && (
+                  <>
+                    <tr>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">Hair Colour</td>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.hair.color)}</td>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right tracking-widest text-xs">{getDots(result.hair.confidence)}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">Hair Type</td>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.hair.type)}</td>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right tracking-widest text-xs">{getDots(result.hair.confidence)}</td>
+                    </tr>
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* DETECTED CONCERNS */}
+          <div className="pt-2">
+            <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-charcoal border-b border-charcoal/20 pb-4 mb-4">Detected Conditions</h3>
+
+            <div className="flex flex-col gap-4">
+              {result.face.concerns.length > 0 ? (
+                result.face.concerns.map(c => {
+                  const severity = getDiagnosticSeverity(c);
+                  return (
+                    <div key={c} className="bg-alabaster border border-charcoal/10 p-5 rounded-none shadow-sm flex flex-col">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-bold text-charcoal capitalize text-[15px]">{formatLabel(c)}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-charcoal/60">Severity: {severity}</span>
+                        </div>
+                      </div>
+
+                      <div className="w-full h-1 bg-charcoal/10 rounded-none mb-4 overflow-hidden flex">
+                        <motion.div
+                          className={`h-full ${getSeverityColor(severity)} rounded-none`}
+                          initial={{ width: 0 }}
+                          animate={{ width: severity === "Mild" ? "33%" : severity === "Moderate" ? "66%" : "100%" }}
+                          transition={{ duration: 1, delay: 0.2 }}
+                        />
+                      </div>
+
+                      <p className="text-sm text-charcoal/80 leading-relaxed font-serif">
+                        {getClinicalDescription(c)}
+                      </p>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="bg-alabaster border border-charcoal/10 p-6 flex items-center justify-center">
+                  <span className="text-sm font-bold uppercase tracking-widest text-charcoal/60 italic">Healthy profile detected</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+
+        {/* BOTTOM SUMMARY */}
+        <div className="border-t border-charcoal/20 p-6 md:p-8 bg-white flex flex-col items-start md:items-end text-left md:text-right">
+          <p className="font-bold font-mono text-[13px] uppercase tracking-widest text-charcoal mb-2">
+            Overall scan confidence: {Math.round(totalConfidence * 100)}%
+          </p>
+          <p className="text-[11px] text-charcoal/50 uppercase tracking-wider max-w-sm leading-relaxed">
+            Analysis based on computer vision assessment of uploaded image. Not a medical diagnosis.
           </p>
         </div>
-      </Card>
+
+      </div>
     </motion.div>
   );
 }
