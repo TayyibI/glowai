@@ -7,6 +7,8 @@ import { motion, AnimatePresence, Variants } from "framer-motion";
 import { AlertCircle, X, ChevronRight, Sparkles, Camera, Upload, RefreshCcw } from "lucide-react";
 import { AnalysisDisplay } from "@/components/AnalysisDisplay";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { FaceLandmarker, FilesetResolver, DrawingUtils } from "@mediapipe/tasks-vision";
+
 declare global {
   interface Window {
     YMK?: {
@@ -61,6 +63,17 @@ export function Scanner() {
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
   const [pendingBlob, setPendingBlob] = useState<Blob | null>(null);
   const [pendingBase64, setPendingBase64] = useState<string | null>(null);
+
+  const [lightingState, setLightingState] = useState<LightingState>("CALCULATING");
+  const [isUneven, setIsUneven] = useState(false);
+  const lightingStateRef = useRef<LightingState>("CALCULATING");
+  const pendingStateRef = useRef<{ state: LightingState, timestamp: number } | null>(null);
+
+  // === FACE MESH REFS ===
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const landmarkerRef = useRef<FaceLandmarker | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+
 
   useEffect(() => {
     if (typeof navigator !== "undefined" && navigator.mediaDevices) {
@@ -183,10 +196,6 @@ export function Scanner() {
     }
   }, []);
   type LightingState = "TOO_DARK" | "LOW_LIGHT" | "GOOD" | "BRIGHT" | "TOO_BRIGHT" | "CALCULATING";
-  const [lightingState, setLightingState] = useState<LightingState>("CALCULATING");
-  const [isUneven, setIsUneven] = useState(false);
-  const lightingStateRef = useRef<LightingState>("CALCULATING");
-  const pendingStateRef = useRef<{ state: LightingState, timestamp: number } | null>(null);
 
   const getLightingUI = (state: LightingState) => {
     switch (state) {
@@ -199,115 +208,205 @@ export function Scanner() {
     }
   };
 
+  // === COMBINED: LIGHTING ANALYSIS + REAL-TIME FACE MESH + GREEN SCAN LINE ===
   useEffect(() => {
-    if (step !== "capture-face" || mode !== "camera") return;
+    if (step !== "capture-face" || mode !== "camera") {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      if (landmarkerRef.current) landmarkerRef.current.close();
+      return;
+    }
 
-    let animationFrameId: number;
-    let lastExecTime = 0;
+    let raf: number;
+    let lastExecTime = 0;           // for lighting (throttled)
+    let lastScanTime = Date.now();  // for scan line
 
-    const analyzeLighting = (timestamp: number) => {
-      // 2fps = every 500ms
-      if (timestamp - lastExecTime < 500) {
-        animationFrameId = requestAnimationFrame(analyzeLighting);
-        return;
-      }
-      lastExecTime = timestamp;
+    let hiddenCanvas: HTMLCanvasElement | null = null;
 
+    const processFrame = (timestamp: number) => {
       const video = videoRef.current;
-      if (!video || video.readyState < 2) {
-        animationFrameId = requestAnimationFrame(analyzeLighting);
-        return;
-      }
 
-      let canvas = document.getElementById("hidden-lighting-canvas") as HTMLCanvasElement;
-      if (!canvas) {
-        canvas = document.createElement("canvas");
-        canvas.id = "hidden-lighting-canvas";
-        canvas.style.display = "none";
-        document.body.appendChild(canvas);
-      }
+      // ──────────────────────────────────────────────
+      // 1. FACE MESH + GREEN SCAN LINE (runs every frame)
+      // ──────────────────────────────────────────────
+      if (landmarkerRef.current && video && canvasRef.current) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          if (canvas.width !== video.videoWidth) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+          }
 
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      if (!ctx) return;
+          const results = landmarkerRef.current.detectForVideo(video, performance.now());
 
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const cropWidth = Math.floor(canvas.width * 0.6);
-      const cropHeight = Math.floor(canvas.height * 0.6);
-      const startX = Math.floor((canvas.width - cropWidth) / 2);
-      const startY = Math.floor((canvas.height - cropHeight) / 2);
+          if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+            const landmarks = results.faceLandmarks[0];
+            const drawingUtils = new DrawingUtils(ctx);
 
-      const imageData = ctx.getImageData(startX, startY, cropWidth, cropHeight);
-      const data = imageData.data;
+            // Green mesh (sticks perfectly to your face)
+            drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_TESSELATION, {
+              color: "#22ff88",
+              lineWidth: 1.8,
+            });
+            drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_CONTOURS, {
+              color: "#22ff88",
+              lineWidth: 3.5,
+            });
 
-      let totalLuminance = 0;
-      let sampleCount = 0;
+            // Green scan line that sweeps top → bottom
+            const now = Date.now();
+            if (now - lastScanTime > 2500) lastScanTime = now;
+            const progress = Math.min((now - lastScanTime) / 2500, 1);
+            const y = progress * canvas.height;
 
-      const halfW = Math.floor(cropWidth / 2);
-      const halfH = Math.floor(cropHeight / 2);
+            ctx.strokeStyle = "#22ff88";
+            ctx.shadowColor = "#22ff88";
+            ctx.shadowBlur = 28;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
 
-      let qTL = 0, qTR = 0, qBL = 0, qBR = 0;
-      let countTL = 0, countTR = 0, countBL = 0, countBR = 0;
-
-      for (let i = 0; i < data.length; i += 16) {
-        const pIndex = Math.floor(i / 4);
-        const px = pIndex % cropWidth;
-        const py = Math.floor(pIndex / cropWidth);
-
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-
-        totalLuminance += luminance;
-        sampleCount++;
-
-        if (py < halfH) {
-          if (px < halfW) { qTL += luminance; countTL++; }
-          else { qTR += luminance; countTR++; }
-        } else {
-          if (px < halfW) { qBL += luminance; countBL++; }
-          else { qBR += luminance; countBR++; }
+            // Soft glow below the line
+            const gradient = ctx.createLinearGradient(0, y, 0, y + 90);
+            gradient.addColorStop(0, "rgba(34, 255, 136, 0.4)");
+            gradient.addColorStop(1, "rgba(34, 255, 136, 0)");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, y, canvas.width, 90);
+          }
         }
       }
 
-      const avgLum = totalLuminance / sampleCount;
-      const avgTL = qTL / Math.max(1, countTL);
-      const avgTR = qTR / Math.max(1, countTR);
-      const avgBL = qBL / Math.max(1, countBL);
-      const avgBR = qBR / Math.max(1, countBR);
+      // ──────────────────────────────────────────────
+      // 2. LIGHTING ANALYSIS (runs only every ~500ms)
+      // ──────────────────────────────────────────────
+      if (timestamp - lastExecTime >= 500) {
+        lastExecTime = timestamp;
 
-      const maxQ = Math.max(avgTL, avgTR, avgBL, avgBR);
-      const minQ = Math.min(avgTL, avgTR, avgBL, avgBR);
-      setIsUneven((maxQ - minQ) > 80);
+        if (video && video.readyState >= 2) {
+          if (!hiddenCanvas) {
+            hiddenCanvas = document.getElementById("hidden-lighting-canvas") as HTMLCanvasElement;
+            if (!hiddenCanvas) {
+              hiddenCanvas = document.createElement("canvas");
+              hiddenCanvas.id = "hidden-lighting-canvas";
+              hiddenCanvas.style.display = "none";
+              document.body.appendChild(hiddenCanvas);
+            }
+          }
 
-      let newState: LightingState = "GOOD";
-      if (avgLum <= 40) newState = "TOO_DARK";
-      else if (avgLum <= 80) newState = "LOW_LIGHT";
-      else if (avgLum <= 200) newState = "GOOD";
-      else if (avgLum <= 240) newState = "BRIGHT";
-      else newState = "TOO_BRIGHT";
+          hiddenCanvas.width = video.videoWidth;
+          hiddenCanvas.height = video.videoHeight;
+          const ctx = hiddenCanvas.getContext("2d", { willReadFrequently: true });
+          if (ctx) {
+            ctx.drawImage(video, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
 
-      if (newState !== lightingStateRef.current) {
-        if (!pendingStateRef.current || pendingStateRef.current.state !== newState) {
-          pendingStateRef.current = { state: newState, timestamp };
-        } else if (timestamp - pendingStateRef.current.timestamp >= 1000) {
-          setLightingState(newState);
-          lightingStateRef.current = newState;
-          pendingStateRef.current = null;
+            const cropWidth = Math.floor(hiddenCanvas.width * 0.6);
+            const cropHeight = Math.floor(hiddenCanvas.height * 0.6);
+            const startX = Math.floor((hiddenCanvas.width - cropWidth) / 2);
+            const startY = Math.floor((hiddenCanvas.height - cropHeight) / 2);
+
+            const imageData = ctx.getImageData(startX, startY, cropWidth, cropHeight);
+            const data = imageData.data;
+
+            let totalLuminance = 0;
+            let sampleCount = 0;
+            const halfW = Math.floor(cropWidth / 2);
+            const halfH = Math.floor(cropHeight / 2);
+
+            let qTL = 0, qTR = 0, qBL = 0, qBR = 0;
+            let countTL = 0, countTR = 0, countBL = 0, countBR = 0;
+
+            for (let i = 0; i < data.length; i += 16) {
+              const pIndex = Math.floor(i / 4);
+              const px = pIndex % cropWidth;
+              const py = Math.floor(pIndex / cropWidth);
+
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+              totalLuminance += luminance;
+              sampleCount++;
+
+              if (py < halfH) {
+                if (px < halfW) { qTL += luminance; countTL++; }
+                else { qTR += luminance; countTR++; }
+              } else {
+                if (px < halfW) { qBL += luminance; countBL++; }
+                else { qBR += luminance; countBR++; }
+              }
+            }
+
+            const avgLum = totalLuminance / sampleCount;
+            const avgTL = qTL / Math.max(1, countTL);
+            const avgTR = qTR / Math.max(1, countTR);
+            const avgBL = qBL / Math.max(1, countBL);
+            const avgBR = qBR / Math.max(1, countBR);
+
+            const maxQ = Math.max(avgTL, avgTR, avgBL, avgBR);
+            const minQ = Math.min(avgTL, avgTR, avgBL, avgBR);
+            setIsUneven((maxQ - minQ) > 80);
+
+            let newState: LightingState = "GOOD";
+            if (avgLum <= 40) newState = "TOO_DARK";
+            else if (avgLum <= 80) newState = "LOW_LIGHT";
+            else if (avgLum <= 200) newState = "GOOD";
+            else if (avgLum <= 240) newState = "BRIGHT";
+            else newState = "TOO_BRIGHT";
+
+            if (newState !== lightingStateRef.current) {
+              if (!pendingStateRef.current || pendingStateRef.current.state !== newState) {
+                pendingStateRef.current = { state: newState, timestamp };
+              } else if (timestamp - pendingStateRef.current.timestamp >= 1000) {
+                setLightingState(newState);
+                lightingStateRef.current = newState;
+                pendingStateRef.current = null;
+              }
+            } else {
+              pendingStateRef.current = null;
+            }
+          }
         }
-      } else {
-        pendingStateRef.current = null;
       }
 
-      animationFrameId = requestAnimationFrame(analyzeLighting);
+      raf = requestAnimationFrame(processFrame);
+      animationFrameRef.current = raf;
     };
 
-    animationFrameId = requestAnimationFrame(analyzeLighting);
+    // Start the loop immediately (lighting works right away)
+    raf = requestAnimationFrame(processFrame);
+    animationFrameRef.current = raf;
 
-    return () => cancelAnimationFrame(animationFrameId);
+    // MediaPipe initializes in the background (mesh appears as soon as it's ready)
+    const initializeMesh = async () => {
+      const fileset = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+      );
+      landmarkerRef.current = await FaceLandmarker.createFromOptions(fileset, {
+        baseOptions: {
+          modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+          delegate: "GPU",
+        },
+        outputFaceBlendshapes: true,
+        outputFacialTransformationMatrixes: true,
+        numFaces: 1,
+        runningMode: "VIDEO",
+      });
+    };
+    initializeMesh().catch(console.error);
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      if (landmarkerRef.current) landmarkerRef.current.close();
+      if (hiddenCanvas) {
+        hiddenCanvas.remove();
+        hiddenCanvas = null;
+      }
+    };
   }, [step, mode]);
   const runLoadingSteps = useCallback(() => {
     setLoadingProgress(0);
@@ -666,7 +765,12 @@ export function Scanner() {
                 muted
                 className={`min-h-full min-w-full object-cover ${step === "confirm-photo" ? "opacity-0" : "opacity-100"} ${facingMode === "user" ? "scale-x-[-1]" : ""}`}
               />
-
+              {step === "capture-face" && (
+                <canvas
+                  ref={canvasRef}
+                  className="absolute inset-0 w-full h-full pointer-events-none z-30"
+                />
+              )}
               {step === "confirm-photo" && pendingBase64 && (
                 <img src={pendingBase64} alt="Captured preview" className="absolute inset-0 min-h-full min-w-full object-cover z-10 opacity-100" />
               )}

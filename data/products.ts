@@ -1,542 +1,544 @@
 /**
  * Static product catalog for GlowAI - French brand products (MVP)
- * L'Oréal Paris (skin), L'Oréal Elvive (hair) — 40 products
+ * L'Oréal Paris (skin) + L'Oréal Elvive (hair)
+ * All purchaseLinks verified on loreal-paris.co.uk — March 2026
  *
- * Tag vocabulary used by the recommendation engine:
- *
- * SKIN CONCERN TAGS   → oily | oiliness | acne | dry | dryness | hydration |
- *                        dullness | brightening | dark_spots | fine_lines |
- *                        wrinkles | anti-aging | sensitive | irritation |
- *                        redness | pollution | combination | mature
- *
- * HAIR CONCERN TAGS   → all-hair | hairfall | damaged | repair | frizzy | frizz |
- *                        dry | dryness | fine | thin | volume | curly | coily |
- *                        wavy | straight | shine | breakage | color_treated
- *
- * ROUTINE SLOTS       → day | night | both | hair
- *
- * PRIORITY SCALE      → 10 (low) → 20 (hero / most effective for tag)
- *
- * Image filenames follow the pattern: {id}.jpg
- * Upload to: gs://product-imgs-glowai/{id}.jpg
- * See IMAGE UPLOAD GUIDE at bottom of this file.
+ * Tag vocabulary:
+ * SKIN  → oily | oiliness | acne | dry | dryness | hydration | dullness |
+ *          brightening | dark_spots | fine_lines | wrinkles | anti-aging |
+ *          sensitive | irritation | redness | pollution | combination | mature | all-skin
+ * HAIR  → all-hair | hairfall | damaged | repair | frizzy | frizz | dry | dryness |
+ *          fine | thin | volume | curly | coily | wavy | straight | shine |
+ *          breakage | color_treated
+ * SLOTS → day | night | both | hair
+ * PRIORITY 10 (low) → 20 (hero)
  */
 
 import type { Product } from "@/types/Product";
 
 export const products: Product[] = [
 
-  // ====================== L'ORÉAL PARIS — SKIN (20) ======================
-  // Revitalift, Hydra Genius, Pure Clay, Age Perfect, UV Defender ranges
+  // ============================================================
+  // L'ORÉAL PARIS — SKIN (20)
+  // ============================================================
 
-  // --- CLEANSERS (6) ---
+  // ── CLEANSERS (6) ──────────────────────────────────────────
+
   {
     id: "loreal-001",
-    name: "Pure Clay Purifying Face Wash 150ml",
+    name: "Pure Clay Purifying Foam Wash",
     category: "cleanser",
     priority: 20,
     tags: ["oily", "combination", "oiliness", "acne", "dullness"],
     routine: "both",
-    purchaseLink: "https://www.lorealparis.com.au/pure-clay-face-wash-purify-mattify",
+    purchaseLink: "https://www.loreal-paris.co.uk/pure-clay/foam-wash-green",
     description:
-      "Kaolin and bentonite clay cleanser that deeply purifies pores, controls excess oil, and leaves skin matte and refreshed.",
+      "3 pure clays + eucalyptus gel-wash that purifies pores, controls excess oil, and leaves skin matte and refreshed.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-001.jpg",
   },
   {
     id: "loreal-002",
-    name: "Pure Clay Brightening Face Wash 150ml",
+    name: "Pure Clay Brightening Foam Wash",
     category: "cleanser",
     priority: 18,
     tags: ["dullness", "brightening", "all-skin", "dark_spots"],
     routine: "both",
-    purchaseLink: "https://www.lorealparis.com.au/pure-clay-face-wash-brighten-glow",
+    purchaseLink: "https://www.loreal-paris.co.uk/pure-clay/foam-wash-red",
     description:
-      "Yuzu lemon-infused clay cleanser that gently exfoliates dead cells to instantly reveal a brighter, more even complexion.",
+      "3 pure clays + red algae exfoliating scrub that buffs away dead skin cells for brighter, smoother skin every day.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-002.jpg",
   },
   {
     id: "loreal-003",
-    name: "Micellar Water 3-in-1 400ml",
+    name: "Revitalift Filler Hyaluronic Acid Micellar Water",
     category: "cleanser",
-    priority: 12,
-    tags: ["sensitive", "gentle", "all-skin", "dryness"],
+    priority: 14,
+    tags: ["sensitive", "dry", "dryness", "hydration", "all-skin"],
     routine: "both",
-    purchaseLink: "https://www.lorealparis.com.au/micellar-cleansing-water-normal-to-dry-skin",
+    purchaseLink: "https://www.loreal-paris.co.uk/revitalift/filler-renew/hyaluronic-acid-cleansing-micellar-water",
     description:
-      "No-rinse micellar water that dissolves makeup, dirt, and impurities without stripping the skin's natural moisture barrier.",
+      "Micellar water enriched with hyaluronic acid that removes makeup and impurities while leaving skin feeling replumped and hydrated.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-003.jpg",
   },
   {
     id: "loreal-004",
-    name: "Pure Clay Anti-Pore Face Wash 150ml",
+    name: "Pure Clay Detox Charcoal Foam Wash",
     category: "cleanser",
     priority: 18,
-    tags: ["oily", "combination", "oiliness", "acne"],
+    tags: ["oily", "combination", "oiliness", "acne", "pollution"],
     routine: "both",
-    purchaseLink: "https://www.lorealparis.com.au/pure-clay-face-wash-minimise-pores",
+    purchaseLink: "https://www.loreal-paris.co.uk/pure-clay/foam-wash-black",
     description:
-      "Three-clay and eucalyptus formula that tightens visible pores and prevents acne-causing congestion with every wash.",
+      "3 pure clays + charcoal gel-wash that acts like a magnet to draw out pollution particles and clear congested pores.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-004.jpg",
   },
   {
     id: "loreal-005",
-    name: "Age Perfect Cleansing Milk 200ml",
+    name: "Bright Reveal Spot Fading Serum-in-Cleanser",
     category: "cleanser",
-    priority: 15,
-    tags: ["mature", "dry", "dryness", "sensitive", "anti-aging"],
+    priority: 18,
+    tags: ["dark_spots", "dullness", "brightening", "oily", "acne", "all-skin"],
     routine: "both",
-    purchaseLink: "https://www.lorealparis.com.au/age-perfect-cleansing-milk",
+    purchaseLink: "https://www.loreal-paris.co.uk/bright-reveal/serum-in-cleanser-niacinamide-and-salicylic-acid",
     description:
-      "Gentle cleansing milk enriched with manuka honey that nourishes and softens mature or dry skin while removing impurities.",
+      "Niacinamide + salicylic acid gel-to-foam cleanser clinically proven to fade post-acne marks and visibly correct dark spots from the first wash.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-005.jpg",
   },
   {
     id: "loreal-006",
-    name: "Revitalift Micro-Peeling Purifying Gel Wash 150ml",
+    name: "Age Perfect Micellar Water for Mature Skin",
     category: "cleanser",
-    priority: 16,
-    tags: ["fine_lines", "dullness", "brightening", "anti-aging", "all-skin"],
+    priority: 14,
+    tags: ["mature", "sensitive", "dry", "dryness", "anti-aging"],
     routine: "both",
-    purchaseLink: "https://www.lorealparis.com.au/revitalift-micro-peeling-purifying-gel-wash",
+    purchaseLink: "https://www.loreal-paris.co.uk/age-perfect/collagen-expert/micellar-water",
     description:
-      "LHA-infused gel wash that micro-exfoliates daily to visibly smooth fine lines and restore radiance without irritation.",
+      "Pro-vitamin B5 micellar water designed for mature and sensitive skin that cleanses, soothes, and hydrates in one gentle action.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-006.jpg",
   },
 
-  // --- SERUMS (4) ---
+  // ── SERUMS (5) ─────────────────────────────────────────────
+
   {
     id: "loreal-007",
-    name: "Revitalift 1.5% Pure Hyaluronic Acid Serum 30ml",
+    name: "Revitalift Filler 1.5% Hyaluronic Acid Serum",
     category: "serum",
     priority: 20,
     tags: ["dry", "dryness", "hydration", "fine_lines", "all-skin"],
-    routine: "day",
-    purchaseLink: "https://www.lorealparis.com.au/revitalift-1-5-pure-hyaluronic-acid-serum",
+    routine: "both",
+    purchaseLink: "https://www.loreal-paris.co.uk/revitalift/filler-renew/hyaluronic-acid-anti-wrinkle-serum",
     description:
-      "Dual-concentration hyaluronic acid serum that plumps skin surface and deep layers, visibly reducing fine lines in 7 days.",
+      "World's #1 serum — dual micro and macro hyaluronic acid formula clinically proven to replump skin and reduce fine lines in 1 hour.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-007.jpg",
   },
   {
     id: "loreal-008",
-    name: "Revitalift 10% Pure Vitamin C Serum 30ml",
+    name: "Revitalift Clinical 12% Pure Vitamin C Serum",
     category: "serum",
     priority: 20,
-    tags: ["dullness", "brightening", "dark_spots", "anti-aging", "all-skin"],
+    tags: ["dullness", "brightening", "dark_spots", "fine_lines", "anti-aging", "all-skin"],
     routine: "day",
     purchaseLink: "https://www.loreal-paris.co.uk/revitalift/clinical/12-percent-vitamin-c-serum",
     description:
-      "Stabilised 10% vitamin C serum that fades dark spots and boosts radiance with clinically proven brightening results in 4 weeks.",
+      "Stabilised 12% pure vitamin C + vitamin E + salicylic acid serum proven to deliver 2x brighter skin and reduce pores and fine lines in 4 weeks.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-008.jpg",
   },
   {
     id: "loreal-009",
-    name: "Revitalift Laser Retinol Night Serum 30ml",
+    name: "Revitalift Laser Pure Retinol Night Serum",
     category: "serum",
     priority: 20,
     tags: ["fine_lines", "wrinkles", "anti-aging", "mature", "dark_spots"],
     routine: "night",
-    purchaseLink: "https://www.lorealparis.com.au/revitalift-laser-pure-retinol-night-serum",
+    purchaseLink: "https://www.loreal-paris.co.uk/revitalift/laser-renew/pure-retinol-deep-anti-wrinkle-night-serum-30ml",
     description:
-      "0.2% pure retinol serum that accelerates cell renewal overnight, visibly reducing deep wrinkles and pigmentation marks.",
+      "Highest concentration pure retinol night serum — 77% of women saw a visible reduction in deep wrinkles. Apply 3-4 drops before moisturiser.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-009.jpg",
   },
   {
     id: "loreal-010",
-    name: "Glycolic Bright Instant Glowing Serum 30ml",
+    name: "Bright Reveal 10% Niacinamide Dark Spot Serum",
     category: "serum",
-    priority: 18,
-    tags: ["dullness", "brightening", "dark_spots", "oily", "combination"],
-    routine: "day",
-    purchaseLink: "https://www.lorealparis.com.au/glycolic-bright-instant-glowing-serum",
+    priority: 20,
+    tags: ["dark_spots", "dullness", "brightening", "all-skin", "oily", "combination"],
+    routine: "both",
+    purchaseLink: "https://www.loreal-paris.co.uk/bright-reveal/10-niacinamide-amino-sulfonic-ferulic-acid-serum",
     description:
-      "Glycolic acid serum that resurfaces skin texture and fades post-acne marks for a visible glow from the first application.",
+      "Dermatologist-validated 10% niacinamide + amino-sulfonic acid serum clinically proven to reduce 77% of dark spots from acne, sun, and ageing.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-010.jpg",
   },
-
-  // --- DAY MOISTURISERS (4) ---
   {
     id: "loreal-011",
-    name: "Hydra Genius Aloe Water Day Moisturiser 70ml",
-    category: "moisturizer",
+    name: "Revitalift Filler 2.5% Hyaluronic Acid Eye Serum",
+    category: "eye_cream",
     priority: 18,
-    tags: ["dry", "dryness", "hydration", "sensitive", "all-skin"],
-    routine: "day",
-    purchaseLink: "https://www.lorealparis.com.au/hydra-genius-the-liquid-care-normal-to-dry-skin",
+    tags: ["fine_lines", "anti-aging", "mature", "dark_spots", "all-skin"],
+    routine: "both",
+    purchaseLink: "https://www.loreal-paris.co.uk/revitalift/filler-renew/hyaluronic-acid-eye-serum",
     description:
-      "Hyaluronic acid and aloe vera liquid moisturiser that provides 72-hour continuous hydration, ideal for dry and sensitive skin types.",
+      "Hyaluronic acid + caffeine eye serum proven to visibly brighten dark circles and replump eye lines. Fragrance-free, validated by dermatologists.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-011.jpg",
   },
+
+  // ── DAY MOISTURISERS (4) ───────────────────────────────────
+
   {
     id: "loreal-012",
-    name: "Revitalift Laser SPF20 Day Cream 50ml",
+    name: "Revitalift Laser Triple Action Anti-Ageing Day Cream",
     category: "moisturizer",
     priority: 20,
-    tags: ["fine_lines", "wrinkles", "anti-aging", "mature", "brightening"],
+    tags: ["fine_lines", "wrinkles", "anti-aging", "mature", "brightening", "all-skin"],
     routine: "day",
-    purchaseLink: "https://www.lorealparis.com.au/revitalift-laser-renew-advanced-anti-aging-cream-spf20",
+    purchaseLink: "https://www.loreal-paris.co.uk/revitalift/laser-routine/laser-renew-anti-ageing-day-cream",
     description:
-      "Pro-retinol and vitamin C day cream with SPF20 that targets deep wrinkles, firms skin, and protects against photoageing.",
+      "Pro-retinol, hyaluronic acid, and vitamin C day cream that simultaneously smooths wrinkles, firms, and brightens — validated by dermatologists.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-012.jpg",
   },
   {
     id: "loreal-013",
-    name: "UV Defender Sunscreen Moisturiser SPF50+ 40ml",
+    name: "Revitalift Clinical SPF50+ Vitamin C UV Fluid",
     category: "moisturizer",
-    priority: 18,
-    tags: ["all-skin", "pollution", "dark_spots", "anti-aging"],
+    priority: 20,
+    tags: ["all-skin", "pollution", "dark_spots", "dullness", "anti-aging", "brightening"],
     routine: "day",
-    purchaseLink: "https://www.lorealparis.com.au/uv-defender-sunscreen-moisturiser-anti-dullness-spf50",
+    purchaseLink: "https://www.loreal-paris.co.uk/revitalift/clinical/vitamin-c-anti-uv-fluid",
     description:
-      "Broad-spectrum SPF50+ daily moisturiser with UVA/UVB and pollution filters that prevents dark spot formation and photoageing.",
+      "Non-oily, non-sticky SPF50+ daily fluid that blocks UV-caused dark spots and ageing. Pairs with vitamin C serum for 4x brighter skin tone.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-013.jpg",
   },
   {
     id: "loreal-014",
-    name: "Pure Clay Mattifying Day Moisturiser 50ml",
+    name: "Bright Reveal Dark Spot Hydrating Cream SPF50",
     category: "moisturizer",
     priority: 18,
-    tags: ["oily", "combination", "oiliness", "acne"],
+    tags: ["dark_spots", "dullness", "brightening", "all-skin", "pollution"],
     routine: "day",
-    purchaseLink: "https://www.lorealparis.com.au/pure-clay-moisturiser-mattify-control-shine",
+    purchaseLink: "https://www.loreal-paris.co.uk/bright-reveal/dark-spot-hydrating-cream-spf-50-niacinamide",
     description:
-      "Lightweight clay moisturiser that controls shine for up to 24 hours without clogging pores, formulated for oily and combination skin.",
+      "Niacinamide + Mexoryl 400 SPF50 moisturiser that visibly fades dark spots in 1 month while providing the broadest UV protection available.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-014.jpg",
   },
-
-  // --- NIGHT MOISTURISERS (3) ---
   {
     id: "loreal-015",
-    name: "Age Perfect Cell Renewal Night Cream 50ml",
-    category: "moisturizer",
-    priority: 20,
-    tags: ["mature", "fine_lines", "wrinkles", "anti-aging", "dullness"],
-    routine: "night",
-    purchaseLink: "https://www.lorealparis.com.au/age-perfect-cell-renewal-rejuvenating-night-cream",
-    description:
-      "Peony extract and LHA night cream that stimulates cell renewal, visibly re-densifies skin and reduces age spots by morning.",
-    image: "https://storage.googleapis.com/product-imgs-glowai/loreal-015.jpg",
-  },
-  {
-    id: "loreal-016",
-    name: "Hydra Genius Sleeping Cream Night Moisturiser 50ml",
+    name: "Revitalift Filler Hyaluronic Acid Plumping Water-Cream",
     category: "moisturizer",
     priority: 18,
-    tags: ["dry", "dryness", "hydration", "fine_lines", "sensitive"],
-    routine: "night",
-    purchaseLink: "https://www.lorealparis.com.au/hydra-genius-sleeping-cream",
+    tags: ["dry", "dryness", "hydration", "fine_lines", "all-skin", "sensitive"],
+    routine: "day",
+    purchaseLink: "https://www.loreal-paris.co.uk/revitalift/filler-renew/plumping-water-cream",
     description:
-      "Overnight hyaluronic acid sleeping cream that intensively replenishes moisture lost during the day for plumper skin by morning.",
+      "Lightweight non-sticky water-cream with 2 types of hyaluronic acid and 3 ceramides — skin is 3x plumper and lines are visibly reduced in 2 weeks.",
+    image: "https://storage.googleapis.com/product-imgs-glowai/loreal-015.jpg",
+  },
+
+  // ── NIGHT MOISTURISERS (3) ─────────────────────────────────
+
+  {
+    id: "loreal-016",
+    name: "Revitalift Laser Retinol + Niacinamide Night Cream",
+    category: "moisturizer",
+    priority: 20,
+    tags: ["fine_lines", "wrinkles", "anti-aging", "mature", "dark_spots", "dullness"],
+    routine: "night",
+    purchaseLink: "https://www.loreal-paris.co.uk/revitalift/laser-renew/retinol-niacinamide-night-cream",
+    description:
+      "Retinol + niacinamide pressed night cream clinically proven to reduce wrinkles and even skin tone in 10 nights. Suitable for retinol beginners.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-016.jpg",
   },
   {
     id: "loreal-017",
-    name: "Revitalift Triple Power Night Cream 50ml",
+    name: "Revitalift Filler Hyaluronic Acid Night Cream",
     category: "moisturizer",
     priority: 18,
-    tags: ["anti-aging", "fine_lines", "wrinkles", "mature", "hydration"],
+    tags: ["dry", "dryness", "hydration", "fine_lines", "wrinkles", "anti-aging"],
     routine: "night",
-    purchaseLink: "https://www.lorealparis.com.au/revitalift-triple-power-anti-aging-overnight-cream",
+    purchaseLink: "https://www.loreal-paris.co.uk/revitalift/filler-renew/night-cream",
     description:
-      "Pro-retinol, vitamin C, and hyaluronic acid night cream that simultaneously firms, brightens and hydrates for comprehensive overnight repair.",
+      "Concentrated hyaluronic acid night cream that fills wrinkles, defines contours, and restores skin while you sleep.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-017.jpg",
   },
-
-  // --- EYE CREAM (1) ---
   {
     id: "loreal-018",
-    name: "Revitalift Laser Renew Eye Cream 15ml",
-    category: "eye_cream",
-    priority: 15,
-    tags: ["fine_lines", "anti-aging", "mature", "dark_spots"],
-    routine: "both",
-    purchaseLink: "https://www.lorealparis.com.au/revitalift-laser-renew-eye-cream",
+    name: "Age Perfect Cell Renew Midnight Cream",
+    category: "moisturizer",
+    priority: 18,
+    tags: ["mature", "fine_lines", "wrinkles", "anti-aging", "dullness", "dry"],
+    routine: "night",
+    purchaseLink: "https://www.loreal-paris.co.uk/age-perfect/cell-renew/midnight-cream",
     description:
-      "Pro-retinol and caffeine eye cream that targets crow's feet, puffiness, and under-eye dark circles in the delicate eye contour area.",
+      "Antioxidant overnight cream for mature skin that stimulates cell renewal, repairs the skin barrier, and reveals a fresher complexion by morning.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-018.jpg",
   },
 
-  // --- TONER/ESSENCE (1) ---
+  // ── MASKS (2) ──────────────────────────────────────────────
+
   {
     id: "loreal-019",
-    name: "Glycolic Bright Instant Glowing Toner 130ml",
-    category: "toner",
-    priority: 15,
-    tags: ["dullness", "brightening", "dark_spots", "oily", "combination"],
-    routine: "both",
-    purchaseLink: "https://www.lorealparis.com.au/glycolic-bright-glowing-toner",
-    description:
-      "Glycolic acid toner that sweeps away residue after cleansing, refines pores, and primes skin for better serum absorption.",
-    image: "https://storage.googleapis.com/product-imgs-glowai/loreal-019.jpg",
-  },
-
-  // --- MASK (1) ---
-  {
-    id: "loreal-020",
-    name: "Pure Clay Anti-Pollution Detox Mask 50ml",
+    name: "Pure Clay Bright Yuzu Lemon Face Mask",
     category: "mask",
     priority: 14,
-    tags: ["oily", "combination", "dullness", "pollution", "all-skin"],
+    tags: ["dullness", "brightening", "dark_spots", "all-skin", "oily", "combination"],
     routine: "both",
-    purchaseLink: "https://www.lorealparis.com.au/pure-clay-face-mask-detox-charcoal",
+    purchaseLink: "https://www.loreal-paris.co.uk/pure-clay/bright-face-mask",
     description:
-      "Activated charcoal and kaolin clay mask that draws out pollution particles and toxins from deep within pores, used 2–3 times weekly.",
+      "3 pure clays + yuzu lemon brightening mask used 2-3x weekly to exfoliate dead cells, absorb oil, and reveal a more even and radiant complexion.",
+    image: "https://storage.googleapis.com/product-imgs-glowai/loreal-019.jpg",
+  },
+  {
+    id: "loreal-020",
+    name: "Pure Clay Detox Charcoal Face Mask",
+    category: "mask",
+    priority: 14,
+    tags: ["oily", "combination", "acne", "pollution", "dullness"],
+    routine: "both",
+    purchaseLink: "https://www.loreal-paris.co.uk/pure-clay/purity-mask",
+    description:
+      "3 pure clays + eucalyptus detox mask used 2-3x weekly that draws out impurities from deep in pores for clarified, matte-looking skin.",
     image: "https://storage.googleapis.com/product-imgs-glowai/loreal-020.jpg",
   },
 
-  // ====================== L'ORÉAL ELVIVE — HAIR (20) ======================
-  // Extraordinary Oil, Total Repair 5, Color Vive, Hyaluron Plump, Dream Long ranges
+  // ============================================================
+  // L'ORÉAL ELVIVE — HAIR (20)
+  // ============================================================
 
-  // --- EXTRAORDINARY OIL (4) ---
+  // ── EXTRAORDINARY OIL (3) ──────────────────────────────────
+
   {
     id: "elvive-001",
-    name: "Extraordinary Oil Shampoo 400ml",
+    name: "Elvive Extraordinary Oil Nourishing Shampoo",
     category: "hair_shampoo",
     priority: 18,
-    tags: ["all-hair", "dry", "dryness", "frizzy", "frizz", "shine"],
+    tags: ["all-hair", "dry", "dryness", "frizzy", "frizz", "shine", "damaged"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-extraordinary-oil-shampoo",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/extraordinary-oil/oil-shampoo-dry-hair",
     description:
-      "6 rare flower oil blend shampoo that nourishes dry, frizzy hair from root to tip, leaving it silky, shiny, and frizz-free.",
+      "Silicone-free shampoo with marula and camellia oils that restores hair lipids for up to 8 weeks of nourishment and shine.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-001.jpg",
   },
   {
     id: "elvive-002",
-    name: "Extraordinary Oil Conditioner 300ml",
+    name: "Elvive Extraordinary Oil Nourishing Conditioner",
     category: "hair_conditioner",
     priority: 18,
     tags: ["all-hair", "dry", "dryness", "frizzy", "frizz", "shine"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-extraordinary-oil-conditioner",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/extraordinary-oil/oil-conditioner",
     description:
-      "Paired conditioner to the Extraordinary Oil shampoo that seals in moisture, controls frizz, and boosts mirror-like shine.",
+      "Marula and camellia oil conditioner that seals in moisture for 90% instant nourishment and hair that feels softer and healthier.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-002.jpg",
   },
   {
     id: "elvive-003",
-    name: "Extraordinary Oil Hair Treatment Serum 100ml",
-    category: "hair_treatment",
-    priority: 20,
-    tags: ["all-hair", "frizzy", "frizz", "dry", "dryness", "shine", "damaged"],
+    name: "Elvive Extraordinary Oil Coco Weightless Shampoo",
+    category: "hair_shampoo",
+    priority: 16,
+    tags: ["all-hair", "fine", "thin", "dry", "frizzy", "shine"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-extraordinary-oil-hair-serum",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/extraordinary-oil/coconut-shampoo",
     description:
-      "Leave-in serum with Camellia oil that tames frizz instantly, adds intense shine, and protects hair from heat styling damage.",
+      "Extra-fine coconut oil shampoo that delivers intense nourishment and irresistible shine with absolutely no weigh-down.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-003.jpg",
   },
+
+  // ── FULL RESTORE 5 (3) ─────────────────────────────────────
+
   {
     id: "elvive-004",
-    name: "Extraordinary Oil Curls Shampoo 400ml",
-    category: "hair_shampoo",
-    priority: 20,
-    tags: ["curly", "coily", "wavy", "frizzy", "frizz", "dry", "dryness"],
-    routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-extraordinary-oil-curls-shampoo",
-    description:
-      "Coconut oil-enriched shampoo specifically developed for curly and coily hair to define curls, eliminate frizz, and restore moisture.",
-    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-004.jpg",
-  },
-
-  // --- TOTAL REPAIR 5 (4) ---
-  {
-    id: "elvive-005",
-    name: "Total Repair 5 Shampoo 400ml",
+    name: "Elvive Full Restore 5 Repairing Shampoo",
     category: "hair_shampoo",
     priority: 20,
     tags: ["damaged", "repair", "breakage", "dry", "frizzy", "frizz"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-total-repair-5-shampoo",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/full-restore-5/elvive-full-restore-5-shampoo",
     description:
-      "Ceramide and protein shampoo that targets 5 damage signs — breakage, dryness, dullness, roughness, and split ends — in one wash.",
-    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-005.jpg",
+      "Ceramide-powered shampoo that targets all 5 signs of hair damage: strength, softness, vitality, silkiness, and shine from the first wash.",
+    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-004.jpg",
   },
   {
-    id: "elvive-006",
-    name: "Total Repair 5 Conditioner 300ml",
+    id: "elvive-005",
+    name: "Elvive Full Restore 5 Repairing Conditioner",
     category: "hair_conditioner",
     priority: 20,
     tags: ["damaged", "repair", "breakage", "dry", "frizzy"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-total-repair-5-conditioner",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/full-restore-5/elvive-full-restore-5-conditioner",
     description:
-      "Deep conditioning ceramide treatment that rebuilds damaged hair fibre structure and prevents future breakage after each use.",
-    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-006.jpg",
+      "Ceramide conditioner that rebuilds damaged hair fibre structure, leaving hair stronger, healthier, and more resilient after every use.",
+    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-005.jpg",
   },
   {
-    id: "elvive-007",
-    name: "Total Repair 5 Extreme Balm 200ml",
+    id: "elvive-006",
+    name: "Elvive Full Restore 5 Repair Mask",
     category: "hair_treatment",
     priority: 18,
-    tags: ["damaged", "repair", "breakage", "dry", "dryness"],
+    tags: ["damaged", "repair", "breakage", "dry", "dryness", "shine"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-total-repair-5-extreme-balm",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/full-restore-5/full-restore-5-mask",
     description:
-      "Intense overnight repair balm for severely damaged ends that restores strength and elasticity without weighing hair down.",
+      "Pro-keratin and ceramide weekly mask that reinforces each hair fibre, restores smoothness, and delivers a visible reduction in signs of damage.",
+    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-006.jpg",
+  },
+
+  // ── BOND REPAIR (3) ────────────────────────────────────────
+
+  {
+    id: "elvive-007",
+    name: "Elvive Bond Repair Pre-Shampoo Treatment",
+    category: "hair_treatment",
+    priority: 20,
+    tags: ["damaged", "repair", "breakage", "frizzy", "frizz", "color_treated"],
+    routine: "hair",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/bond-repair/pre-shampoo-treatment",
+    description:
+      "Citric acid complex pre-shampoo that rebuilds broken hair bonds from within — up to 98% less breakage and 90% more shine.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-007.jpg",
   },
   {
     id: "elvive-008",
-    name: "Total Repair 5 Renewing Mask 300ml",
-    category: "hair_treatment",
-    priority: 18,
-    tags: ["damaged", "repair", "breakage", "dry", "dryness", "frizzy"],
+    name: "Elvive Bond Repair Shampoo",
+    category: "hair_shampoo",
+    priority: 20,
+    tags: ["damaged", "repair", "breakage", "frizzy", "frizz", "color_treated"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-total-repair-5-renewing-mask",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/bond-repair/shampoo",
     description:
-      "Weekly ceramide and arginine mask that delivers intensive repair for hair weakened by heat, colour, or chemical treatments.",
+      "Sulphate-free citric acid shampoo that restores hair to its original strength — step 2 of the Bond Repair routine, up to 82% stronger hair.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-008.jpg",
   },
-
-  // --- HYALURON PLUMP (3) ---
   {
     id: "elvive-009",
-    name: "Hyaluron Plump Shampoo 400ml",
+    name: "Elvive Bond Repair Conditioner",
+    category: "hair_conditioner",
+    priority: 20,
+    tags: ["damaged", "repair", "breakage", "frizzy", "frizz", "shine", "color_treated"],
+    routine: "hair",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/bond-repair/conditioner",
+    description:
+      "Step 3 of the Bond Repair routine — citric acid conditioner that seals repaired bonds, eliminates frizz, and delivers glass-like shine.",
+    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-009.jpg",
+  },
+
+  // ── HYDRA HYALURONIC (3) ───────────────────────────────────
+
+  {
+    id: "elvive-010",
+    name: "Elvive Hydra Hyaluronic Moisture Boosting Shampoo",
     category: "hair_shampoo",
     priority: 18,
     tags: ["all-hair", "dry", "dryness", "fine", "thin", "hydration"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-hyaluron-plump-shampoo",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/hydra-hyaluronic/shampoo-with-hyaluronic-acid",
     description:
-      "Hyaluronic acid infused shampoo that replenishes moisture in dry, dehydrated hair and adds weightless plumping volume.",
-    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-009.jpg",
-  },
-  {
-    id: "elvive-010",
-    name: "Hyaluron Plump Conditioner 300ml",
-    category: "hair_conditioner",
-    priority: 18,
-    tags: ["all-hair", "dry", "dryness", "fine", "thin", "hydration"],
-    routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-hyaluron-plump-conditioner",
-    description:
-      "Hyaluronic acid conditioner that provides lasting hydration without weighing down fine or thin hair — adds body and softness.",
+      "Hyaluronic acid shampoo that weightlessly coats hair to keep it feeling hydrated for up to 72 hours — hair looks plumped, bouncy, and shiny.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-010.jpg",
   },
   {
     id: "elvive-011",
-    name: "Hyaluron Plump Replumping Serum 150ml",
-    category: "hair_treatment",
-    priority: 20,
-    tags: ["all-hair", "dry", "dryness", "fine", "thin", "hydration", "volume"],
+    name: "Elvive Hydra Hyaluronic Moisture Locking Conditioner",
+    category: "hair_conditioner",
+    priority: 18,
+    tags: ["all-hair", "dry", "dryness", "fine", "thin", "hydration"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-hyaluron-plump-replumping-serum",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/hydra-hyaluronic/conditioner-with-hyaluronic-acid",
     description:
-      "Leave-in hyaluronic acid hair serum that fills in gaps in the hair fibre, visibly plumping and thickening each strand.",
+      "Hyaluronic acid conditioner that locks in moisture for up to 72 hours with no weigh-down — suitable for all hair types and textures.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-011.jpg",
   },
-
-  // --- COLOR VIVE (3) ---
   {
     id: "elvive-012",
-    name: "Color Vive Shampoo 400ml",
-    category: "hair_shampoo",
-    priority: 18,
-    tags: ["color_treated", "all-hair", "shine", "damaged"],
+    name: "Elvive Hydra Hyaluronic Wonder Water",
+    category: "hair_treatment",
+    priority: 20,
+    tags: ["all-hair", "dry", "dryness", "shine", "frizzy", "frizz", "fine"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-color-vive-shampoo",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/wonder-water-with-hyaluronic-acid",
     description:
-      "UV filter and antioxidant shampoo that protects colour-treated hair from fading, washing out 2× slower than unprotected hair.",
+      "8-second rinse-out lamellar water with hyaluronic acid — hair looks up to 5x shinier and feels plumped. Silicone-free, works on all textures.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-012.jpg",
   },
+
+  // ── COLOUR PROTECT (3) ─────────────────────────────────────
+
   {
     id: "elvive-013",
-    name: "Color Vive Conditioner 300ml",
-    category: "hair_conditioner",
+    name: "Elvive Colour Protect Shampoo",
+    category: "hair_shampoo",
     priority: 18,
     tags: ["color_treated", "all-hair", "shine", "damaged", "frizzy"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-color-vive-conditioner",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/colour-protect/elvive-colour-protect-care-shampoo",
     description:
-      "Colour-protect conditioner that seals the hair cuticle to lock in dye, add shine, and prevent colour-related frizz.",
+      "Pure vitamin C + UV filter shampoo that preserves colour vibrancy for up to 40 washes — sunproof and waterproof for coloured hair.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-013.jpg",
   },
   {
     id: "elvive-014",
-    name: "Color Vive Protecting Balm 300ml",
-    category: "hair_treatment",
-    priority: 15,
-    tags: ["color_treated", "damaged", "repair", "shine"],
-    routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-color-vive-protecting-mask",
-    description:
-      "Weekly deep treatment balm that reinforces colour-treated hair, reduces breakage from chemical processing, and restores vibrancy.",
-    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-014.jpg",
-  },
-
-  // --- DREAM LONG (3) ---
-  {
-    id: "elvive-015",
-    name: "Dream Long Shampoo 400ml",
-    category: "hair_shampoo",
-    priority: 18,
-    tags: ["all-hair", "hairfall", "breakage", "fine", "thin"],
-    routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-dream-long-shampoo",
-    description:
-      "Castor oil and arginine shampoo that reinforces weak, fragile hair from root to tip, reducing breakage to help hair grow longer.",
-    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-015.jpg",
-  },
-  {
-    id: "elvive-016",
-    name: "Dream Long Conditioner 300ml",
+    name: "Elvive Colour Protect Conditioner",
     category: "hair_conditioner",
     priority: 18,
-    tags: ["all-hair", "hairfall", "breakage", "fine", "thin", "dry"],
+    tags: ["color_treated", "all-hair", "shine", "frizzy", "frizz"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-dream-long-conditioner",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/colour-protect/elvive-colour-protect-conditioner",
     description:
-      "Lightweight conditioner that detangles and strengthens fragile long hair without weighing it down, reducing breakage at brushing.",
+      "Pure vitamin C conditioner that seals the hair cuticle to lock in dye, shield against UV damage, and boost colour-radiant shine.",
+    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-014.jpg",
+  },
+  {
+    id: "elvive-015",
+    name: "Elvive Colour Protect Wonder Water",
+    category: "hair_treatment",
+    priority: 16,
+    tags: ["color_treated", "all-hair", "shine", "damaged", "frizzy", "frizz"],
+    routine: "hair",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/colour-protect/wonder-water",
+    description:
+      "8-second lamellar rinse-out treatment for coloured hair — pH-optimised formula delivers up to 5x more shine and vibrant colour radiance.",
+    image: "https://storage.googleapis.com/product-imgs-glowai/elvive-015.jpg",
+  },
+
+  // ── DREAM LENGTHS (3) ──────────────────────────────────────
+
+  {
+    id: "elvive-016",
+    name: "Elvive Dream Lengths Restoring Shampoo",
+    category: "hair_shampoo",
+    priority: 18,
+    tags: ["all-hair", "hairfall", "breakage", "damaged", "fine", "thin"],
+    routine: "hair",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/dream-lengths/long-hair-shampoo",
+    description:
+      "Vegetal keratin and castor oil shampoo that strengthens hair fibre from root to tip — split ends appear sealed, saving your last 3 cm.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-016.jpg",
   },
   {
     id: "elvive-017",
-    name: "Dream Long Wonder Water 200ml",
-    category: "hair_treatment",
-    priority: 20,
-    tags: ["all-hair", "frizzy", "frizz", "shine", "damaged", "breakage"],
+    name: "Elvive Dream Lengths Restoring Conditioner",
+    category: "hair_conditioner",
+    priority: 18,
+    tags: ["all-hair", "hairfall", "breakage", "damaged", "fine", "thin", "dry"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-wonder-water",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/dream-lengths/long-hair-conditioner",
     description:
-      "10-second lamellar water rinse-off treatment that seals the hair cuticle for instant smoothness, glass-like shine, and frizz control.",
+      "Keratin and castor oil conditioner that instantly helps repair fragile lengths and seals split ends — suitable for all hair types.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-017.jpg",
   },
-
-  // --- ANTI-HAIRFALL (2) ---
   {
     id: "elvive-018",
-    name: "Full Resist Anti-Hairfall Shampoo 400ml",
+    name: "Elvive Dream Lengths More Than Shampoo",
     category: "hair_shampoo",
-    priority: 20,
-    tags: ["all-hair", "hairfall", "breakage", "fine", "thin"],
+    priority: 16,
+    tags: ["all-hair", "hairfall", "breakage", "damaged", "dry"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-full-resist-shampoo",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/dream-lengths/more-than-shampoo",
     description:
-      "Biotin and arginine anti-hairfall shampoo that strengthens hair bonds and reduces hair loss due to breakage by up to 97%.",
+      "Shampoo with the care of a mask — keratin, vitamins, and castor oil in one step for long, damaged hair that needs serious strengthening.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-018.jpg",
   },
+
+  // ── GLYCOLIC GLOSS + HA SERUM (2) ──────────────────────────
+
   {
     id: "elvive-019",
-    name: "Full Resist Anti-Hairfall Conditioner 300ml",
+    name: "Elvive Glycolic Gloss Shine-Sealing Conditioner",
     category: "hair_conditioner",
-    priority: 20,
-    tags: ["all-hair", "hairfall", "breakage", "fine", "thin", "dry"],
+    priority: 18,
+    tags: ["all-hair", "shine", "damaged", "frizzy", "frizz", "color_treated", "wavy", "straight"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-full-resist-conditioner",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/glycolic-gloss/glycolic-gloss-core-conditioner",
     description:
-      "Biotin-enriched anti-breakage conditioner that reinforces the hair fibre and reduces hairfall visible during rinsing and brushing.",
+      "Glycolic acid conditioner that laminates the hair cuticle with an instant shine glaze for exceptional sleekness — ideal for dull, porous hair.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-019.jpg",
   },
-
-  // --- SCALP (1) ---
   {
     id: "elvive-020",
-    name: "Scalp Advanced Anti-Dandruff Shampoo 400ml",
-    category: "hair_shampoo",
-    priority: 15,
-    tags: ["all-hair", "scalp", "dandruff", "dry", "dryness"],
+    name: "Elvive Hydra Hyaluronic Moisture Plump Hair Serum",
+    category: "hair_treatment",
+    priority: 18,
+    tags: ["all-hair", "dry", "dryness", "hydration", "fine", "thin", "frizzy", "frizz"],
     routine: "hair",
-    purchaseLink: "https://www.lorealparis.com.au/elvive-scalp-advanced-anti-dandruff-shampoo",
+    purchaseLink: "https://www.loreal-paris.co.uk/elvive/hydra-hyaluronic/hair-serum-with-hyaluronic-acid",
     description:
-      "Piroctone olamine anti-dandruff shampoo that eliminates flakes, soothes scalp irritation, and keeps hair clean and refreshed.",
+      "Leave-in hyaluronic acid hair serum that weightlessly coats strands for up to 72-hour hydration — use on wet or dry hair at any time.",
     image: "https://storage.googleapis.com/product-imgs-glowai/elvive-020.jpg",
   },
 ];
@@ -544,90 +546,83 @@ export const products: Product[] = [
 // ─────────────────────────────────────────────────────────────────────────────
 // SAFE ROUTINE FALLBACKS
 // Used when no products score > 0 for a given profile.
-// These are the most universally suitable products across all skin/hair types.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Safe day routine: gentle cleanser + hydrating serum + SPF moisturiser */
+/** Day: gentle cleanser + universal hydration serum + SPF */
 export const SAFE_ROUTINE_DAY_IDS = [
-  "loreal-003",  // Micellar Water (all-skin gentle cleanser)
+  "loreal-003",  // Revitalift Micellar Water (all-skin cleanser)
   "loreal-007",  // Hyaluronic Acid Serum (universal hydration)
-  "loreal-013",  // UV Defender SPF50+ (everyone needs SPF)
-  "loreal-011",  // Hydra Genius Day Moisturiser
+  "loreal-013",  // Revitalift Clinical SPF50+ (everyone needs SPF)
+  "loreal-015",  // Revitalift Filler Water-Cream
 ];
 
-/** Safe night routine: gentle cleanser + night moisturiser */
+/** Night: micellar water + HA serum + hydrating night cream */
 export const SAFE_ROUTINE_NIGHT_IDS = [
-  "loreal-003",  // Micellar Water
-  "loreal-016",  // Hydra Genius Sleeping Cream
-  "loreal-015",  // Age Perfect Night Cream
+  "loreal-003",  // Revitalift Micellar Water
+  "loreal-007",  // Hyaluronic Acid Serum
+  "loreal-017",  // Revitalift Filler Night Cream
 ];
 
-/** Safe hair routine: universal repair shampoo + conditioner + treatment */
+/** Hair: ceramide repair shampoo + conditioner + universal treatment */
 export const SAFE_ROUTINE_HAIR_IDS = [
-  "elvive-005",  // Total Repair 5 Shampoo (addresses most hair concerns)
-  "elvive-006",  // Total Repair 5 Conditioner
-  "elvive-003",  // Extraordinary Oil Serum (universal finishing treatment)
+  "elvive-004",  // Full Restore 5 Shampoo
+  "elvive-005",  // Full Restore 5 Conditioner
+  "elvive-012",  // Hydra Hyaluronic Wonder Water
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // IMAGE UPLOAD GUIDE
-// ─────────────────────────────────────────────────────────────────────────────
+// Bucket:  gs://product-imgs-glowai/
+// Public:  https://storage.googleapis.com/product-imgs-glowai/{id}.jpg
 //
-// Upload each product image to your GCloud bucket using the filename = product id.
+// Get images from each product page on loreal-paris.co.uk
+// Right-click product hero image > Save as > rename to {id}.jpg
 //
-// Bucket path: gs://product-imgs-glowai/
-// Public URL:  https://storage.googleapis.com/product-imgs-glowai/{id}.jpg
+// SKIN
+//   loreal-001  Pure Clay Green Foam Wash (green tube)
+//   loreal-002  Pure Clay Red Foam Wash (red/pink tube)
+//   loreal-003  Revitalift Filler Micellar Water (clear/blue bottle)
+//   loreal-004  Pure Clay Black Charcoal Foam Wash (black tube)
+//   loreal-005  Bright Reveal Serum-in-Cleanser (pink/white bottle)
+//   loreal-006  Age Perfect Micellar Water (gold/beige bottle)
+//   loreal-007  Revitalift Filler HA Serum (clear dropper bottle)
+//   loreal-008  Revitalift Clinical Vitamin C Serum (orange bottle)
+//   loreal-009  Revitalift Laser Retinol Night Serum (dark purple bottle)
+//   loreal-010  Bright Reveal Niacinamide Serum (pink/gold bottle)
+//   loreal-011  Revitalift Filler Eye Serum (silver tube with roller tip)
+//   loreal-012  Revitalift Laser Day Cream (white/gold jar)
+//   loreal-013  Revitalift Clinical SPF50+ UV Fluid (white tube)
+//   loreal-014  Bright Reveal Dark Spot Cream SPF50 (pink/white jar)
+//   loreal-015  Revitalift Filler Water-Cream (white/blue jar)
+//   loreal-016  Revitalift Laser Retinol Night Cream (purple/gold jar)
+//   loreal-017  Revitalift Filler Night Cream (white/purple jar)
+//   loreal-018  Age Perfect Cell Renew Midnight Cream (dark blue jar)
+//   loreal-019  Pure Clay Bright Mask (yellow jar)
+//   loreal-020  Pure Clay Detox Mask (black jar)
 //
-// SKIN PRODUCTS (L'Oréal Paris) — search these exact product names on:
-//   lorealparis.com.au, lorealparis.co.uk, or loreal-paris.com for official images
+// HAIR
+//   elvive-001  Extraordinary Oil Shampoo (gold/bronze bottle)
+//   elvive-002  Extraordinary Oil Conditioner (gold/bronze bottle)
+//   elvive-003  Extraordinary Oil Coco Shampoo (white/gold bottle)
+//   elvive-004  Full Restore 5 Shampoo (red/cream bottle)
+//   elvive-005  Full Restore 5 Conditioner (red/cream bottle)
+//   elvive-006  Full Restore 5 Mask (red jar)
+//   elvive-007  Bond Repair Pre-Shampoo (black/gold bottle)
+//   elvive-008  Bond Repair Shampoo (black/gold bottle)
+//   elvive-009  Bond Repair Conditioner (black/gold bottle)
+//   elvive-010  Hydra Hyaluronic Shampoo (blue/clear bottle)
+//   elvive-011  Hydra Hyaluronic Conditioner (blue/clear bottle)
+//   elvive-012  Hydra Hyaluronic Wonder Water (blue/clear bottle)
+//   elvive-013  Colour Protect Shampoo (purple bottle)
+//   elvive-014  Colour Protect Conditioner (purple bottle)
+//   elvive-015  Colour Protect Wonder Water (purple bottle)
+//   elvive-016  Dream Lengths Shampoo (pink bottle)
+//   elvive-017  Dream Lengths Conditioner (pink bottle)
+//   elvive-018  Dream Lengths More Than Shampoo (pink/gold bottle)
+//   elvive-019  Glycolic Gloss Conditioner (red/pink bottle)
+//   elvive-020  Hydra Hyaluronic Hair Serum (blue spray bottle)
 //
-//   loreal-001.jpg  → L'Oréal Pure Clay Purifying Face Wash (black tube)
-//   loreal-002.jpg  → L'Oréal Pure Clay Brightening Face Wash (yellow/white tube)
-//   loreal-003.jpg  → L'Oréal Micellar Water 3-in-1 400ml (clear/pink bottle)
-//   loreal-004.jpg  → L'Oréal Pure Clay Anti-Pore Face Wash (blue/green tube)
-//   loreal-005.jpg  → L'Oréal Age Perfect Cleansing Milk (gold/beige bottle)
-//   loreal-006.jpg  → L'Oréal Revitalift Micro-Peeling Gel Wash (white/gold tube)
-//   loreal-007.jpg  → L'Oréal Revitalift 1.5% Hyaluronic Acid Serum (clear bottle)
-//   loreal-008.jpg  → L'Oréal Revitalift 10% Vitamin C Serum (orange bottle)
-//   loreal-009.jpg  → L'Oréal Revitalift Laser Retinol Serum (dark purple bottle)
-//   loreal-010.jpg  → L'Oréal Glycolic Bright Glowing Serum (pink bottle)
-//   loreal-011.jpg  → L'Oréal Hydra Genius Aloe Water Moisturiser (green bottle)
-//   loreal-012.jpg  → L'Oréal Revitalift Laser SPF20 Day Cream (gold/white jar)
-//   loreal-013.jpg  → L'Oréal UV Defender SPF50+ (white tube)
-//   loreal-014.jpg  → L'Oréal Pure Clay Mattifying Moisturiser (black jar)
-//   loreal-015.jpg  → L'Oréal Age Perfect Cell Renewal Night Cream (gold jar)
-//   loreal-016.jpg  → L'Oréal Hydra Genius Sleeping Cream (turquoise jar)
-//   loreal-017.jpg  → L'Oréal Revitalift Triple Power Night Cream (white jar)
-//   loreal-018.jpg  → L'Oréal Revitalift Laser Eye Cream (small gold tube)
-//   loreal-019.jpg  → L'Oréal Glycolic Bright Toner (pink bottle)
-//   loreal-020.jpg  → L'Oréal Pure Clay Charcoal Detox Mask (black jar)
-//
-// HAIR PRODUCTS (L'Oréal Elvive) — search "Elvive {product name}" on:
-//   lorealparis.com.au or elvive.com
-//
-//   elvive-001.jpg  → Elvive Extraordinary Oil Shampoo (gold/bronze bottle)
-//   elvive-002.jpg  → Elvive Extraordinary Oil Conditioner (gold/bronze bottle)
-//   elvive-003.jpg  → Elvive Extraordinary Oil Serum (gold dropper bottle)
-//   elvive-004.jpg  → Elvive Extraordinary Oil Curls Shampoo (orange bottle)
-//   elvive-005.jpg  → Elvive Total Repair 5 Shampoo (red/white bottle)
-//   elvive-006.jpg  → Elvive Total Repair 5 Conditioner (red/white bottle)
-//   elvive-007.jpg  → Elvive Total Repair 5 Extreme Balm (red jar)
-//   elvive-008.jpg  → Elvive Total Repair 5 Renewing Mask (red jar)
-//   elvive-009.jpg  → Elvive Hyaluron Plump Shampoo (blue/clear bottle)
-//   elvive-010.jpg  → Elvive Hyaluron Plump Conditioner (blue/clear bottle)
-//   elvive-011.jpg  → Elvive Hyaluron Plump Serum (blue bottle)
-//   elvive-012.jpg  → Elvive Color Vive Shampoo (purple bottle)
-//   elvive-013.jpg  → Elvive Color Vive Conditioner (purple bottle)
-//   elvive-014.jpg  → Elvive Color Vive Protecting Balm (purple jar)
-//   elvive-015.jpg  → Elvive Dream Long Shampoo (pink bottle)
-//   elvive-016.jpg  → Elvive Dream Long Conditioner (pink bottle)
-//   elvive-017.jpg  → Elvive Wonder Water (clear/blue bottle)
-//   elvive-018.jpg  → Elvive Full Resist Anti-Hairfall Shampoo (red/white bottle)
-//   elvive-019.jpg  → Elvive Full Resist Anti-Hairfall Conditioner (red/white bottle)
-//   elvive-020.jpg  → Elvive Scalp Advanced Anti-Dandruff Shampoo (blue bottle)
-//
-// QUICK UPLOAD COMMAND (run from terminal with gsutil installed):
+// BULK UPLOAD COMMANDS:
 //   gsutil -m cp ./product-images/*.jpg gs://product-imgs-glowai/
-//
-// Make sure the bucket has public read access:
 //   gsutil iam ch allUsers:objectViewer gs://product-imgs-glowai
+// ─────────────────────────────────────────────────────────────────────────────
