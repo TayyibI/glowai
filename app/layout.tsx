@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
-import { MobileGate } from "@/components/MobileGate";
+import { LangProvider } from "@/contexts/LangContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,9 +17,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "GlowAI – AI-Powered Beauty & Wellness Insights",
+  title: "GlowAI – AI-Powered Skin & Hair Analysis",
   description:
-    "Enterprise-grade AI for personalized skin and hair analysis. Trusted by teams worldwide.",
+    "Personalised skin and hair analysis powered by computer vision. Get your custom morning, evening, and hair care routine in under 2 minutes.",
 };
 
 export default function RootLayout({
@@ -28,11 +28,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} min-h-screen font-sans antialiased bg-alabaster text-charcoal selection:bg-champagne/30 selection:text-charcoal`}>
-        <MobileGate>
+    <html suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${playfair.variable} min-h-screen font-sans antialiased bg-alabaster text-charcoal selection:bg-champagne/30 selection:text-charcoal`}
+      >
+        {/* LangProvider sets dir="rtl" and lang="ur" dynamically for Urdu */}
+        <LangProvider>
           <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
-        </MobileGate>
+        </LangProvider>
       </body>
     </html>
   );

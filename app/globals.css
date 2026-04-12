@@ -2,19 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
-/* GlowAI – French Luxury palette */
+/* ══════════════════════════════════════════════════════════════════
+   GlowAI — Premium Design Token System
+   Quiet Luxury / Old Money palette
+   ══════════════════════════════════════════════════════════════════ */
 :root {
+  /* Core palette */
   --alabaster: #FAF8F5;
   --charcoal: #1A1C19;
   --bordeaux: #4A1C27;
   --champagne: #C2A878;
+  --champagne-muted: rgba(194, 168, 120, 0.12);
+  --charcoal-muted: rgba(26, 28, 25, 0.08);
+
+  /* Typography */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-serif: "Playfair Display", serif;
+  --font-mono: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", ui-monospace, monospace;
+
+  /* Geometry — strict flat luxury */
   --radius-btn: 0px;
   --radius-input: 0px;
   --radius-card: 0px;
+
+  /* Motion tokens */
+  --ease-micro: 200ms ease-in-out;
+  --ease-panel: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-reveal: 600ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Trust / badge */
+  --privacy-green: #2D6A4F;
+  --privacy-green-bg: rgba(45, 106, 79, 0.08);
 }
 
+/* ── Base reset ─────────────────────────────────────────────────── */
 body {
   font-family: var(--font-sans);
   background: var(--alabaster);
@@ -30,13 +51,156 @@ body {
   }
 }
 
+/* ── Global 200ms micro-interactions ────────────────────────────── */
+button,
+a,
+[role="button"],
+input[type="checkbox"],
+input[type="radio"],
+label[for],
+.interactive {
+  transition: all var(--ease-micro);
+}
+
+button:not(:disabled):hover,
+a:hover {
+  opacity: 0.88;
+}
+
+button:not(:disabled):active,
+a:active {
+  transform: scale(0.975);
+}
+
+/* ── Card primitives ────────────────────────────────────────────── */
 .card {
   background: var(--alabaster);
   border-radius: var(--radius-card);
-  border: 1px solid var(--charcoal);
+  border: 1px solid rgba(26, 28, 25, 0.15);
   padding: 24px;
 }
 
 .card-compact {
   padding: 20px;
+}
+
+.card-clinical {
+  background: #fff;
+  border-radius: 0;
+  border: 1px solid rgba(26, 28, 25, 0.12);
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ── Scanning animation utilities ───────────────────────────────── */
+@keyframes scan-line {
+  0%   { transform: translateY(-100%); opacity: 0.5; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes glow-pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(45, 106, 79, 0.0); }
+  50%       { box-shadow: 0 0 24px 4px rgba(45, 106, 79, 0.45); }
+}
+
+@keyframes glow-pulse-amber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.0); }
+  50%       { box-shadow: 0 0 20px 3px rgba(217, 119, 6, 0.40); }
+}
+
+@keyframes glow-pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(189, 30, 30, 0.0); }
+  50%       { box-shadow: 0 0 20px 3px rgba(189, 30, 30, 0.45); }
+}
+
+.scan-line {
+  animation: scan-line 2.4s linear infinite;
+}
+
+.cursor-blink::after {
+  content: '▌';
+  animation: blink-cursor 1.1s step-end infinite;
+}
+
+.bounding-box-good {
+  border-color: #2D8A63 !important;
+  animation: glow-pulse-green 2s ease-in-out infinite;
+}
+
+.bounding-box-warn {
+  border-color: #D97706 !important;
+  animation: glow-pulse-amber 2s ease-in-out infinite;
+}
+
+.bounding-box-bad {
+  border-color: #BD1E1E !important;
+  animation: glow-pulse-red 2s ease-in-out infinite;
+}
+
+/* ── Privacy badge ──────────────────────────────────────────────── */
+.privacy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--privacy-green-bg);
+  border: 1px solid rgba(45, 106, 79, 0.25);
+  color: var(--privacy-green);
+  padding: 8px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 0;
+  transition: all var(--ease-micro);
+}
+
+/* ── Diagnostic row layout ──────────────────────────────────────── */
+.diagnostic-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid rgba(26, 28, 25, 0.08);
+  transition: background var(--ease-micro);
+}
+
+@media (min-width: 640px) {
+  .diagnostic-row {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 24px;
+  }
+}
+
+.diagnostic-row:hover {
+  background: rgba(194, 168, 120, 0.05);
+}
+
+.diagnostic-row:last-child {
+  border-bottom: none;
+}
+
+/* ── Match score bar ────────────────────────────────────────────── */
+.match-bar-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(26, 28, 25, 0.10);
+  border-radius: 0;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.match-bar-fill {
+  height: 100%;
+  background: var(--champagne);
+  border-radius: 0;
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }

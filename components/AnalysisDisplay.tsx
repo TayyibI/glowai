@@ -56,7 +56,10 @@ function getClinicalDescription(name: string): string {
   return `Detected structural variance associated with ${norm} characteristic.`;
 }
 
+import { useLang } from "@/contexts/LangContext";
+
 export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
+  const { t } = useLang();
   const [scanId, setScanId] = useState("");
   const [timestamp, setTimestamp] = useState("");
 
@@ -84,13 +87,13 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
       <div className="bg-white border sm:border-charcoal/20 border-charcoal/10 pb-8 rounded-none mt-2">
         {/* HEADER */}
         <div className="border-b border-charcoal/20 p-6 md:p-8 bg-white">
-          <h2 className="font-serif text-3xl text-charcoal tracking-wide mb-4">Skin Analysis Report</h2>
+          <h2 className="font-serif text-3xl text-charcoal tracking-wide mb-4">{t("report.title")}</h2>
           <div className="flex flex-col gap-1">
             <p className="font-mono text-xs text-charcoal/70 uppercase tracking-widest">
-              Scan ID: <span className="font-bold text-charcoal">{scanId || "..."}</span>
+              {t("report.scan_id")} <span className="font-bold text-charcoal">{scanId || "..."}</span>
             </p>
             <p className="font-mono text-xs text-charcoal/70 uppercase tracking-widest">
-              Analysed: <span className="font-bold text-charcoal">{timestamp || "..."}</span>
+              {t("report.analysed")} <span className="font-bold text-charcoal">{timestamp || "..."}</span>
             </p>
           </div>
         </div>
@@ -127,44 +130,44 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
               </div>
             </div>
 
-            <span className="text-[10px] font-bold text-charcoal/60 uppercase tracking-[0.2em] mt-3">Hydration Index</span>
-            <p className="text-sm text-charcoal mt-2 max-w-sm text-center">
+            <span className="text-[10px] font-bold text-charcoal/60 uppercase tracking-[0.2em] mt-3">{t("report.hydration")}</span>
+            <p className="text-sm text-charcoal mt-2 max-w-sm text-center font-bold">
               {getHydrationLabel(result.face.hydrationScore)}
             </p>
           </div>
 
           {/* ATTRIBUTE DATA TABLE */}
-          <div className="w-full overflow-hidden">
-            <table className="w-full text-left border-collapse">
+          <div className="w-full overflow-x-auto scroller-none">
+            <table className="w-full min-w-[340px] text-left border-collapse">
               <thead>
                 <tr>
-                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 font-medium">Parameter</th>
-                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 font-medium w-1/3">Result</th>
-                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 font-medium text-right">Confidence</th>
+                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10">{t("report.parameter")}</th>
+                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 w-1/3">{t("report.result")}</th>
+                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 text-right md:text-left">{t("report.confidence")}</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
                 <tr>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">Skin Tone</td>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">{t("report.tone")}</td>
                   <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.face.skinTone)}</td>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right tracking-widest text-xs">{getDots(result.face.confidence)}</td>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right md:text-left tracking-widest text-xs">{getDots(result.face.confidence)}</td>
                 </tr>
                 <tr>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">Skin Type</td>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">{t("report.type")}</td>
                   <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.face.skinType)}</td>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right tracking-widest text-xs">{getDots(result.face.confidence)}</td>
+                  <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right md:text-left tracking-widest text-xs">{getDots(result.face.confidence)}</td>
                 </tr>
                 {result.hair && (
                   <>
                     <tr>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">Hair Colour</td>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">{t("report.hair_color")}</td>
                       <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.hair.color)}</td>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right tracking-widest text-xs">{getDots(result.hair.confidence)}</td>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right md:text-left tracking-widest text-xs">{getDots(result.hair.confidence)}</td>
                     </tr>
                     <tr>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">Hair Type</td>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">{t("report.hair_type")}</td>
                       <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.hair.type)}</td>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right tracking-widest text-xs">{getDots(result.hair.confidence)}</td>
+                      <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right md:text-left tracking-widest text-xs">{getDots(result.hair.confidence)}</td>
                     </tr>
                   </>
                 )}
@@ -174,7 +177,7 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
 
           {/* DETECTED CONCERNS */}
           <div className="pt-2">
-            <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-charcoal border-b border-charcoal/20 pb-4 mb-4">Detected Conditions</h3>
+            <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-charcoal border-b border-charcoal/20 pb-4 mb-4">{t("report.conditions")}</h3>
 
             <div className="flex flex-col gap-4">
               {result.face.concerns.length > 0 ? (
@@ -182,10 +185,10 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                   const severity = getDiagnosticSeverity(c);
                   return (
                     <div key={c} className="bg-alabaster border border-charcoal/10 p-5 rounded-none shadow-sm flex flex-col">
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="flex flex-col sm:flex-row justify-between items-start mb-2 gap-2">
                         <span className="font-bold text-charcoal capitalize text-[15px]">{formatLabel(c)}</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-charcoal/60">Severity: {severity}</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-charcoal/60">{t("report.severity")} {severity}</span>
                         </div>
                       </div>
 
@@ -206,7 +209,7 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 })
               ) : (
                 <div className="bg-alabaster border border-charcoal/10 p-6 flex items-center justify-center">
-                  <span className="text-sm font-bold uppercase tracking-widest text-charcoal/60 italic">Healthy profile detected</span>
+                  <span className="text-sm font-bold uppercase tracking-widest text-charcoal/60 italic">{t("report.healthy")}</span>
                 </div>
               )}
             </div>
@@ -217,10 +220,10 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
         {/* BOTTOM SUMMARY */}
         <div className="border-t border-charcoal/20 p-6 md:p-8 bg-white flex flex-col items-start md:items-end text-left md:text-right">
           <p className="font-bold font-mono text-[13px] uppercase tracking-widest text-charcoal mb-2">
-            Overall scan confidence: {Math.round(totalConfidence * 100)}%
+            {t("report.overall_conf")} {Math.round(totalConfidence * 100)}%
           </p>
           <p className="text-[11px] text-charcoal/50 uppercase tracking-wider max-w-sm leading-relaxed">
-            Analysis based on computer vision assessment of uploaded image. Not a medical diagnosis.
+            {t("report.disclaimer")}
           </p>
         </div>
 

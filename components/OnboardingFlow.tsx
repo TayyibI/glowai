@@ -2,257 +2,318 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLang } from "@/contexts/LangContext";
+import { LangToggle } from "@/components/LangToggle";
 
-type FlowStep = 1 | 2 | 3;
+type FlowStep = 1 | 2 | 3 | 4;
 
 interface OnboardingFlowProps {
-    onComplete: () => void;
-    onSkipSetup: () => void;
+  onComplete: () => void;
+  onSkipSetup: () => void;
 }
 
-const GOAL_OPTIONS = [
-    "Brighter skin", "Less oiliness", "Fade dark spots",
-    "Anti-ageing", "Clear acne", "Deep hydration"
-];
+// ── Options (bilingual) ───────────────────────────────────────────────────────
+const GOAL_OPTIONS: Record<string, { en: string; ur: string }> = {
+  "brighter skin":    { en: "Brighter skin", ur: "روشن جلد" },
+  "less oiliness":    { en: "Less oiliness", ur: "کم چکنائی" },
+  "fade dark spots":  { en: "Fade dark spots", ur: "داغ دھبے کم کریں" },
+  "anti-ageing":      { en: "Anti-ageing", ur: "عمر بڑھنے سے روکیں" },
+  "clear acne":       { en: "Clear acne", ur: "کیل مہاسے صاف کریں" },
+  "deep hydration":   { en: "Deep hydration", ur: "گہری نمی" },
+};
 
-const SENSITIVITY_OPTIONS = [
-    "Fragrance-free", "Alcohol-free", "No retinol",
-    "Paraben-free", "Vegan only", "None"
-];
+const SENSITIVITY_OPTIONS: Record<string, { en: string; ur: string }> = {
+  fragrance:          { en: "Fragrance-free", ur: "خوشبو کے بغیر" },
+  retinol:            { en: "No retinol", ur: "ریٹینول نہیں" },
+  acids:              { en: "No acids (AHA/BHA)", ur: "ایسڈ نہیں" },
+  "paraben-free":     { en: "Paraben-free", ur: "پیرابین کے بغیر" },
+  "alcohol-free":     { en: "Alcohol-free", ur: "الکوحل کے بغیر" },
+  none:               { en: "None", ur: "کوئی نہیں" },
+};
 
-const TIME_OPTIONS = [
-    "Under 3 minutes", "5–10 minutes", "10+ minutes"
-];
+const TIME_OPTIONS: Record<string, { en: string; ur: string; sub?: { en: string; ur: string } }> = {
+  "Under 3 minutes":  { en: "Under 3 minutes", ur: "3 منٹ سے کم", sub: { en: "2–3 products", ur: "2–3 مصنوعات" } },
+  "5–10 minutes":     { en: "5–10 minutes", ur: "5–10 منٹ", sub: { en: "4 products", ur: "4 مصنوعات" } },
+  "10+ minutes":      { en: "10+ minutes", ur: "10+ منٹ", sub: { en: "Full routine", ur: "مکمل روٹین" } },
+};
+
+const HAIR_CONCERN_OPTIONS: Record<string, { en: string; ur: string }> = {
+  Hairfall:           { en: "Hairfall / Thinning", ur: "بال گرنا / پتلے ہونا" },
+  Frizz:              { en: "Frizz & dryness", ur: "الجھے اور خشک بال" },
+  Dandruff:           { en: "Dandruff / Scalp", ur: "خشکی / کھوپڑی" },
+  Damage:             { en: "Damage & breakage", ur: "نقصان اور ٹوٹنا" },
+  Shine:              { en: "Dullness / Shine", ur: "بے رونقی / چمک" },
+  None:               { en: "No specific concern", ur: "کوئی مخصوص مسئلہ نہیں" },
+};
+
+const TOTAL_STEPS = 4;
 
 export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps) {
-    const [step, setStep] = useState<FlowStep>(1);
+  const { lang, t, isUrdu } = useLang();
+  const [step, setStep] = useState<FlowStep>(1);
 
-    // States
-    const [goal, setGoal] = useState<string | null>(null);
-    const [sensitivities, setSensitivities] = useState<string[]>([]);
-    const [routineTime, setRoutineTime] = useState<string | null>(null);
+  const [goal, setGoal] = useState<string | null>(null);
+  const [sensitivities, setSensitivities] = useState<string[]>([]);
+  const [routineTime, setRoutineTime] = useState<string | null>(null);
+  const [hairConcern, setHairConcern] = useState<string | null>(null);
 
-    const handleNext = () => {
-        if (step < 3) {
-            setStep((prev) => (prev + 1) as FlowStep);
-        } else {
-            finishSetup();
-        }
-    };
+  const handleNext = () => {
+    if (step < TOTAL_STEPS) {
+      setStep((prev) => (prev + 1) as FlowStep);
+    } else {
+      finishSetup();
+    }
+  };
 
-    const handleSkipStep2 = () => {
-        setStep(3);
-    };
+  const handleSkipSetup = () => {
+    sessionStorage.setItem("glowai_onboarding", JSON.stringify({
+      goal: null, sensitivities: [], routineTime: "5–10 minutes", hairConcern: null,
+    }));
+    onSkipSetup();
+  };
 
-    const handleSkipSetup = () => {
-        sessionStorage.setItem("glowai_onboarding", JSON.stringify({
-            goal: null,
-            sensitivities: [],
-            routineTime: "5-10"
-        }));
-        onSkipSetup();
-    };
+  const finishSetup = () => {
+    sessionStorage.setItem("glowai_onboarding", JSON.stringify({
+      goal, sensitivities, routineTime, hairConcern,
+    }));
+    onComplete();
+  };
 
-    const finishSetup = () => {
-        sessionStorage.setItem("glowai_onboarding", JSON.stringify({
-            goal,
-            sensitivities,
-            routineTime
-        }));
-        onComplete();
-    };
+  const toggleSensitivity = (key: string) => {
+    if (key === "none") { setSensitivities(["none"]); return; }
+    setSensitivities((prev) => {
+      const filtered = prev.filter((s) => s !== "none");
+      return filtered.includes(key)
+        ? filtered.filter((s) => s !== key)
+        : [...filtered, key];
+    });
+  };
 
-    const toggleSensitivity = (item: string) => {
-        if (item === "None") {
-            setSensitivities(["None"]);
-            return;
-        }
-        setSensitivities((prev) => {
-            // Removing 'None' if it was selected
-            const filtered = prev.filter(s => s !== "None");
-            if (filtered.includes(item)) {
-                return filtered.filter(s => s !== item);
-            }
-            return [...filtered, item];
-        });
-    };
+  const canProceed = () => {
+    if (step === 1) return !!goal;
+    if (step === 2) return sensitivities.length > 0;
+    if (step === 3) return !!routineTime;
+    if (step === 4) return !!hairConcern;
+    return false;
+  };
 
-    // Check if current step allows progression
-    const canProceed = () => {
-        if (step === 1) return !!goal;
-        if (step === 2) return sensitivities.length > 0;
-        if (step === 3) return !!routineTime;
-        return false;
-    };
+  const optLabel = (opt: { en: string; ur: string }) => isUrdu ? opt.ur : opt.en;
 
-    return (
-        <div className="absolute inset-0 bg-alabaster flex flex-col z-20 overflow-y-auto">
-            {/* Top Bar */}
-            <div className="sticky top-0 bg-alabaster/90 backdrop-blur-md z-30 flex flex-col">
-                {/* Progress Bar */}
-                <div className="w-full h-1 bg-charcoal/10">
-                    <motion.div
-                        className="h-full bg-champagne"
-                        initial={{ width: "33.3%" }}
-                        animate={{ width: `${(step / 3) * 100}%` }}
-                        transition={{ ease: "easeInOut", duration: 0.3 }}
-                    />
-                </div>
+  const pillClass = (active: boolean) =>
+    `px-5 py-3 text-sm font-semibold transition-all duration-200 ease-in-out border ${
+      active
+        ? "border-[#c9a98a] bg-[#c9a98a]/20 text-[#c9a98a]"
+        : "border-charcoal/15 text-charcoal/80 bg-transparent hover:border-charcoal/30"
+    }`;
 
-                <div className="flex items-center justify-between px-6 py-4">
-                    <span className="text-[11px] font-bold text-charcoal/50 uppercase tracking-widest">
-                        Step {step} of 3
-                    </span>
-                    <div className="flex items-center gap-4">
-                        {step === 2 && (
-                            <button
-                                onClick={handleSkipStep2}
-                                className="text-[11px] font-bold text-charcoal/60 hover:text-charcoal uppercase tracking-widest transition-colors"
-                            >
-                                Skip step
-                            </button>
-                        )}
-                        <button
-                            onClick={handleSkipSetup}
-                            className="text-[11px] font-bold text-charcoal/60 hover:text-charcoal uppercase tracking-widest transition-colors"
-                        >
-                            Skip setup
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex-1 flex flex-col px-6 pt-8 pb-32 max-w-xl mx-auto w-full">
-                <AnimatePresence mode="wait">
-                    {step === 1 && (
-                        <motion.div
-                            key="step1"
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.3 }}
-                            className="flex flex-col gap-8"
-                        >
-                            <div>
-                                <h1 className="font-serif text-[32px] md:text-4xl text-charcoal leading-tight mb-2">
-                                    What&apos;s your main skin goal?
-                                </h1>
-                                <p className="text-sm text-charcoal/60">
-                                    We&apos;ll tailor your routine around this.
-                                </p>
-                            </div>
-
-                            <div className="flex flex-wrap gap-3">
-                                {GOAL_OPTIONS.map(opt => {
-                                    const isSelected = goal === opt;
-                                    return (
-                                        <button
-                                            key={opt}
-                                            onClick={() => setGoal(opt)}
-                                            className={`px-5 py-3 rounded-full text-sm font-semibold transition-all border ${isSelected
-                                                    ? "border-[#c9a98a] bg-[#c9a98a]/20 text-[#c9a98a]"
-                                                    : "border-charcoal/15 text-charcoal/80 bg-transparent hover:border-charcoal/30"
-                                                }`}
-                                        >
-                                            {opt}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {step === 2 && (
-                        <motion.div
-                            key="step2"
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.3 }}
-                            className="flex flex-col gap-8"
-                        >
-                            <div>
-                                <h1 className="font-serif text-[32px] md:text-4xl text-charcoal leading-tight mb-2">
-                                    Any ingredients to avoid?
-                                </h1>
-                                <p className="text-sm text-charcoal/60">
-                                    Skip if you&apos;re not sure.
-                                </p>
-                            </div>
-
-                            <div className="flex flex-wrap gap-3">
-                                {SENSITIVITY_OPTIONS.map(opt => {
-                                    const isSelected = sensitivities.includes(opt);
-                                    return (
-                                        <button
-                                            key={opt}
-                                            onClick={() => toggleSensitivity(opt)}
-                                            className={`px-5 py-3 rounded-full text-sm font-semibold transition-all border ${isSelected
-                                                    ? "border-[#c9a98a] bg-[#c9a98a]/20 text-[#c9a98a]"
-                                                    : "border-charcoal/15 text-charcoal/80 bg-transparent hover:border-charcoal/30"
-                                                }`}
-                                        >
-                                            {opt}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {step === 3 && (
-                        <motion.div
-                            key="step3"
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.3 }}
-                            className="flex flex-col gap-8"
-                        >
-                            <div>
-                                <h1 className="font-serif text-[32px] md:text-4xl text-charcoal leading-tight mb-2">
-                                    How long is your morning routine?
-                                </h1>
-                                <p className="text-sm text-charcoal/60">
-                                    We&apos;ll match the number of product steps to this.
-                                </p>
-                            </div>
-
-                            <div className="flex flex-wrap gap-3 w-full">
-                                {TIME_OPTIONS.map(opt => {
-                                    const isSelected = routineTime === opt;
-                                    return (
-                                        <button
-                                            key={opt}
-                                            onClick={() => setRoutineTime(opt)}
-                                            className={`w-full text-left px-5 py-4 rounded-xl text-base font-semibold transition-all border ${isSelected
-                                                    ? "border-[#c9a98a] bg-[#c9a98a]/20 text-[#c9a98a]"
-                                                    : "border-charcoal/15 text-charcoal/80 bg-transparent hover:border-charcoal/30"
-                                                }`}
-                                        >
-                                            {opt}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* Bottom Floating Action */}
-            <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-alabaster via-alabaster space-y-4">
-                <button
-                    onClick={handleNext}
-                    disabled={!canProceed()}
-                    className={`w-full max-w-xl mx-auto flex items-center justify-center p-4 rounded-xl font-bold uppercase tracking-widest text-[13px] transition-all transform active:scale-[0.98] ${canProceed()
-                            ? "bg-bordeaux text-white hover:bg-charcoal"
-                            : "bg-charcoal/10 text-charcoal/40 cursor-not-allowed"
-                        }`}
-                >
-                    {step === 3 ? "Start scan" : "Next"}
-                </button>
-            </div>
+  return (
+    <div
+      className="absolute inset-0 bg-alabaster flex flex-col z-20 overflow-y-auto"
+      dir={isUrdu ? "rtl" : "ltr"}
+      role="main"
+    >
+      {/* Top Bar */}
+      <div className="sticky top-0 bg-alabaster/90 backdrop-blur-md z-30 flex flex-col">
+        {/* Progress Bar */}
+        <div className="w-full h-1 bg-charcoal/10" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={TOTAL_STEPS}>
+          <motion.div
+            className="h-full bg-champagne"
+            initial={{ width: `${(1 / TOTAL_STEPS) * 100}%` }}
+            animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+            transition={{ ease: "easeInOut", duration: 0.3 }}
+          />
         </div>
-    );
+
+        <div className="flex items-center justify-between px-6 py-4">
+          <span className="text-[11px] font-bold text-charcoal/50 uppercase tracking-widest">
+            {isUrdu ? `مرحلہ ${step} از ${TOTAL_STEPS}` : `Step ${step} of ${TOTAL_STEPS}`}
+          </span>
+          <div className="flex items-center gap-3">
+            <LangToggle />
+            <button
+              id="skip-setup-btn"
+              onClick={handleSkipSetup}
+              aria-label="Skip setup and go directly to scan"
+              className="text-[11px] font-bold text-charcoal/60 hover:text-charcoal uppercase tracking-widest transition-colors duration-200"
+            >
+              {isUrdu ? "چھوڑیں" : "Skip setup"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col px-6 pt-8 pb-36 max-w-xl mx-auto w-full">
+        <AnimatePresence mode="wait">
+
+          {/* ── STEP 1: Skin Goal ── */}
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}
+              className="flex flex-col gap-8"
+            >
+              <div>
+                <h1 className="font-serif text-[32px] text-charcoal leading-tight mb-2">
+                  {isUrdu ? "آپ کا مرکزی جلد کا مقصد کیا ہے؟" : "What's your main skin goal?"}
+                </h1>
+                <p className="text-sm text-charcoal/60">
+                  {isUrdu ? "ہم آپ کی روٹین اس کے ارد گرد بنائیں گے۔" : "We'll tailor your routine around this."}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3" role="group" aria-label="Skin goal options">
+                {Object.entries(GOAL_OPTIONS).map(([key, labels]) => (
+                  <button
+                    key={key}
+                    id={`goal-${key.replace(/\s/g, "-")}`}
+                    onClick={() => setGoal(key)}
+                    aria-pressed={goal === key}
+                    className={`${pillClass(goal === key)} rounded-full`}
+                  >
+                    {optLabel(labels)}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── STEP 2: Sensitivities ── */}
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}
+              className="flex flex-col gap-8"
+            >
+              <div>
+                <h1 className="font-serif text-[32px] text-charcoal leading-tight mb-2">
+                  {isUrdu ? "کون سے اجزاء سے گریز کریں؟" : "Any ingredients to avoid?"}
+                </h1>
+                <p className="text-sm text-charcoal/60">
+                  {isUrdu
+                    ? "ان اجزاء والی مصنوعات کو خودکار طور پر ہٹا دیا جائے گا۔"
+                    : "Products with these ingredients will be automatically removed from your routine."}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3" role="group" aria-label="Ingredient sensitivity options">
+                {Object.entries(SENSITIVITY_OPTIONS).map(([key, labels]) => (
+                  <button
+                    key={key}
+                    id={`sensitivity-${key}`}
+                    onClick={() => toggleSensitivity(key)}
+                    aria-pressed={sensitivities.includes(key)}
+                    className={`${pillClass(sensitivities.includes(key))} rounded-full`}
+                  >
+                    {optLabel(labels)}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => { setSensitivities(["none"]); setStep(3); }}
+                className="text-[11px] font-bold uppercase tracking-widest text-charcoal/40 hover:text-charcoal transition-colors duration-200 underline w-fit"
+              >
+                {isUrdu ? "اس مرحلے کو چھوڑیں" : "Skip this step"}
+              </button>
+            </motion.div>
+          )}
+
+          {/* ── STEP 3: Routine Time ── */}
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}
+              className="flex flex-col gap-8"
+            >
+              <div>
+                <h1 className="font-serif text-[32px] text-charcoal leading-tight mb-2">
+                  {isUrdu ? "آپ کی صبح کی روٹین کتنی لمبی ہے؟" : "How long is your morning routine?"}
+                </h1>
+                <p className="text-sm text-charcoal/60">
+                  {isUrdu ? "ہم اس کے مطابق مراحل کی تعداد ملائیں گے۔" : "We'll match the number of steps to this."}
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 w-full" role="group" aria-label="Routine time options">
+                {Object.entries(TIME_OPTIONS).map(([key, labels]) => {
+                  const isSelected = routineTime === key;
+                  return (
+                    <button
+                      key={key}
+                      id={`time-${key.replace(/\s/g, "-")}`}
+                      onClick={() => setRoutineTime(key)}
+                      aria-pressed={isSelected}
+                      className={`w-full text-left px-5 py-4 font-semibold transition-all duration-200 ease-in-out border flex items-center justify-between ${
+                        isSelected
+                          ? "border-[#c9a98a] bg-[#c9a98a]/10 text-[#c9a98a]"
+                          : "border-charcoal/15 text-charcoal/80 bg-transparent hover:border-charcoal/30"
+                      }`}
+                    >
+                      <span className="text-base">{optLabel(labels)}</span>
+                      {labels.sub && (
+                        <span className="text-[11px] opacity-60">{isUrdu ? labels.sub.ur : labels.sub.en}</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── STEP 4: Hair Concern (Pakistan-specific) ── */}
+          {step === 4 && (
+            <motion.div
+              key="step4"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}
+              className="flex flex-col gap-8"
+            >
+              <div>
+                <h1 className="font-serif text-[32px] text-charcoal leading-tight mb-2">
+                  {isUrdu ? "آپ کی بالوں کی بنیادی تشویش کیا ہے؟" : "What's your main hair concern?"}
+                </h1>
+                <p className="text-sm text-charcoal/60">
+                  {isUrdu
+                    ? "بالوں کی مصنوعات اس کے مطابق چُنی جائیں گی۔"
+                    : "Hair products will be selected accordingly."}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3" role="group" aria-label="Hair concern options">
+                {Object.entries(HAIR_CONCERN_OPTIONS).map(([key, labels]) => (
+                  <button
+                    key={key}
+                    id={`hair-${key.toLowerCase()}`}
+                    onClick={() => setHairConcern(key)}
+                    aria-pressed={hairConcern === key}
+                    className={`${pillClass(hairConcern === key)} rounded-full`}
+                  >
+                    {optLabel(labels)}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
+      </div>
+
+      {/* Bottom Floating Action */}
+      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-alabaster via-alabaster/95">
+        <button
+          id="onboarding-next-btn"
+          onClick={handleNext}
+          disabled={!canProceed()}
+          aria-label={step === TOTAL_STEPS ? "Finish setup and start scan" : "Go to next step"}
+          className={`w-full max-w-xl mx-auto flex items-center justify-center p-4 font-bold uppercase tracking-widest text-[13px] transition-all duration-200 ease-in-out active:scale-[0.98] ${
+            canProceed()
+              ? "bg-bordeaux text-white hover:bg-charcoal"
+              : "bg-charcoal/10 text-charcoal/40 cursor-not-allowed"
+          }`}
+        >
+          {step === TOTAL_STEPS
+            ? (isUrdu ? "اسکین شروع کریں" : "Start scan")
+            : (isUrdu ? "اگلا" : "Next")}
+        </button>
+      </div>
+    </div>
+  );
 }
