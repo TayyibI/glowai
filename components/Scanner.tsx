@@ -10,6 +10,7 @@ import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { PrivacyBadge } from "@/components/PrivacyBadge";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { useLang } from "@/contexts/LangContext";
+import { PrivacyModal, getPrivacyAccepted } from "@/components/PrivacyModal";
 
 declare global {
   interface Window {
@@ -81,6 +82,15 @@ export function Scanner() {
   const { t, isUrdu } = useLang();
   const [step, setStep] = useState<ScanStep>("onboarding");
   const [mode, setMode] = useState<ScanMode>(null);
+
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [privacyAccepted, setPrivacyAcceptedState] = useState(true); // true initially to avoid flicker, then checked in effect
+
+  useEffect(() => {
+    const accepted = getPrivacyAccepted();
+    setPrivacyAcceptedState(accepted);
+    if (!accepted) setPrivacyOpen(true);
+  }, []);
 
   const [capturedImages, setCapturedImages] = useState<(string | null)[]>([null, null, null, null]);
   const [capturePhase, setCapturePhase] = useState<CapturePhase>("face");
@@ -558,7 +568,20 @@ export function Scanner() {
 
   // ══════════════════════════════════════════════════════════════════════════
   return (
-    <div className="relative w-full max-w-4xl mx-auto min-h-[600px] overflow-hidden rounded-none bg-champagne/10 border border-charcoal/20">
+    <div className="relative w-full max-w-4xl mx-auto min-h-[600px] overflow-hidden rounded-none bg-champagne/10 border border-charcoal/20" dir={isUrdu ? "rtl" : "ltr"}>
+      {privacyOpen && (
+        <PrivacyModal 
+          accepted={privacyAccepted} 
+          onAccept={() => {
+            setPrivacyAcceptedState(true);
+            setPrivacyOpen(false);
+          }} 
+          onDecline={() => {
+            window.location.href = "/";
+          }}
+          lang={isUrdu ? "ur" : "en"}
+        />
+      )}
 
       {/* ── Global Toast Notification Stack ──────────────────────────────── */}
       <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none max-w-xs w-full">

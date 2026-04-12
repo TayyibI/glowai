@@ -21,7 +21,7 @@ export function PrivacyBadge({ variant = "default", className = "" }: PrivacyBad
       >
         <Lock className="w-2.5 h-2.5 text-green-400 shrink-0" />
         <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-white/80">
-          Bank-Level Privacy · RAM-Only Processing
+          No Pictures Stored
         </span>
       </motion.div>
     );
@@ -38,7 +38,7 @@ export function PrivacyBadge({ variant = "default", className = "" }: PrivacyBad
         <Lock className="w-3 h-3 text-green-400 shrink-0" />
         <div className="flex flex-col">
           <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-white/90 leading-tight">
-            Bank-Level Privacy Guarantee
+            Privacy Guarantee
           </span>
           <span className="text-[8.5px] text-white/50 uppercase tracking-wider leading-tight mt-0.5">
             Images processed in RAM only · Never stored
