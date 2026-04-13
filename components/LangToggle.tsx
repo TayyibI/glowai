@@ -21,7 +21,7 @@ export function LangToggle({ className = "" }: { className?: string }) {
           id={`lang-toggle-${l}`}
           onClick={() => setLang(l)}
           aria-pressed={lang === l}
-          className={`relative px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all duration-200 ease-in-out ${
+          className={`relative px-3 py-1.5 text-[10px] font-bold uppercase tracking-tight transition-all duration-200 ease-in-out ${
             lang === l
               ? "text-[#0a0a0a]"
               : "text-white/40 hover:text-white/70"

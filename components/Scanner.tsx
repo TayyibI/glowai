@@ -6,7 +6,7 @@ import type { AnalysisResult } from "@/types/AnalysisResult";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { AlertCircle, X, Sparkles, Camera, Upload, CheckCircle, AlertTriangle, FlipHorizontal } from "lucide-react";
 import { AnalysisDisplay } from "@/components/AnalysisDisplay";
-import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { ChatQuestionnaire } from "@/components/ChatQuestionnaire";
 import { PrivacyBadge } from "@/components/PrivacyBadge";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { useLang } from "@/contexts/LangContext";
@@ -159,8 +159,9 @@ export function Scanner() {
     try {
       const res = await navigator.permissions?.query({ name: "camera" as any });
       if (res?.state === "denied") {
-        setErrorMessage("Camera access was denied. You can upload photos instead.");
-        setStep("camera-error");
+        addToast("error", t("error.camera_title"), t("error.upload_instead"));
+        setMode("upload");
+        setStep("upload");
         return false;
       }
     } catch (_) { }
@@ -190,8 +191,9 @@ export function Scanner() {
           return await attach(await navigator.mediaDevices.getUserMedia({ video: true, audio: false }));
         } catch (_) { }
       }
-      setErrorMessage("Camera permission was denied, or another app is using your camera.");
-      setStep("camera-error");
+      addToast("error", t("error.camera_title"), t("error.upload_instead"));
+      setMode("upload");
+      setStep("upload");
       return false;
     }
   }, [facingMode]);
@@ -568,7 +570,7 @@ export function Scanner() {
 
   // ══════════════════════════════════════════════════════════════════════════
   return (
-    <div className="relative w-full max-w-4xl mx-auto min-h-[600px] overflow-hidden rounded-none bg-champagne/10 border border-charcoal/20" dir={isUrdu ? "rtl" : "ltr"}>
+    <div className="relative w-full max-w-4xl mx-auto min-h-[600px] overflow-hidden rounded-3xl bg-ponds-blush/10 border border-unilever-blue/20 shadow-2xl" dir={isUrdu ? "rtl" : "ltr"}>
       {privacyOpen && (
         <PrivacyModal 
           accepted={privacyAccepted} 
@@ -610,7 +612,7 @@ export function Scanner() {
                 {toast.type === "info" && <Sparkles className="w-4 h-4 text-blue-400" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-[10px] uppercase tracking-widest opacity-90 mb-0.5">{toast.title}</p>
+                <p className="font-bold text-[10px] uppercase tracking-tight opacity-90 mb-0.5">{toast.title}</p>
                 <p className="text-[11px] opacity-75 leading-relaxed">{toast.message}</p>
               </div>
               <button
@@ -629,8 +631,8 @@ export function Scanner() {
         {/* ── ONBOARDING ───────────────────────────────────────────────── */}
         {step === "onboarding" && (
           <motion.div key="onboarding" variants={fadeVariants} initial="hidden" animate="show" exit="exit"
-            className="absolute inset-0 z-10 bg-alabaster">
-            <OnboardingFlow
+            className="absolute inset-0 z-10 bg-clinical-white">
+            <ChatQuestionnaire
               onComplete={() => { setMode("camera"); setCapturePhase("face"); setStep("capturing"); }}
               onSkipSetup={() => { setMode("camera"); setCapturePhase("face"); setStep("capturing"); }}
             />
@@ -640,23 +642,23 @@ export function Scanner() {
         {/* ── UPLOAD MODE ──────────────────────────────────────────────── */}
         {step === "upload" && (
           <motion.div key="upload" variants={fadeVariants} initial="hidden" animate="show" exit="exit"
-            className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-champagne/10/80">
+            className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-ponds-blush/10/80">
 
             <button onClick={handleRetry}
               aria-label={t("error.try_again")}
-              className="absolute top-6 left-6 text-charcoal/80 hover:text-charcoal p-3 bg-alabaster border border-charcoal/20 rounded-none transition-all duration-200 ease-in-out">
+              className="absolute top-6 left-6 text-unilever-blue/80 hover:text-unilever-blue p-3 bg-clinical-white border border-unilever-blue/20 rounded-2xl transition-all duration-200 ease-in-out">
               <X className="w-6 h-6" />
             </button>
 
-            <h2 className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-3">Upload Photos</h2>
-            <p className="text-sm font-bold tracking-widest uppercase text-charcoal/60 mb-2 max-w-sm">
-              Select exactly 4 photos in this order:
+            <h2 className="font-sans text-3xl uppercase tracking-tight text-unilever-blue mb-3">{t("upload.title")}</h2>
+            <p className="text-sm font-bold tracking-tight uppercase text-unilever-blue/60 mb-2 max-w-sm">
+              {t("upload.subtitle")}
             </p>
-            <ol className="text-xs uppercase tracking-widest text-charcoal/80 mb-8 space-y-1 font-bold">
-              <li>① Face — straight on</li>
-              <li>② Hair — front view</li>
-              <li>③ Hair — right side</li>
-              <li>④ Hair — left side</li>
+            <ol className="text-xs uppercase tracking-tight text-unilever-blue/80 mb-8 space-y-1 font-bold">
+              <li>{t("upload.step1")}</li>
+              <li>{t("upload.step2")}</li>
+              <li>{t("upload.step3")}</li>
+              <li>{t("upload.step4")}</li>
             </ol>
 
             <div className="mb-8">
@@ -667,20 +669,20 @@ export function Scanner() {
             <motion.button
               whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
               onClick={() => fileInputRef.current?.click()}
-              className="w-full max-w-md rounded-none border border-dashed border-charcoal/20 hover:bg-alabaster bg-transparent py-16 flex flex-col items-center justify-center gap-4 transition-all duration-200 ease-in-out"
+              className="w-full max-w-md rounded-2xl border border-dashed border-unilever-blue/20 hover:bg-clinical-white bg-transparent py-16 flex flex-col items-center justify-center gap-4 transition-all duration-200 ease-in-out"
             >
-              <div className="w-16 h-16 bg-champagne/10 border border-charcoal/20 rounded-none flex items-center justify-center">
-                <Upload className="w-8 h-8 text-charcoal" />
+              <div className="w-16 h-16 bg-ponds-blush/10 border border-unilever-blue/20 rounded-2xl flex items-center justify-center">
+                <Upload className="w-8 h-8 text-unilever-blue" />
               </div>
-              <span className="text-charcoal font-bold uppercase tracking-widest text-sm">Select 4 photos</span>
-              <span className="text-xs text-charcoal/60 uppercase tracking-widest">PNG, JPG · up to 10MB each</span>
+              <span className="text-unilever-blue font-bold uppercase tracking-tight text-sm">{t("upload.btn_label")}</span>
+              <span className="text-xs text-unilever-blue/60 uppercase tracking-tight">{t("upload.btn_desc")}</span>
             </motion.button>
 
             <button
               onClick={() => { setMode("camera"); setCapturePhase("face"); setStep("capturing"); }}
-              className="mt-8 text-xs tracking-widest uppercase font-bold text-charcoal/60 hover:text-charcoal underline transition-all duration-200 ease-in-out"
+              className="mt-8 text-xs tracking-tight uppercase font-bold text-unilever-blue/60 hover:text-unilever-blue underline transition-all duration-200 ease-in-out"
             >
-              Use camera instead
+              {t("upload.use_camera")}
             </button>
           </motion.div>
         )}
@@ -688,13 +690,13 @@ export function Scanner() {
         {/* ── CAMERA — SINGLE CONTINUOUS SESSION ───────────────────────── */}
         {step === "capturing" && mode === "camera" && (
           <motion.div key="capturing" variants={fadeVariants} initial="hidden" animate="show" exit="exit"
-            className="absolute inset-0 bg-charcoal z-10 flex flex-col">
+            className="absolute inset-0 bg-unilever-blue z-10 flex flex-col">
 
             {/* Top bar */}
             <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 pt-6">
               <button onClick={handleRetry}
                 aria-label="Close camera"
-                className="text-white/80 hover:text-white p-3 backdrop-blur-md bg-black/30 rounded-none border border-white/20 transition-all duration-200 ease-in-out">
+                className="text-white/80 hover:text-white p-3 backdrop-blur-md bg-black/30 rounded-2xl border border-white/20 transition-all duration-200 ease-in-out">
                 <X className="w-6 h-6" />
               </button>
 
@@ -711,7 +713,7 @@ export function Scanner() {
               {/* Lighting chip — face phase only */}
               {capturePhase === "face"
                 ? (
-                  <div className="bg-black/60 text-white text-xs px-3 py-2 rounded-none flex items-center gap-2 backdrop-blur-md">
+                  <div className="bg-black/60 text-white text-xs px-3 py-2 rounded-2xl flex items-center gap-2 backdrop-blur-md">
                     <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${getLightingDotColor(lightingState)}`} />
                     <span className="text-[10px] font-bold uppercase tracking-wider">{getLightingMsg(lightingState)}</span>
                   </div>
@@ -771,11 +773,11 @@ export function Scanner() {
                     </div>
                   ) : (
                     // Hair phases: rectangular guide
-                    <div className="relative w-[80%] sm:w-[65%] aspect-[3/4] border-2 border-[#c9a98a]/60">
-                      <div className="absolute -top-[2px] -left-[2px] w-5 h-5 border-t-2 border-l-2 border-[#c9a98a]" />
-                      <div className="absolute -top-[2px] -right-[2px] w-5 h-5 border-t-2 border-r-2 border-[#c9a98a]" />
-                      <div className="absolute -bottom-[2px] -left-[2px] w-5 h-5 border-b-2 border-l-2 border-[#c9a98a]" />
-                      <div className="absolute -bottom-[2px] -right-[2px] w-5 h-5 border-b-2 border-r-2 border-[#c9a98a]" />
+                    <div className="relative w-[80%] sm:w-[65%] aspect-[3/4] border-2 border-scanner-cyan/60">
+                      <div className="absolute -top-[2px] -left-[2px] w-5 h-5 border-t-2 border-l-2 border-scanner-cyan" />
+                      <div className="absolute -top-[2px] -right-[2px] w-5 h-5 border-t-2 border-r-2 border-scanner-cyan" />
+                      <div className="absolute -bottom-[2px] -left-[2px] w-5 h-5 border-b-2 border-l-2 border-scanner-cyan" />
+                      <div className="absolute -bottom-[2px] -right-[2px] w-5 h-5 border-b-2 border-r-2 border-scanner-cyan" />
                     </div>
                   )}
                 </div>
@@ -786,7 +788,7 @@ export function Scanner() {
                 {qualityFeedback && capturePhase === "face" && !previewBase64 && (
                   <motion.div
                     initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
-                    className="absolute top-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-none text-xs uppercase tracking-widest font-bold flex items-center gap-3 w-[80%] max-w-sm text-center border bg-alabaster/95 text-charcoal border-charcoal/20 z-40"
+                    className="absolute top-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl text-xs uppercase tracking-tight font-bold flex items-center gap-3 w-[80%] max-w-sm text-center border bg-clinical-white/95 text-unilever-blue border-unilever-blue/20 z-40"
                   >
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <span>{qualityFeedback}</span>
@@ -804,7 +806,7 @@ export function Scanner() {
             <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center z-50">
               {previewBase64 ? (
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  className="text-white/70 text-xs uppercase tracking-widest font-bold">
+                  className="text-white/70 text-xs uppercase tracking-tight font-bold">
                   {capturePhase === "hair-left" ? "Analyzing…" : "Good — next photo…"}
                 </motion.p>
               ) : (
@@ -813,7 +815,7 @@ export function Scanner() {
                     <motion.p key={capturePhase}
                       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.22 }}
-                      className="text-white/80 text-xs uppercase tracking-widest mb-1 text-center max-w-xs font-bold"
+                      className="text-white/80 text-xs uppercase tracking-tight mb-1 text-center max-w-xs font-bold"
                     >
                       {capturePhase === "face" ? t("scan.centre_face") :
                        capturePhase === "hair-front" ? t("scan.hair_front") :
@@ -821,7 +823,7 @@ export function Scanner() {
                        t("scan.hair_left")}
                     </motion.p>
                   </AnimatePresence>
-                  <p className="text-white/35 text-xs uppercase tracking-widest mb-6">
+                  <p className="text-white/35 text-xs uppercase tracking-tight mb-6">
                     {t("scan.step_of").replace("{n}", String(phaseIndex + 1)).replace("{total}", "4")}
                   </p>
 
@@ -858,7 +860,7 @@ export function Scanner() {
                       
                     <button
                       onClick={() => { stopCamera(); setMode("upload"); setStep("upload"); }}
-                      className="text-xs tracking-widest uppercase font-bold text-white/50 hover:text-white/80 underline transition-all duration-200 ease-in-out"
+                      className="text-xs tracking-tight uppercase font-bold text-white/50 hover:text-white/80 underline transition-all duration-200 ease-in-out"
                     >
                       {t("scan.upload_instead")}
                     </button>
@@ -900,10 +902,10 @@ export function Scanner() {
                 />
                 <Sparkles className="w-5 h-5 text-[#C2A878]" />
               </div>
-              <h2 className="font-serif text-2xl uppercase tracking-[0.2em] text-[#FAF8F5] mb-1">
+              <h2 className="font-sans text-2xl uppercase tracking-[0.2em] text-[#FAF8F5] mb-1">
                 {t("analyze.title")}
               </h2>
-              <p className="text-[#888888] font-bold text-[10px] tracking-widest uppercase">
+              <p className="text-[#888888] font-bold text-[10px] tracking-tight uppercase">
                 {t("analyze.engine")}
               </p>
             </div>
@@ -919,7 +921,7 @@ export function Scanner() {
                     className="flex items-center gap-3 text-[#f5f2ee] bg-[#1a1b18] px-4 py-2 border border-[#2a2b28]"
                   >
                     <span className="text-[#C2A878] text-[10px]">◈</span>
-                    <span className="font-mono text-[10px] uppercase tracking-widest opacity-80">{log}</span>
+                    <span className="font-mono text-[10px] uppercase tracking-tight opacity-80">{log}</span>
                   </motion.div>
                 ))}
               </AnimatePresence>
@@ -933,7 +935,7 @@ export function Scanner() {
                     animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1, repeat: Infinity }}
                     className="w-[1px] h-3 bg-[#c9a98a]"
                   />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-[#888888]">
+                  <span className="font-mono text-[10px] uppercase tracking-tight text-[#888888]">
                     Processing...
                   </span>
                 </motion.div>
@@ -960,23 +962,23 @@ export function Scanner() {
         {/* ── RESULTS ──────────────────────────────────────────────────── */}
         {step === "results" && analysis && routine && (
           <motion.div key="results" variants={fadeVariants} initial="hidden" animate="show" exit="exit"
-            className="p-6 md:p-10 min-h-[600px] bg-champagne/10/80">
+            className="p-6 md:p-10 min-h-[600px] bg-ponds-blush/10/80">
             <div className="flex items-center justify-between mb-12">
               <div>
-                <h1 className="font-serif text-4xl uppercase tracking-widest text-charcoal mb-2">Your Personal Routine</h1>
-                <p className="text-sm text-charcoal/80 uppercase tracking-widest">Based on our detailed AI analysis</p>
+                <h1 className="font-sans text-4xl uppercase tracking-tight text-unilever-blue mb-2">Your Personal Routine</h1>
+                <p className="text-sm text-unilever-blue/80 uppercase tracking-tight">Based on our detailed AI analysis</p>
               </div>
-              <Button variant="secondary" onClick={handleRetry} className="hidden sm:flex max-w-[150px] py-3 text-xs uppercase tracking-widest">
+              <Button variant="secondary" onClick={handleRetry} className="hidden sm:flex max-w-[150px] py-3 text-xs uppercase tracking-tight">
                 New Scan
               </Button>
             </div>
             <div className="mb-12 max-w-4xl mx-auto w-full">
               <AnalysisDisplay result={analysis} />
             </div>
-            <div className="bg-alabaster rounded-none p-8 md:p-12 border border-charcoal/20">
+            <div className="bg-clinical-white rounded-2xl p-8 md:p-12 border border-unilever-blue/20">
               <RecommendationList routine={routine} showBuyNow userTags={targetTags} />
             </div>
-            <Button variant="secondary" onClick={handleRetry} className="w-full mt-10 sm:hidden py-5 text-sm uppercase tracking-widest font-bold">
+            <Button variant="secondary" onClick={handleRetry} className="w-full mt-10 sm:hidden py-5 text-sm uppercase tracking-tight font-bold">
               New Scan
             </Button>
           </motion.div>
@@ -985,20 +987,20 @@ export function Scanner() {
         {/* ── CAMERA ERROR ─────────────────────────────────────────────── */}
         {step === "camera-error" && (
           <motion.div key="camera-error" variants={fadeVariants} initial="hidden" animate="show" exit="exit"
-            className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-alabaster z-20 absolute inset-0">
-            <div className="w-20 h-20 bg-champagne/10 border border-charcoal/20 rounded-none flex items-center justify-center mb-8">
-              <Camera className="w-10 h-10 text-charcoal" />
+            className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-clinical-white z-20 absolute inset-0">
+            <div className="w-20 h-20 bg-ponds-blush/10 border border-unilever-blue/20 rounded-2xl flex items-center justify-center mb-8">
+              <Camera className="w-10 h-10 text-unilever-blue" />
             </div>
-            <h2 className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-4">Camera couldn't start</h2>
-            <p className="text-sm uppercase tracking-widest text-charcoal/80 font-bold max-w-sm mb-12 leading-relaxed">{errorMessage}</p>
+            <h2 className="font-sans text-3xl uppercase tracking-tight text-unilever-blue mb-4">Camera couldn't start</h2>
+            <p className="text-sm uppercase tracking-tight text-unilever-blue/80 font-bold max-w-sm mb-12 leading-relaxed">{errorMessage}</p>
             <div className="flex flex-col gap-4 w-full max-w-sm">
               <Button variant="primary" onClick={() => { setMode("upload"); setStep("upload"); }}
-                className="py-4 text-xs font-bold uppercase tracking-widest">
+                className="py-4 text-xs font-bold uppercase tracking-tight">
                 Upload photos instead
               </Button>
               <Button variant="secondary"
                 onClick={() => { setErrorMessage(null); streamRef.current = null; setStep("capturing"); }}
-                className="py-4 text-xs font-bold uppercase tracking-widest bg-transparent border border-charcoal/20 text-charcoal">
+                className="py-4 text-xs font-bold uppercase tracking-tight bg-transparent border border-unilever-blue/20 text-unilever-blue">
                 Try again
               </Button>
             </div>
@@ -1008,15 +1010,15 @@ export function Scanner() {
         {/* ── ERROR ────────────────────────────────────────────────────── */}
         {step === "error" && (
           <motion.div key="error" variants={fadeVariants} initial="hidden" animate="show" exit="exit"
-            className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-alabaster border border-charcoal/20">
-            <div className="w-20 h-20 bg-champagne/10 border border-charcoal/20 rounded-none flex items-center justify-center mb-8">
-              <AlertCircle className="w-10 h-10 text-charcoal" />
+            className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-clinical-white border border-unilever-blue/20">
+            <div className="w-20 h-20 bg-ponds-blush/10 border border-unilever-blue/20 rounded-2xl flex items-center justify-center mb-8">
+              <AlertCircle className="w-10 h-10 text-unilever-blue" />
             </div>
-            <h2 className="font-serif text-3xl uppercase tracking-widest text-charcoal mb-4">Analysis Interrupted</h2>
-            <p className="text-sm uppercase tracking-widest text-charcoal/80 font-bold max-w-sm mb-12 leading-relaxed">
+            <h2 className="font-sans text-3xl uppercase tracking-tight text-unilever-blue mb-4">Analysis Interrupted</h2>
+            <p className="text-sm uppercase tracking-tight text-unilever-blue/80 font-bold max-w-sm mb-12 leading-relaxed">
               {errorMessage ?? "Something went wrong during analysis."}
             </p>
-            <Button variant="primary" onClick={handleRetry} className="py-4 text-xs font-bold uppercase tracking-widest">
+            <Button variant="primary" onClick={handleRetry} className="py-4 text-xs font-bold uppercase tracking-tight">
               Try again
             </Button>
           </motion.div>

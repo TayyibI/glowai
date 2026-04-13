@@ -11,11 +11,11 @@ export function ClientLayoutWrapper({ children }: { children: React.ReactNode })
 
     useEffect(() => {
         if (isLanding) {
-            document.body.classList.remove("bg-alabaster", "text-charcoal");
+            document.body.classList.remove("bg-clinical-white", "text-unilever-blue");
             document.body.classList.add("bg-[#0a0a0a]", "text-[#f5f2ee]");
         } else {
             document.body.classList.remove("bg-[#0a0a0a]", "text-[#f5f2ee]");
-            document.body.classList.add("bg-alabaster", "text-charcoal");
+            document.body.classList.add("bg-clinical-white", "text-unilever-blue");
         }
     }, [isLanding]);
 

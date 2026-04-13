@@ -58,7 +58,7 @@ export function PrivacyBadge({ variant = "default", className = "" }: PrivacyBad
     >
       <Lock className="w-3 h-3 shrink-0" style={{ color: "var(--privacy-green)" }} />
       <div className="flex flex-col">
-        <span className="leading-tight">Bank-Level Privacy Guarantee</span>
+        <span className="leading-tight">Privacy Guarantee</span>
         <span className="font-normal opacity-70 text-[8.5px] leading-tight mt-0.5 tracking-wider">
           Images processed in RAM only · Never stored or sold
         </span>

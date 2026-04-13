@@ -82,18 +82,18 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="bg-alabaster shadow-none"
+      className="bg-clinical-white shadow-none"
     >
-      <div className="bg-white border sm:border-charcoal/20 border-charcoal/10 pb-8 rounded-none mt-2">
+      <div className="bg-white border sm:border-unilever-blue/20 border-unilever-blue/10 pb-8 rounded-2xl mt-2">
         {/* HEADER */}
-        <div className="border-b border-charcoal/20 p-6 md:p-8 bg-white">
-          <h2 className="font-serif text-3xl text-charcoal tracking-wide mb-4">{t("report.title")}</h2>
+        <div className="border-b border-unilever-blue/20 p-6 md:p-8 bg-white">
+          <h2 className="font-sans text-3xl text-unilever-blue tracking-wide mb-4">{t("report.title")}</h2>
           <div className="flex flex-col gap-1">
-            <p className="font-mono text-xs text-charcoal/70 uppercase tracking-widest">
-              {t("report.scan_id")} <span className="font-bold text-charcoal">{scanId || "..."}</span>
+            <p className="font-mono text-xs text-unilever-blue/70 uppercase tracking-tight">
+              {t("report.scan_id")} <span className="font-bold text-unilever-blue">{scanId || "..."}</span>
             </p>
-            <p className="font-mono text-xs text-charcoal/70 uppercase tracking-widest">
-              {t("report.analysed")} <span className="font-bold text-charcoal">{timestamp || "..."}</span>
+            <p className="font-mono text-xs text-unilever-blue/70 uppercase tracking-tight">
+              {t("report.analysed")} <span className="font-bold text-unilever-blue">{timestamp || "..."}</span>
             </p>
           </div>
         </div>
@@ -109,7 +109,7 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                   stroke="currentColor"
                   strokeWidth="6"
                   fill="transparent"
-                  className="text-charcoal/10"
+                  className="text-unilever-blue/10"
                   strokeLinecap="round"
                 />
                 <motion.path
@@ -126,12 +126,12 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 />
               </svg>
               <div className="absolute bottom-1 w-full flex flex-col items-center justify-end h-full">
-                <span className="text-3xl font-mono font-bold text-charcoal leading-none block">{result.face.hydrationScore}</span>
+                <span className="text-3xl font-mono font-bold text-unilever-blue leading-none block">{result.face.hydrationScore}</span>
               </div>
             </div>
 
-            <span className="text-[10px] font-bold text-charcoal/60 uppercase tracking-[0.2em] mt-3">{t("report.hydration")}</span>
-            <p className="text-sm text-charcoal mt-2 max-w-sm text-center font-bold">
+            <span className="text-[10px] font-bold text-unilever-blue/60 uppercase tracking-[0.2em] mt-3">{t("report.hydration")}</span>
+            <p className="text-sm text-unilever-blue mt-2 max-w-sm text-center font-bold">
               {getHydrationLabel(result.face.hydrationScore)}
             </p>
           </div>
@@ -141,33 +141,33 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
             <table className="w-full min-w-[340px] text-left border-collapse">
               <thead>
                 <tr>
-                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10">{t("report.parameter")}</th>
-                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 w-1/3">{t("report.result")}</th>
-                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-charcoal/50 pb-3 font-sans border-b border-charcoal/10 text-right md:text-left">{t("report.confidence")}</th>
+                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-unilever-blue/50 pb-3 font-sans border-b border-unilever-blue/10">{t("report.parameter")}</th>
+                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-unilever-blue/50 pb-3 font-sans border-b border-unilever-blue/10 w-1/3">{t("report.result")}</th>
+                  <th className="font-bold text-[10px] uppercase tracking-[0.15em] text-unilever-blue/50 pb-3 font-sans border-b border-unilever-blue/10 text-right md:text-left">{t("report.confidence")}</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
                 <tr>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">{t("report.tone")}</td>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.face.skinTone)}</td>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right md:text-left tracking-widest text-xs">{getDots(result.face.confidence)}</td>
+                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue font-medium text-xs font-bold uppercase tracking-tight">{t("report.tone")}</td>
+                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue capitalize">{formatLabel(result.face.skinTone)}</td>
+                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.face.confidence)}</td>
                 </tr>
                 <tr>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">{t("report.type")}</td>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.face.skinType)}</td>
-                  <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right md:text-left tracking-widest text-xs">{getDots(result.face.confidence)}</td>
+                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue font-medium text-xs font-bold uppercase tracking-tight">{t("report.type")}</td>
+                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue capitalize">{formatLabel(result.face.skinType)}</td>
+                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.face.confidence)}</td>
                 </tr>
                 {result.hair && (
                   <>
                     <tr>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">{t("report.hair_color")}</td>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.hair.color)}</td>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right md:text-left tracking-widest text-xs">{getDots(result.hair.confidence)}</td>
+                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue font-medium text-xs font-bold uppercase tracking-tight">{t("report.hair_color")}</td>
+                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue capitalize">{formatLabel(result.hair.color)}</td>
+                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.hair.confidence)}</td>
                     </tr>
                     <tr>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal font-medium text-xs font-bold uppercase tracking-widest">{t("report.hair_type")}</td>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal capitalize">{formatLabel(result.hair.type)}</td>
-                      <td className="py-4 border-b border-charcoal/10 text-charcoal/80 text-right md:text-left tracking-widest text-xs">{getDots(result.hair.confidence)}</td>
+                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue font-medium text-xs font-bold uppercase tracking-tight">{t("report.hair_type")}</td>
+                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue capitalize">{formatLabel(result.hair.type)}</td>
+                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.hair.confidence)}</td>
                     </tr>
                   </>
                 )}
@@ -177,39 +177,39 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
 
           {/* DETECTED CONCERNS */}
           <div className="pt-2">
-            <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-charcoal border-b border-charcoal/20 pb-4 mb-4">{t("report.conditions")}</h3>
+            <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-unilever-blue border-b border-unilever-blue/20 pb-4 mb-4">{t("report.conditions")}</h3>
 
             <div className="flex flex-col gap-4">
               {result.face.concerns.length > 0 ? (
                 result.face.concerns.map(c => {
                   const severity = getDiagnosticSeverity(c);
                   return (
-                    <div key={c} className="bg-alabaster border border-charcoal/10 p-5 rounded-none shadow-sm flex flex-col">
+                    <div key={c} className="bg-clinical-white border border-unilever-blue/10 p-5 rounded-2xl shadow-sm flex flex-col">
                       <div className="flex flex-col sm:flex-row justify-between items-start mb-2 gap-2">
-                        <span className="font-bold text-charcoal capitalize text-[15px]">{formatLabel(c)}</span>
+                        <span className="font-bold text-unilever-blue capitalize text-[15px]">{formatLabel(c)}</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-charcoal/60">{t("report.severity")} {severity}</span>
+                          <span className="text-[10px] font-bold uppercase tracking-tight text-unilever-blue/60">{t("report.severity")} {severity}</span>
                         </div>
                       </div>
 
-                      <div className="w-full h-1 bg-charcoal/10 rounded-none mb-4 overflow-hidden flex">
+                      <div className="w-full h-1 bg-unilever-blue/10 rounded-2xl mb-4 overflow-hidden flex">
                         <motion.div
-                          className={`h-full ${getSeverityColor(severity)} rounded-none`}
+                          className={`h-full ${getSeverityColor(severity)} rounded-2xl`}
                           initial={{ width: 0 }}
                           animate={{ width: severity === "Mild" ? "33%" : severity === "Moderate" ? "66%" : "100%" }}
                           transition={{ duration: 1, delay: 0.2 }}
                         />
                       </div>
 
-                      <p className="text-sm text-charcoal/80 leading-relaxed font-serif">
+                      <p className="text-sm text-unilever-blue/80 leading-relaxed font-sans">
                         {getClinicalDescription(c)}
                       </p>
                     </div>
                   );
                 })
               ) : (
-                <div className="bg-alabaster border border-charcoal/10 p-6 flex items-center justify-center">
-                  <span className="text-sm font-bold uppercase tracking-widest text-charcoal/60 italic">{t("report.healthy")}</span>
+                <div className="bg-clinical-white border border-unilever-blue/10 p-6 flex items-center justify-center">
+                  <span className="text-sm font-bold uppercase tracking-tight text-unilever-blue/60 italic">{t("report.healthy")}</span>
                 </div>
               )}
             </div>
@@ -218,11 +218,11 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
         </div>
 
         {/* BOTTOM SUMMARY */}
-        <div className="border-t border-charcoal/20 p-6 md:p-8 bg-white flex flex-col items-start md:items-end text-left md:text-right">
-          <p className="font-bold font-mono text-[13px] uppercase tracking-widest text-charcoal mb-2">
+        <div className="border-t border-unilever-blue/20 p-6 md:p-8 bg-white flex flex-col items-start md:items-end text-left md:text-right">
+          <p className="font-bold font-mono text-[13px] uppercase tracking-tight text-unilever-blue mb-2">
             {t("report.overall_conf")} {Math.round(totalConfidence * 100)}%
           </p>
-          <p className="text-[11px] text-charcoal/50 uppercase tracking-wider max-w-sm leading-relaxed">
+          <p className="text-[11px] text-unilever-blue/50 uppercase tracking-wider max-w-sm leading-relaxed">
             {t("report.disclaimer")}
           </p>
         </div>

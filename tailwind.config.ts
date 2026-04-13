@@ -8,28 +8,34 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
-        serif: ["var(--font-playfair)", "Playfair Display", "serif"],
+        sans: ["var(--font-poppins)", "Poppins", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
       },
       colors: {
-        /* Quiet Luxury / Old Money palette */
-        alabaster: "#FAF8F5",
-        charcoal: "#1A1C19",
-        bordeaux: "#4A1C27",
-        champagne: "#C2A878",
+        /* Unilever Beauty / Clinical palette */
+        "clinical-white": "#FFFFFF",
+        "unilever-blue": "#002D72",
+        "ponds-blush": "#FCE4EC",
+        "simple-green": "#84C254",
+        "scanner-cyan": "#00E5FF",
+        
+        // Aliases to avoid breaking everything immediately before refactoring finishes
+        alabaster: "#FFFFFF",
+        charcoal: "#002D72",
+        bordeaux: "#002D72",
+        champagne: "#FCE4EC",
       },
       boxShadow: {
-        /* Removed soft/glow shadows. Luxury is flat. */
+        soft: "0 8px 30px rgba(0, 0, 0, 0.08)",
+        floating: "0 10px 40px rgba(0, 0, 0, 0.12)",
       },
       backdropBlur: {
         glass: "12px",
         "glass-lg": "20px",
       },
       borderRadius: {
-        /* Strictly no rounded corners */
-        "btn": "0px",
-        "input": "0px",
-        "card": "0px",
+        "btn": "9999px",
+        "input": "1rem",
+        "card": "1.5rem",
       },
     },
   },

@@ -11,7 +11,7 @@ interface CardProps {
 export function Card({ children, className = "", compact }: CardProps) {
   return (
     <div
-      className={`rounded-none bg-alabaster border border-champagne/30 ${compact ? "p-8" : "p-12"} ${className}`}
+      className={`rounded-2xl bg-clinical-white shadow-soft border border-black/[0.04] ${compact ? "p-8" : "p-12"} ${className}`}
     >
       {children}
     </div>
@@ -26,7 +26,7 @@ interface CardTitleProps {
 export function CardTitle({ children, className = "" }: CardTitleProps) {
   return (
     <h3
-      className={`font-serif uppercase tracking-widest text-charcoal ${className}`}
+      className={`font-sans font-bold text-unilever-blue ${className}`}
       style={{ fontSize: "18px" }}
     >
       {children}

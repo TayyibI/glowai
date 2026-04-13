@@ -150,6 +150,29 @@ const translations: Record<string, Record<Lang, string>> = {
 
   // Privacy badge
   "badge.camera":           { en: "Bank-Level Privacy · Encrypted in Transit", ur: "بینک سطح کی رازداری · خفیہ ترسیل" },
+
+  // Footer
+  "footer.copyright":       { en: "© 2026 GlowAI · All rights reserved", ur: "© 2026 گلو اے آئی · جملہ حقوق محفوظ ہیں" },
+  "footer.privacy":         { en: "Privacy Policy", ur: "رازداری کی پالیسی" },
+  "footer.terms":           { en: "Terms of Service", ur: "سروس کی شرائط" },
+  "footer.about":           { en: "About Us", ur: "ہمارے بارے میں" },
+  "footer.contact":         { en: "Contact", ur: "رابطہ کریں" },
+
+  // Upload Box
+  "upload.title":           { en: "Upload Photos", ur: "تصاویر اپلوڈ کریں" },
+  "upload.subtitle":        { en: "Select exactly 4 photos in this order:", ur: "اس ترتیب میں بالکل 4 تصاویر منتخب کریں:" },
+  "upload.step1":           { en: "① Face — straight on", ur: "① چہرہ — سیدھا سامنے" },
+  "upload.step2":           { en: "② Hair — front view", ur: "② بال — سامنے سے منظر" },
+  "upload.step3":           { en: "③ Hair — right side", ur: "③ بال — دائیں طرف" },
+  "upload.step4":           { en: "④ Hair — left side", ur: "④ بال — بائیں طرف" },
+  "upload.btn_label":       { en: "Select 4 photos", ur: "4 تصاویر منتخب کریں" },
+  "upload.btn_desc":        { en: "PNG, JPG · up to 10MB each", ur: "PNG, JPG · ہر ایک 10MB تک" },
+  "upload.use_camera":      { en: "Use camera instead", ur: "اس کے بجائے کیمرہ استعمال کریں" },
+
+  // Chat
+  "chat.assistant":         { en: "GlowAI Assistant", ur: "گلو اے آئی اسسٹنٹ" },
+  "chat.ai_badge":          { en: "AI", ur: "اے آئی" },
+  "chat.skip":              { en: "Skip", ur: "چھوڑیں" },
 };
 
 const LangContext = createContext<LangContextValue>({

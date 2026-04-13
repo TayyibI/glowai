@@ -103,21 +103,21 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
     `px-5 py-3 text-sm font-semibold transition-all duration-200 ease-in-out border ${
       active
         ? "border-[#c9a98a] bg-[#c9a98a]/20 text-[#c9a98a]"
-        : "border-charcoal/15 text-charcoal/80 bg-transparent hover:border-charcoal/30"
+        : "border-unilever-blue/15 text-unilever-blue/80 bg-transparent hover:border-unilever-blue/30"
     }`;
 
   return (
     <div
-      className="absolute inset-0 bg-alabaster flex flex-col z-20 overflow-y-auto"
+      className="absolute inset-0 bg-clinical-white flex flex-col z-20 overflow-y-auto"
       dir={isUrdu ? "rtl" : "ltr"}
       role="main"
     >
       {/* Top Bar */}
-      <div className="sticky top-0 bg-alabaster/90 backdrop-blur-md z-30 flex flex-col">
+      <div className="sticky top-0 bg-clinical-white/90 backdrop-blur-md z-30 flex flex-col">
         {/* Progress Bar */}
-        <div className="w-full h-1 bg-charcoal/10" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={TOTAL_STEPS}>
+        <div className="w-full h-1 bg-unilever-blue/10" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={TOTAL_STEPS}>
           <motion.div
-            className="h-full bg-champagne"
+            className="h-full bg-ponds-blush"
             initial={{ width: `${(1 / TOTAL_STEPS) * 100}%` }}
             animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
             transition={{ ease: "easeInOut", duration: 0.3 }}
@@ -125,7 +125,7 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
         </div>
 
         <div className="flex items-center justify-between px-6 py-4">
-          <span className="text-[11px] font-bold text-charcoal/50 uppercase tracking-widest">
+          <span className="text-[11px] font-bold text-unilever-blue/50 uppercase tracking-tight">
             {isUrdu ? `مرحلہ ${step} از ${TOTAL_STEPS}` : `Step ${step} of ${TOTAL_STEPS}`}
           </span>
           <div className="flex items-center gap-3">
@@ -134,7 +134,7 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
               id="skip-setup-btn"
               onClick={handleSkipSetup}
               aria-label="Skip setup and go directly to scan"
-              className="text-[11px] font-bold text-charcoal/60 hover:text-charcoal uppercase tracking-widest transition-colors duration-200"
+              className="text-[11px] font-bold text-unilever-blue/60 hover:text-unilever-blue uppercase tracking-tight transition-colors duration-200"
             >
               {isUrdu ? "چھوڑیں" : "Skip setup"}
             </button>
@@ -154,10 +154,10 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
               className="flex flex-col gap-8"
             >
               <div>
-                <h1 className="font-serif text-[32px] text-charcoal leading-tight mb-2">
+                <h1 className="font-sans text-[32px] text-unilever-blue leading-tight mb-2">
                   {isUrdu ? "آپ کا مرکزی جلد کا مقصد کیا ہے؟" : "What's your main skin goal?"}
                 </h1>
-                <p className="text-sm text-charcoal/60">
+                <p className="text-sm text-unilever-blue/60">
                   {isUrdu ? "ہم آپ کی روٹین اس کے ارد گرد بنائیں گے۔" : "We'll tailor your routine around this."}
                 </p>
               </div>
@@ -186,10 +186,10 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
               className="flex flex-col gap-8"
             >
               <div>
-                <h1 className="font-serif text-[32px] text-charcoal leading-tight mb-2">
+                <h1 className="font-sans text-[32px] text-unilever-blue leading-tight mb-2">
                   {isUrdu ? "کون سے اجزاء سے گریز کریں؟" : "Any ingredients to avoid?"}
                 </h1>
-                <p className="text-sm text-charcoal/60">
+                <p className="text-sm text-unilever-blue/60">
                   {isUrdu
                     ? "ان اجزاء والی مصنوعات کو خودکار طور پر ہٹا دیا جائے گا۔"
                     : "Products with these ingredients will be automatically removed from your routine."}
@@ -210,7 +210,7 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
               </div>
               <button
                 onClick={() => { setSensitivities(["none"]); setStep(3); }}
-                className="text-[11px] font-bold uppercase tracking-widest text-charcoal/40 hover:text-charcoal transition-colors duration-200 underline w-fit"
+                className="text-[11px] font-bold uppercase tracking-tight text-unilever-blue/40 hover:text-unilever-blue transition-colors duration-200 underline w-fit"
               >
                 {isUrdu ? "اس مرحلے کو چھوڑیں" : "Skip this step"}
               </button>
@@ -226,10 +226,10 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
               className="flex flex-col gap-8"
             >
               <div>
-                <h1 className="font-serif text-[32px] text-charcoal leading-tight mb-2">
+                <h1 className="font-sans text-[32px] text-unilever-blue leading-tight mb-2">
                   {isUrdu ? "آپ کی صبح کی روٹین کتنی لمبی ہے؟" : "How long is your morning routine?"}
                 </h1>
-                <p className="text-sm text-charcoal/60">
+                <p className="text-sm text-unilever-blue/60">
                   {isUrdu ? "ہم اس کے مطابق مراحل کی تعداد ملائیں گے۔" : "We'll match the number of steps to this."}
                 </p>
               </div>
@@ -245,7 +245,7 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
                       className={`w-full text-left px-5 py-4 font-semibold transition-all duration-200 ease-in-out border flex items-center justify-between ${
                         isSelected
                           ? "border-[#c9a98a] bg-[#c9a98a]/10 text-[#c9a98a]"
-                          : "border-charcoal/15 text-charcoal/80 bg-transparent hover:border-charcoal/30"
+                          : "border-unilever-blue/15 text-unilever-blue/80 bg-transparent hover:border-unilever-blue/30"
                       }`}
                     >
                       <span className="text-base">{optLabel(labels)}</span>
@@ -268,10 +268,10 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
               className="flex flex-col gap-8"
             >
               <div>
-                <h1 className="font-serif text-[32px] text-charcoal leading-tight mb-2">
+                <h1 className="font-sans text-[32px] text-unilever-blue leading-tight mb-2">
                   {isUrdu ? "آپ کی بالوں کی بنیادی تشویش کیا ہے؟" : "What's your main hair concern?"}
                 </h1>
-                <p className="text-sm text-charcoal/60">
+                <p className="text-sm text-unilever-blue/60">
                   {isUrdu
                     ? "بالوں کی مصنوعات اس کے مطابق چُنی جائیں گی۔"
                     : "Hair products will be selected accordingly."}
@@ -303,10 +303,10 @@ export function OnboardingFlow({ onComplete, onSkipSetup }: OnboardingFlowProps)
           onClick={handleNext}
           disabled={!canProceed()}
           aria-label={step === TOTAL_STEPS ? "Finish setup and start scan" : "Go to next step"}
-          className={`w-full max-w-xl mx-auto flex items-center justify-center p-4 font-bold uppercase tracking-widest text-[13px] transition-all duration-200 ease-in-out active:scale-[0.98] ${
+          className={`w-full max-w-xl mx-auto flex items-center justify-center p-4 font-bold uppercase tracking-tight text-[13px] transition-all duration-200 ease-in-out active:scale-[0.98] ${
             canProceed()
-              ? "bg-bordeaux text-white hover:bg-charcoal"
-              : "bg-charcoal/10 text-charcoal/40 cursor-not-allowed"
+              ? "bg-unilever-blue text-white hover:bg-unilever-blue"
+              : "bg-unilever-blue/10 text-unilever-blue/40 cursor-not-allowed"
           }`}
         >
           {step === TOTAL_STEPS

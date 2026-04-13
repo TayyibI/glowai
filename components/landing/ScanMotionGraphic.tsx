@@ -12,7 +12,7 @@ const BADGE_LABELS = [
 
 export function ScanMotionGraphic() {
   return (
-    <div className="absolute inset-0 overflow-hidden rounded-none border border-charcoal/20 bg-alabaster">
+    <div className="absolute inset-0 overflow-hidden rounded-2xl border border-unilever-blue/20 bg-clinical-white">
 
       {/* 1. Your model photo */}
       <Image
@@ -36,7 +36,7 @@ export function ScanMotionGraphic() {
           className="w-[78%] md:w-[48%] pointer-events-none"   // bigger
           style={{
             mixBlendMode: "screen",
-            filter: "drop-shadow(0 0 25px rgba(74, 28, 39, 0.4))",
+            filter: "drop-shadow(0 0 25px rgba(0, 229, 255, 0.4))",
           }}
           initial={{ opacity: 0 }}
           animate={{
@@ -53,8 +53,8 @@ export function ScanMotionGraphic() {
 
       {/* 3. Sweeping Champagne Laser (stronger glow) */}
       <motion.div
-        className="absolute left-0 right-0 h-[2.5px] w-full bg-[#C2A878] z-20"
-        style={{ boxShadow: "0 0 15px 2px rgba(194, 168, 120, 0.6)" }}
+        className="absolute left-0 right-0 h-[2.5px] w-full bg-scanner-cyan z-20"
+        style={{ boxShadow: "0 0 20px 4px rgba(0, 229, 255, 0.7)" }}
         animate={{ top: ["0%", "100%"] }}
         transition={{
           duration: 2.35,
@@ -66,7 +66,7 @@ export function ScanMotionGraphic() {
 
       {/* 4. Floating UI badge */}
       <motion.div
-        className="absolute bottom-[8%] right-[2%] flex w-max -translate-x-1/2 items-center justify-center rounded-none border border-charcoal/20 bg-alabaster/90 backdrop-blur-sm px-6 py-3 text-xs font-bold uppercase tracking-widest text-charcoal z-30"
+        className="absolute bottom-[8%] right-[2%] flex w-max -translate-x-1/2 items-center justify-center rounded-2xl border border-unilever-blue/20 bg-clinical-white/90 backdrop-blur-sm px-6 py-3 text-xs font-bold uppercase tracking-tight text-unilever-blue z-30"
         animate={{ y: [0, -7, 0] }}
         transition={{
           duration: 4.8,

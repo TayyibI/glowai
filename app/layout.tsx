@@ -1,19 +1,14 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
 import { LangProvider } from "@/contexts/LangContext";
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-playfair",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
@@ -30,7 +25,7 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${playfair.variable} min-h-screen font-sans antialiased bg-alabaster text-charcoal selection:bg-champagne/30 selection:text-charcoal`}
+        className={`${poppins.variable} min-h-screen font-sans antialiased bg-clinical-white text-unilever-blue selection:bg-ponds-blush/30 selection:text-unilever-blue`}
       >
         {/* LangProvider sets dir="rtl" and lang="ur" dynamically for Urdu */}
         <LangProvider>

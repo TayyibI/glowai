@@ -90,10 +90,10 @@ function DiagnosticRow({
     >
       {/* Left: Step number + thumbnail */}
       <div className="flex flex-row sm:flex-col items-center sm:items-center gap-4 sm:gap-2 shrink-0">
-        <span className="font-mono text-[9px] uppercase tracking-widest text-charcoal/40 font-bold">
+        <span className="font-mono text-[9px] uppercase tracking-tight text-unilever-blue/40 font-bold">
           {getStep(index)}
         </span>
-        <div className={`w-16 h-16 sm:w-20 sm:h-20 border border-charcoal/10 overflow-hidden shrink-0 transition-all duration-200 ${isActive ? "bg-champagne/10" : "bg-charcoal/5 grayscale"}`}>
+        <div className={`w-16 h-16 sm:w-20 sm:h-20 border border-unilever-blue/10 overflow-hidden shrink-0 transition-all duration-200 ${isActive ? "bg-ponds-blush/10" : "bg-unilever-blue/5 grayscale"}`}>
           <img
             src={product.image || "/placeholder-product.jpg"}
             alt={product.name}
@@ -106,10 +106,10 @@ function DiagnosticRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-3 mb-1">
           <div className="min-w-0">
-            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-charcoal/40 mb-0.5">
+            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-unilever-blue/40 mb-0.5">
               {brandName}
             </p>
-            <h3 className={`font-serif text-base sm:text-lg uppercase tracking-wide truncate transition-colors ${isActive ? "text-charcoal" : "text-charcoal/40"}`}>
+            <h3 className={`font-sans text-base sm:text-lg uppercase tracking-wide truncate transition-colors ${isActive ? "text-unilever-blue" : "text-unilever-blue/40"}`}>
               {product.name}
             </h3>
           </div>
@@ -124,18 +124,18 @@ function DiagnosticRow({
 
         {/* Metadata row */}
         <div className="flex flex-wrap gap-x-5 gap-y-1 mb-3">
-          <span className="text-[9px] uppercase tracking-[0.12em] text-charcoal/50 font-bold">
-            {t("row.category")} <span className="text-charcoal/70">{product.category.replace(/_/g, " ")}</span>
+          <span className="text-[9px] uppercase tracking-[0.12em] text-unilever-blue/50 font-bold">
+            {t("row.category")} <span className="text-unilever-blue/70">{product.category.replace(/_/g, " ")}</span>
           </span>
-          <span className="text-[9px] uppercase tracking-[0.12em] text-charcoal/50 font-bold">
-            {t("row.target")} <span className="text-charcoal/70">{targetArea}</span>
+          <span className="text-[9px] uppercase tracking-[0.12em] text-unilever-blue/50 font-bold">
+            {t("row.target")} <span className="text-unilever-blue/70">{targetArea}</span>
           </span>
         </div>
 
         {/* Match Score bar */}
         <div className="mb-3">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-[8.5px] uppercase tracking-widest text-charcoal/40 font-bold">{t("row.efficacy")}</span>
+            <span className="text-[8.5px] uppercase tracking-tight text-unilever-blue/40 font-bold">{t("row.efficacy")}</span>
             <span className="text-[8.5px] font-mono font-bold text-[#C2A878]">{matchScore}%</span>
           </div>
           <div className="match-bar-track">
@@ -148,13 +148,13 @@ function DiagnosticRow({
         </div>
 
         {/* Why this */}
-        <div className={`flex items-start gap-2 text-xs leading-relaxed transition-colors ${isActive ? "text-charcoal/70" : "text-charcoal/30"}`}>
+        <div className={`flex items-start gap-2 text-xs leading-relaxed transition-colors ${isActive ? "text-unilever-blue/70" : "text-unilever-blue/30"}`}>
           <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 shrink-0 text-[#C2A878]" />
           <div>
-            <span className="font-bold uppercase tracking-widest text-[9px] text-charcoal/40 block mb-0.5">{t("row.rationale")}</span>
+            <span className="font-bold uppercase tracking-tight text-[9px] text-unilever-blue/40 block mb-0.5">{t("row.rationale")}</span>
             <ReactMarkdown
               components={{
-                strong: ({ node, ...props }) => <span className="font-bold text-charcoal/80" {...props} />,
+                strong: ({ node, ...props }) => <span className="font-bold text-unilever-blue/80" {...props} />,
                 p: ({ node, ...props }) => <span {...props} />,
               }}
             >
@@ -173,10 +173,10 @@ function DiagnosticRow({
             href={product.purchaseLink}
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center gap-1.5 px-6 sm:px-4 py-3 sm:py-2.5 text-[10px] sm:text-[9px] font-bold uppercase tracking-widest border transition-all duration-200 ease-in-out w-full sm:w-auto justify-center ${
+            className={`flex items-center gap-1.5 px-6 sm:px-4 py-3 sm:py-2.5 text-[10px] sm:text-[9px] font-bold uppercase tracking-tight border transition-all duration-200 ease-in-out w-full sm:w-auto justify-center ${
               isActive
-                ? "border-charcoal/25 bg-charcoal text-white hover:bg-alabaster hover:text-charcoal"
-                : "border-charcoal/10 bg-charcoal/5 text-charcoal/30 pointer-events-none"
+                ? "border-unilever-blue/25 bg-unilever-blue text-white hover:bg-clinical-white hover:text-unilever-blue"
+                : "border-unilever-blue/10 bg-unilever-blue/5 text-unilever-blue/30 pointer-events-none"
             }`}
           >
             {t("row.order")}
@@ -217,21 +217,21 @@ function SectionHeader({
 }) {
   const { t } = useLang();
   return (
-    <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 pb-5 gap-3 border-b border-charcoal/10">
+    <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 pb-5 gap-3 border-b border-unilever-blue/10">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 flex items-center justify-center border border-charcoal/15 text-charcoal/60">
+        <div className="w-8 h-8 flex items-center justify-center border border-unilever-blue/15 text-unilever-blue/60">
           {icon}
         </div>
         <div>
-          <h2 className="font-serif text-2xl uppercase tracking-widest text-charcoal">{title}</h2>
-          <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-charcoal/40 mt-0.5">
+          <h2 className="font-sans text-2xl uppercase tracking-tight text-unilever-blue">{title}</h2>
+          <p className="text-[9px] font-mono font-bold uppercase tracking-tight text-unilever-blue/40 mt-0.5">
             {steps === 1 ? t("rec.1_active") : steps + " " + t("rec.active_products")} &nbsp;·&nbsp; ~{Math.ceil(time)} {t("rec.min")}
           </p>
         </div>
       </div>
       <button
         onClick={onReset}
-        className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-charcoal/40 hover:text-charcoal transition-all duration-200 ease-in-out"
+        className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-tight text-unilever-blue/40 hover:text-unilever-blue transition-all duration-200 ease-in-out"
       >
         <Undo2 className="w-3 h-3" />
         {t("rec.reset")}
@@ -256,11 +256,11 @@ function SectionFooter({
 }) {
   const { t } = useLang();
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-charcoal/8 mt-2">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-unilever-blue/8 mt-2">
       {hiddenCount > 0 && !expanded ? (
         <button
           onClick={onExpand}
-          className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-charcoal/50 hover:text-charcoal transition-all duration-200 ease-in-out"
+          className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-tight text-unilever-blue/50 hover:text-unilever-blue transition-all duration-200 ease-in-out"
         >
           <ChevronDown className="w-3.5 h-3.5" />
           {hiddenCount === 1 ? t("rec.show_1_more") : t("rec.show_more").replace("{n}", String(hiddenCount))}
@@ -269,7 +269,7 @@ function SectionFooter({
 
       <button
         onClick={onSave}
-        className="flex items-center gap-2 bg-bordeaux text-white px-5 py-2.5 text-[9px] font-bold uppercase tracking-widest hover:bg-charcoal transition-all duration-200 ease-in-out"
+        className="flex items-center gap-2 bg-unilever-blue text-white px-5 py-2.5 text-[9px] font-bold uppercase tracking-tight hover:bg-unilever-blue transition-all duration-200 ease-in-out"
       >
         <Save className="w-3.5 h-3.5" />
         {saveLabel}
@@ -387,31 +387,31 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
     <div className="space-y-16 relative">
 
       {/* ── Report header ─────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-charcoal/10 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-unilever-blue/10 gap-4">
         <div>
-          <p className="text-[9px] font-mono uppercase tracking-[0.18em] text-charcoal/40 mb-1">{t("rec.routine_protocol")}</p>
-          <h2 className="font-serif text-3xl uppercase tracking-widest text-charcoal">{t("rec.prescribed")}</h2>
+          <p className="text-[9px] font-mono uppercase tracking-[0.18em] text-unilever-blue/40 mb-1">{t("rec.routine_protocol")}</p>
+          <h2 className="font-sans text-3xl uppercase tracking-tight text-unilever-blue">{t("rec.prescribed")}</h2>
         </div>
-        <div className="flex items-center gap-2 bg-champagne/10 border border-charcoal/10 px-4 py-3 shrink-0 self-start md:self-auto">
-          <ShieldCheck className="w-4 h-4 text-charcoal/50" />
-          <span className="text-[9px] font-bold uppercase tracking-widest text-charcoal/50">{t("rec.ai_verified")}</span>
+        <div className="flex items-center gap-2 bg-ponds-blush/10 border border-unilever-blue/10 px-4 py-3 shrink-0 self-start md:self-auto">
+          <ShieldCheck className="w-4 h-4 text-unilever-blue/50" />
+          <span className="text-[9px] font-bold uppercase tracking-tight text-unilever-blue/50">{t("rec.ai_verified")}</span>
         </div>
       </div>
 
       {/* ── Tabs selector ─────────────────────────────────────────────── */}
-      <div className="flex space-x-2 border-b border-charcoal/10 pb-0 overflow-x-auto scroller-none">
+      <div className="flex space-x-2 border-b border-unilever-blue/10 pb-0 overflow-x-auto scroller-none">
         <button
           onClick={() => setActiveTab("morning")}
-          className={`px-4 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-widest border-b-2 transition-all shrink-0 ${
-            activeTab === "morning" ? "border-charcoal text-charcoal" : "border-transparent text-charcoal/40 hover:text-charcoal/70"
+          className={`px-4 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-tight border-b-2 transition-all shrink-0 ${
+            activeTab === "morning" ? "border-unilever-blue text-unilever-blue" : "border-transparent text-unilever-blue/40 hover:text-unilever-blue/70"
           }`}
         >
           {t("rec.morning_tab")}
         </button>
         <button
           onClick={() => setActiveTab("evening")}
-          className={`px-4 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-widest border-b-2 transition-all shrink-0 ${
-            activeTab === "evening" ? "border-charcoal text-charcoal" : "border-transparent text-charcoal/40 hover:text-charcoal/70"
+          className={`px-4 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-tight border-b-2 transition-all shrink-0 ${
+            activeTab === "evening" ? "border-unilever-blue text-unilever-blue" : "border-transparent text-unilever-blue/40 hover:text-unilever-blue/70"
           }`}
         >
           {t("rec.evening_tab")}
@@ -419,8 +419,8 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
         {routine.hair.length > 0 && (
           <button
             onClick={() => setActiveTab("hair")}
-            className={`px-4 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-widest border-b-2 transition-all shrink-0 ${
-              activeTab === "hair" ? "border-charcoal text-charcoal" : "border-transparent text-charcoal/40 hover:text-charcoal/70"
+            className={`px-4 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-tight border-b-2 transition-all shrink-0 ${
+              activeTab === "hair" ? "border-unilever-blue text-unilever-blue" : "border-transparent text-unilever-blue/40 hover:text-unilever-blue/70"
             }`}
           >
             {t("rec.hair_tab")}
@@ -435,10 +435,10 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-charcoal text-white px-6 py-3 border border-bordeaux shadow-2xl flex items-center gap-3"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-unilever-blue text-white px-6 py-3 border border-bordeaux shadow-2xl flex items-center gap-3"
           >
             <CheckCircle2 className="w-4 h-4 text-[#C2A878]" />
-            <span className="text-[9px] font-bold tracking-widest uppercase">{toastMsg}</span>
+            <span className="text-[9px] font-bold tracking-tight uppercase">{toastMsg}</span>
           </motion.div>
         )}
       </AnimatePresence>
