@@ -32,6 +32,15 @@ const config: Config = {
         glass: "12px",
         "glass-lg": "20px",
       },
+      keyframes: {
+        heroStatFloat: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+      },
+      animation: {
+        heroStatFloat: "heroStatFloat 6s ease-in-out infinite",
+      },
       borderRadius: {
         "btn": "9999px",
         "input": "1rem",

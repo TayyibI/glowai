@@ -1,9 +1,8 @@
 "use client";
 import { useLang } from "@/contexts/LangContext";
-import { motion } from "framer-motion";
 
 /**
- * A premium pill toggle to switch between English and Urdu.
+ * A clear pill toggle to switch between English and Urdu.
  * Accessible: keyboard-navigable, aria-pressed on active option.
  */
 export function LangToggle({ className = "" }: { className?: string }) {
@@ -13,28 +12,22 @@ export function LangToggle({ className = "" }: { className?: string }) {
     <div
       role="group"
       aria-label="Language selector"
-      className={`inline-flex items-center bg-white/5 border border-white/10 overflow-hidden ${className}`}
+      className={`inline-flex items-center divide-x divide-unilever-blue/30 overflow-hidden rounded-full border border-unilever-blue bg-transparent ${className}`}
     >
       {(["en", "ur"] as const).map((l) => (
         <button
           key={l}
           id={`lang-toggle-${l}`}
+          type="button"
           onClick={() => setLang(l)}
           aria-pressed={lang === l}
-          className={`relative px-3 py-1.5 text-[10px] font-bold uppercase tracking-tight transition-all duration-200 ease-in-out ${
+          className={`bg-transparent px-3 py-1.5 text-[10px] font-bold uppercase tracking-tight transition-colors duration-200 ease-in-out ${
             lang === l
-              ? "text-[#0a0a0a]"
-              : "text-white/40 hover:text-white/70"
+              ? "text-unilever-blue"
+              : "text-unilever-blue/50 hover:text-unilever-blue/80"
           }`}
         >
-          {lang === l && (
-            <motion.span
-              layoutId="lang-pill"
-              className="absolute inset-0 bg-[#c9a98a]"
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            />
-          )}
-          <span className="relative z-10">{l === "en" ? "EN" : "اردو"}</span>
+          {l === "en" ? "EN" : "اردو"}
         </button>
       ))}
     </div>

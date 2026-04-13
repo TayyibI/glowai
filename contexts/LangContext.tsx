@@ -33,6 +33,9 @@ const translations: Record<string, Record<Lang, string>> = {
   "hero.cta":               { en: "Start free scan", ur: "مفت اسکین شروع کریں" },
   "hero.how":               { en: "See how it works", ur: "طریقہ کار دیکھیں" },
   "hero.disclaimer":        { en: "~90 sec full analysis · Free · No app download", ur: "~90 سیکنڈ مکمل تجزیہ · مفت · ایپ ڈاؤن لوڈ نہیں" },
+  "hero.stat_hydration":    { en: "Hydration · 84%", ur: "نمی · ۸۴٪" },
+  "hero.stat_texture":      { en: "Texture · Smooth", ur: "بناوٹ · ہموار" },
+  "hero.stat_barrier":      { en: "Barrier · Stable", ur: "حفاظتی بیرئیر · مستحکم" },
 
   // Stats
   "stats.analysis":         { en: "3-in-1", ur: "3-میں-1" },
