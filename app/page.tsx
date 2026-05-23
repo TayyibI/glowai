@@ -9,7 +9,6 @@ import { Footer } from "@/components/Footer";
 
 /** Served from `public/videos/hero-scan.mp4` (optional second file: `hero-scan.webm`). */
 const HERO_VIDEO_MP4 = "/videos/hero-scan.mp4";
-const HERO_VIDEO_WEBM = "/videos/hero-scan.webm";
 const HERO_VIDEO_POSTER = "/images/scanner-model.jpg";
 
 export default function MobileLandingPage() {
@@ -77,7 +76,6 @@ export default function MobileLandingPage() {
               aria-hidden="true"
               onError={handleHeroVideoError}
             >
-              <source src={HERO_VIDEO_WEBM} type="video/webm" />
               <source src={HERO_VIDEO_MP4} type="video/mp4" />
             </video>
           ) : (

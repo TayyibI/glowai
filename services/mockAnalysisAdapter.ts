@@ -18,10 +18,10 @@ export function getMockAnalysis(input: MockAnalyzeInput): PerfectCorpAnalysisRaw
       skinTone: "light",
       skinType: "combination",
       concerns: ["dullness", "fine_lines", "dark_spots"],
-      confidence: 0.88,
+      confidence: 0.93,
     },
     hair: hasHair
-      ? { color: "dark_brown", type: "wavy", confidence: 0.72 }
+      ? { color: "dark_brown", type: "wavy", confidence: 0.92 }
       : null,
   };
 }

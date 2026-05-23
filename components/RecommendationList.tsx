@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import type { Product, Routine, RecommendedProduct } from "@/types/Product";
 import { motion, Variants, AnimatePresence } from "framer-motion";
 import {
-  ExternalLink, CheckCircle2, Save, Undo2, ChevronDown, ChevronUp,
+  ExternalLink, CheckCircle2, Save, Undo2, ChevronDown,
   Sun, Moon, Wind, ShieldCheck
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -19,11 +19,13 @@ interface RecommendationListProps {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function getBrandName(id: string) {
+  if (id.startsWith("loreal")) return "L'Oréal Paris";
+  if (id.startsWith("elvive")) return "L'Oréal Elvive";
   if (id.startsWith("ponds")) return "Pond's";
   if (id.startsWith("simple")) return "Simple";
   if (id.startsWith("sunsilk")) return "Sunsilk";
   if (id.startsWith("dove")) return "Dove";
-  return "Premium Brand";
+  return "L'Oréal Paris";
 }
 
 function getMatchScore(product: Product, userTags: string[]): number {
@@ -201,6 +203,118 @@ function getEstimatedTime(products: RecommendedProduct[], activeIds: Set<string>
   return time;
 }
 
+// ── PDF generation ───────────────────────────────────────────────────────────
+function generateRoutinePDF(
+  day: RecommendedProduct[],
+  night: RecommendedProduct[],
+  hair: RecommendedProduct[],
+  activeMorningIds: Set<string>,
+  activeEveningIds: Set<string>,
+  activeHairIds: Set<string>
+) {
+  // Merge day + night, deduplicate by product id, label with time-of-day
+  const combinedMap = new Map<string, { rec: RecommendedProduct; time: string }>();
+  for (const rec of day) {
+    if (!activeMorningIds.has(rec.product.id)) continue;
+    combinedMap.set(rec.product.id, { rec, time: "AM" });
+  }
+  for (const rec of night) {
+    if (!activeEveningIds.has(rec.product.id)) continue;
+    if (combinedMap.has(rec.product.id)) {
+      combinedMap.get(rec.product.id)!.time = "AM + PM";
+    } else {
+      combinedMap.set(rec.product.id, { rec, time: "PM" });
+    }
+  }
+  const combined = Array.from(combinedMap.values());
+  const activeHair = hair.filter((r) => activeHairIds.has(r.product.id));
+  const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+  const productRow = (item: { rec: RecommendedProduct; time: string }, idx: number) => `
+    <div class="product">
+      <div class="step">Step ${String(idx + 1).padStart(2, "0")}</div>
+      <div class="product-header">
+        <div class="product-name">${item.rec.product.name}</div>
+        <div class="product-time">${item.time}</div>
+      </div>
+      <div class="product-category">${item.rec.product.category.replace(/_/g, " ")}</div>
+      ${item.rec.product.description ? `<div class="product-desc">${item.rec.product.description}</div>` : ""}
+      ${item.rec.reason ? `<div class="product-reason">Why this product: ${item.rec.reason.replace(/\*\*/g, "")}</div>` : ""}
+      ${item.rec.product.purchaseLink ? `<div class="product-link">Buy now: <a href="${item.rec.product.purchaseLink}">${item.rec.product.purchaseLink}</a></div>` : ""}
+    </div>`;
+
+  const hairRow = (rec: RecommendedProduct, idx: number) => `
+    <div class="product">
+      <div class="step">Step ${String(idx + 1).padStart(2, "0")}</div>
+      <div class="product-header">
+        <div class="product-name">${rec.product.name}</div>
+        <div class="product-time">HAIR</div>
+      </div>
+      <div class="product-category">${rec.product.category.replace(/_/g, " ")}</div>
+      ${rec.product.description ? `<div class="product-desc">${rec.product.description}</div>` : ""}
+      ${rec.reason ? `<div class="product-reason">Why this product: ${rec.reason.replace(/\*\*/g, "")}</div>` : ""}
+      ${rec.product.purchaseLink ? `<div class="product-link">Buy now: <a href="${rec.product.purchaseLink}">${rec.product.purchaseLink}</a></div>` : ""}
+    </div>`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>GlowAI Routine — ${date}</title>
+  <style>
+    @page { size: A4; margin: 18mm 15mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Helvetica Neue", Arial, sans-serif; color: #1a1a2e; font-size: 10pt; line-height: 1.4; }
+    .header { border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .brand { font-size: 20pt; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; }
+    .header-right { text-align: right; }
+    .subtitle { font-size: 8pt; letter-spacing: 0.18em; text-transform: uppercase; color: #555; }
+    .date { font-size: 7.5pt; color: #999; margin-top: 3px; }
+    .section-title { font-size: 12pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 22px 0 12px; padding-bottom: 5px; border-bottom: 1px solid #ddd; }
+    .product { padding: 10px 0; border-bottom: 1px solid #f2f2f2; page-break-inside: avoid; }
+    .product-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 2px; }
+    .product-name { font-weight: 700; font-size: 10pt; text-transform: uppercase; letter-spacing: 0.04em; flex: 1; }
+    .product-time { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; background: #1a1a2e; padding: 2px 7px; white-space: nowrap; flex-shrink: 0; }
+    .product-category { font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 4px; }
+    .product-desc { font-size: 8.5pt; color: #444; line-height: 1.5; margin-bottom: 3px; }
+    .product-reason { font-size: 8pt; color: #666; font-style: italic; margin-bottom: 3px; }
+    .product-link { font-size: 7.5pt; color: #1a1a2e; word-break: break-all; }
+    .product-link a { color: #1a1a2e; }
+    .step { font-size: 7pt; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #bbb; margin-bottom: 2px; }
+    .empty { color: #999; font-style: italic; font-size: 9pt; padding: 10px 0; }
+    .footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #e0e0e0; font-size: 7pt; color: #aaa; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">GlowAI</div>
+    <div class="header-right">
+      <div class="subtitle">Personalised Beauty Routine</div>
+      <div class="date">Generated ${date}</div>
+    </div>
+  </div>
+
+  <div class="section-title">Skincare Routine (AM &amp; PM)</div>
+  ${combined.length === 0 ? '<p class="empty">No products selected.</p>' : combined.map(productRow).join("")}
+
+  ${activeHair.length > 0 ? `
+  <div class="section-title">Hair Care Routine</div>
+  ${activeHair.map(hairRow).join("")}` : ""}
+
+  <div class="footer">
+    GlowAI — Powered by L'Oréal Paris &nbsp;|&nbsp; AI-generated personalised routine — consult a dermatologist for clinical advice
+  </div>
+</body>
+</html>`;
+
+  const win = window.open("", "_blank");
+  if (!win) { alert("Please allow pop-ups to save your routine as PDF."); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => { win.print(); }, 400);
+}
+
 // ── Section header ────────────────────────────────────────────────────────────
 function SectionHeader({
   title,
@@ -240,39 +354,26 @@ function SectionHeader({
   );
 }
 
-// ── Section footer (save + expand) ───────────────────────────────────────────
+// ── Section footer (expand only) ─────────────────────────────────────────────
 function SectionFooter({
   hiddenCount,
   expanded,
   onExpand,
-  onSave,
-  saveLabel,
 }: {
   hiddenCount: number;
   expanded: boolean;
   onExpand: () => void;
-  onSave: () => void;
-  saveLabel: string;
 }) {
   const { t } = useLang();
+  if (hiddenCount <= 0 || expanded) return null;
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-unilever-blue/8 mt-2">
-      {hiddenCount > 0 && !expanded ? (
-        <button
-          onClick={onExpand}
-          className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-tight text-unilever-blue/50 hover:text-unilever-blue transition-all duration-200 ease-in-out"
-        >
-          <ChevronDown className="w-3.5 h-3.5" />
-          {hiddenCount === 1 ? t("rec.show_1_more") : t("rec.show_more").replace("{n}", String(hiddenCount))}
-        </button>
-      ) : <div />}
-
+    <div className="pt-5 border-t border-unilever-blue/8 mt-2">
       <button
-        onClick={onSave}
-        className="flex items-center gap-2 bg-unilever-blue text-white px-5 py-2.5 text-[9px] font-bold uppercase tracking-tight hover:bg-unilever-blue transition-all duration-200 ease-in-out"
+        onClick={onExpand}
+        className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-tight text-unilever-blue/50 hover:text-unilever-blue transition-all duration-200 ease-in-out"
       >
-        <Save className="w-3.5 h-3.5" />
-        {saveLabel}
+        <ChevronDown className="w-3.5 h-3.5" />
+        {hiddenCount === 1 ? t("rec.show_1_more") : t("rec.show_more").replace("{n}", String(hiddenCount))}
       </button>
     </div>
   );
@@ -333,17 +434,9 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
     setTimeout(() => setToastMsg(null), 3200);
   };
 
-  const saveRoutine = (type: "morning" | "evening" | "hair") => {
-    if (type === "morning") {
-      localStorage.setItem("glowai_morningRoutine", JSON.stringify(Array.from(activeMorningIds)));
-      showToast("Morning routine saved");
-    } else if (type === "evening") {
-      localStorage.setItem("glowai_eveningRoutine", JSON.stringify(Array.from(activeEveningIds)));
-      showToast("Evening routine saved");
-    } else {
-      localStorage.setItem("glowai_hairRoutine", JSON.stringify(Array.from(activeHairIds)));
-      showToast("Hair routine saved");
-    }
+  const handleSavePDF = () => {
+    generateRoutinePDF(routine.day, routine.night, routine.hair, activeMorningIds, activeEveningIds, activeHairIds);
+    showToast("Opening print dialog — choose 'Save as PDF'");
   };
 
   const resetRecommended = () => {
@@ -392,9 +485,18 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
           <p className="text-[9px] font-mono uppercase tracking-[0.18em] text-unilever-blue/40 mb-1">{t("rec.routine_protocol")}</p>
           <h2 className="font-sans text-3xl uppercase tracking-tight text-unilever-blue">{t("rec.prescribed")}</h2>
         </div>
-        <div className="flex items-center gap-2 bg-ponds-blush/10 border border-unilever-blue/10 px-4 py-3 shrink-0 self-start md:self-auto">
-          <ShieldCheck className="w-4 h-4 text-unilever-blue/50" />
-          <span className="text-[9px] font-bold uppercase tracking-tight text-unilever-blue/50">{t("rec.ai_verified")}</span>
+        <div className="flex items-center gap-3 self-start md:self-auto">
+          <div className="flex items-center gap-2 bg-ponds-blush/10 border border-unilever-blue/10 px-4 py-3 shrink-0">
+            <ShieldCheck className="w-4 h-4 text-unilever-blue/50" />
+            <span className="text-[9px] font-bold uppercase tracking-tight text-unilever-blue/50">{t("rec.ai_verified")}</span>
+          </div>
+          <button
+            onClick={handleSavePDF}
+            className="flex items-center gap-2 bg-unilever-blue text-white px-5 py-3 text-[9px] font-bold uppercase tracking-tight hover:opacity-90 transition-opacity duration-200 shrink-0"
+          >
+            <Save className="w-3.5 h-3.5" />
+            Save Routine as PDF
+          </button>
         </div>
       </div>
 
@@ -473,8 +575,6 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
             hiddenCount={morningHiddenCount}
             expanded={expandMorning}
             onExpand={() => setExpandMorning(true)}
-            onSave={() => saveRoutine("morning")}
-            saveLabel={t("rec.save_morning")}
           />
         </section>
       )}
@@ -508,8 +608,6 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
             hiddenCount={eveningHiddenCount}
             expanded={expandEvening}
             onExpand={() => setExpandEvening(true)}
-            onSave={() => saveRoutine("evening")}
-            saveLabel={t("rec.save_evening")}
           />
         </section>
       )}
@@ -543,8 +641,6 @@ export function RecommendationList({ routine, showBuyNow, userTags = [] }: Recom
             hiddenCount={hairHiddenCount}
             expanded={expandHair}
             onExpand={() => setExpandHair(true)}
-            onSave={() => saveRoutine("hair")}
-            saveLabel={t("rec.save_hair")}
           />
         </section>
       )}

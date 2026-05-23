@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { getRecommendations } from "@/logic/recommendationLogic";
 import { RecommendationList } from "@/components/RecommendationList";
 import type { AnalysisResult } from "@/types/AnalysisResult";
+import { normalizeYouCamBeautyToAnalysisResult } from "@/services/youcamBeautyNormalizer";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { AlertCircle, X, Sparkles, Camera, Upload, CheckCircle, AlertTriangle, FlipHorizontal } from "lucide-react";
 import { AnalysisDisplay } from "@/components/AnalysisDisplay";
@@ -40,14 +41,14 @@ type CapturePhase = "face" | "hair-front" | "hair-right" | "hair-left";
 const CAPTURE_PHASES: CapturePhase[] = ["face", "hair-front", "hair-right", "hair-left"];
 
 const PHASE_LABELS: Record<CapturePhase, string> = {
-  "face": "Centre your face in the frame",
+  face: "Centre your face in the frame",
   "hair-front": "Show the front of your hair",
   "hair-right": "Turn to your right side",
   "hair-left": "Turn to your left side",
 };
 
 const PHASE_STEP: Record<CapturePhase, string> = {
-  "face": "Step 1 of 4",
+  face: "Step 1 of 4",
   "hair-front": "Step 2 of 4",
   "hair-right": "Step 3 of 4",
   "hair-left": "Step 4 of 4",
@@ -78,6 +79,14 @@ interface ToastMessage {
   message: string;
 }
 
+type AnalysisChatMessage = { id: string; role: "agent" | "user"; text: string };
+
+type AnalysisDiagnostics = {
+  isMock: boolean;
+  mockReason?: string;
+  mockDetail?: string;
+};
+
 export function Scanner() {
   const { t, isUrdu } = useLang();
   const [step, setStep] = useState<ScanStep>("onboarding");
@@ -99,6 +108,8 @@ export function Scanner() {
 
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [analysisChatMessages, setAnalysisChatMessages] = useState<AnalysisChatMessage[]>([]);
+  const [analysisDiagnostics, setAnalysisDiagnostics] = useState<AnalysisDiagnostics>({ isMock: false });
 
   // ── Gamified scan state ──────────────────────────────────────────────────
   const [scanLog, setScanLog] = useState<string[]>([]);
@@ -381,12 +392,10 @@ export function Scanner() {
 
   useEffect(() => {
     if (step !== "capturing" || mode !== "camera" || !window.YMK) return;
-    if (capturePhase === "face") {
-      window.YMK.init({ faceDetectionMode: "skincare" });
-      window.YMK.addEventListener("faceQualityChanged", handleFaceQuality);
-    } else {
-      window.YMK.init({ faceDetectionMode: "hairtype" });
-    }
+    window.YMK.init({
+      faceDetectionMode: capturePhase === "face" ? "skincare" : "hairtype",
+    });
+    window.YMK.addEventListener("faceQualityChanged", handleFaceQuality);
     return () => window.YMK?.removeEventListener("faceQualityChanged", handleFaceQuality);
   }, [step, mode, capturePhase, handleFaceQuality]);
 
@@ -437,42 +446,91 @@ export function Scanner() {
     return () => clearInterval(iv);
   }, []);
 
-  // ── Analysis ──────────────────────────────────────────────────────────────
-  const handleAnalyze = useCallback(async (skinImg: string, hairImgs: string[]) => {
-    setStep("analyzing");
-    const clear = runScanAnimation();
-    try {
-      const [skinRes, hairRes] = await Promise.all([
-        fetch("/api/analyze-skin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: skinImg }),
-        }).then(async (r) => {
-          if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? "Skin analysis failed");
-          return r.json() as Promise<AnalysisResult>;
-        }),
-        fetch("/api/analyze-hair", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ images: hairImgs }),
-        }).then(async (r) => {
-          if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? "Hair analysis failed");
-          return r.json() as Promise<AnalysisResult>;
-        }),
-      ]);
-      setAnalysis({
-        face: skinRes.face,
-        hair: hairRes.hair,
-        overallConfidence: Math.min(skinRes.overallConfidence, hairRes.overallConfidence),
-      });
-      setStep("results");
-    } catch (e) {
-      setErrorMessage(e instanceof Error ? e.message : "Analysis failed");
-      setStep("error");
-    } finally {
-      clear();
-    }
-  }, [runScanAnimation]);
+  // ── Analysis (single image → /api/analyze-beauty) ─────────────────────────
+  const mapAnalyzeBeautyError = useCallback(
+    (status: number, body: { error?: string }) => {
+      const api = typeof body.error === "string" ? body.error.trim() : "";
+      if (status === 500 || api.includes("YOUCAM_API_KEY")) return t("error.analysis_config");
+      if (status === 502) return api || t("error.analysis_server");
+      if (status === 429) return api || "Too many requests. Please wait and try again.";
+      if (status === 400) return api || t("error.analysis_generic");
+      return api || t("error.analysis_generic");
+    },
+    [t]
+  );
+
+  const runAnalyzeBeauty = useCallback(
+    async (faceFile: File, hairAngles?: [File, File, File]) => {
+      setStep("analyzing");
+      setErrorMessage(null);
+      setAnalysisChatMessages([]);
+      setAnalysisDiagnostics({ isMock: false });
+      const clear = runScanAnimation();
+      try {
+        const form = new FormData();
+        form.append("file", faceFile, faceFile.name);
+        if (hairAngles) {
+          form.append("hair_front", hairAngles[0], hairAngles[0].name);
+          form.append("hair_right", hairAngles[1], hairAngles[1].name);
+          form.append("hair_left", hairAngles[2], hairAngles[2].name);
+        }
+
+        const res = await fetch("/api/analyze-beauty", { method: "POST", body: form });
+        const data = (await res.json().catch(() => ({}))) as {
+          mock?: boolean;
+          mockReason?: string;
+          mockDetail?: string;
+          analysis?: AnalysisResult;
+          error?: string;
+          skin?: unknown;
+          hair?: unknown;
+        };
+
+        if (res.ok && data.mock === true && data.analysis) {
+          setAnalysis(data.analysis);
+          setAnalysisDiagnostics({
+            isMock: true,
+            mockReason: data.mockReason,
+            mockDetail: data.mockDetail,
+          });
+          const detail = [data.mockReason, data.mockDetail].filter(Boolean).join(" — ");
+          console.warn("[Scanner] /api/analyze-beauty mock response:", detail);
+          addToast("info", t("results.mock_banner"), detail || "See browser console for full diagnostic.");
+          setStep("results");
+          return;
+        }
+
+        if (res.ok && data.mock === false && data.skin !== undefined) {
+          setAnalysis(normalizeYouCamBeautyToAnalysisResult(data.skin, data.hair));
+          setAnalysisDiagnostics({ isMock: false });
+          setStep("results");
+          return;
+        }
+
+        if (!res.ok) {
+          const friendly = mapAnalyzeBeautyError(res.status, data);
+          setErrorMessage(friendly);
+          setAnalysisChatMessages([{ id: `err-${Date.now()}`, role: "agent", text: friendly }]);
+          setStep("error");
+          return;
+        }
+
+        setErrorMessage(t("error.analysis_generic"));
+        setAnalysisChatMessages([{ id: `err-${Date.now()}`, role: "agent", text: t("error.analysis_generic") }]);
+        setStep("error");
+      } catch (e) {
+        console.error("[Scanner] /api/analyze-beauty request failed", e);
+        const friendly = e instanceof Error ? e.message : t("error.analysis_generic");
+        addToast("error", "Network or server error", friendly);
+        setErrorMessage(friendly);
+        setAnalysisChatMessages([{ id: `err-${Date.now()}`, role: "agent", text: friendly }]);
+        setStep("error");
+      } finally {
+        clear();
+      }
+    },
+    [addToast, mapAnalyzeBeautyError, runScanAnimation, t]
+  );
 
   // ── Capture from live video ───────────────────────────────────────────────
   const captureFromVideo = useCallback((): string | null => {
@@ -509,37 +567,55 @@ export function Scanner() {
         if (next !== "face") setQualityFeedback("");
       } else {
         stopCamera();
-        const [skin, ...hair] = newImages as string[];
-        handleAnalyze(skin, hair);
+        const [skin, hFront, hRight, hLeft] = newImages as [string, string, string, string];
+        if (skin && hFront && hRight && hLeft) {
+          void (async () => {
+            const blob = (u: string) => fetch(u).then((r) => r.blob());
+            const faceBlob = await blob(skin);
+            const faceFile = new File([faceBlob], `face_${Date.now()}.jpg`, { type: faceBlob.type || "image/jpeg" });
+            const hairFiles: [File, File, File] = [
+              new File([await blob(hFront)], `hair_front_${Date.now()}.jpg`, { type: "image/jpeg" }),
+              new File([await blob(hRight)], `hair_right_${Date.now()}.jpg`, { type: "image/jpeg" }),
+              new File([await blob(hLeft)], `hair_left_${Date.now()}.jpg`, { type: "image/jpeg" }),
+            ];
+            await runAnalyzeBeauty(faceFile, hairFiles);
+          })();
+        }
       }
     }, 900);
-  }, [capturePhase, capturedImages, captureFromVideo, stopCamera, handleAnalyze]);
+  }, [capturePhase, capturedImages, captureFromVideo, stopCamera, runAnalyzeBeauty]);
 
   // ── Upload ─────────────────────────────────────────────────────────────────
   const handleUploadFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
+    e.target.value = "";
+    if (!files?.length) return;
+
+    const maxBytes = 10 * 1024 * 1024;
+    const tooBig = Array.from(files).find((f) => f.size > maxBytes);
+    if (tooBig) {
+      const msg = "One or more files exceed 10MB. Please choose smaller images.";
+      setErrorMessage(msg);
+      setAnalysisChatMessages([{ id: `err-${Date.now()}`, role: "agent", text: msg }]);
+      setStep("error");
+      return;
+    }
+
+    if (files.length === 1) {
+      void runAnalyzeBeauty(files[0]);
+      return;
+    }
 
     if (files.length !== 4) {
-      setErrorMessage("Please select exactly 4 photos in order: face, hair front, hair right, hair left.");
-      setStep("error");
-      return;
-    }
-    if (Array.from(files).some((f) => f.size > 10 * 1024 * 1024)) {
-      setErrorMessage("One or more photos exceeds 10MB. Please choose smaller images.");
+      const msg = "Select exactly 4 photos (face, hair front, right, left) or one face-only photo.";
+      setErrorMessage(msg);
+      setAnalysisChatMessages([{ id: `err-${Date.now()}`, role: "agent", text: msg }]);
       setStep("error");
       return;
     }
 
-    Promise.all(
-      Array.from(files).map(
-        (file) => new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
-        })
-      )
-    ).then(([skin, ...hair]) => handleAnalyze(skin, hair));
+    const [face, hf, hr, hl] = Array.from(files) as [File, File, File, File];
+    void runAnalyzeBeauty(face, [hf, hr, hl]);
   };
 
   // ── Reset ─────────────────────────────────────────────────────────────────
@@ -549,6 +625,8 @@ export function Scanner() {
     setMode(null);
     setAnalysis(null);
     setErrorMessage(null);
+    setAnalysisChatMessages([]);
+    setAnalysisDiagnostics({ isMock: false });
     setCapturedImages([null, null, null, null]);
     setCapturePhase("face");
     setPreviewBase64(null);
@@ -567,17 +645,25 @@ export function Scanner() {
     : [];
 
   const phaseIndex = CAPTURE_PHASES.indexOf(capturePhase);
+  const captureInstruction =
+    capturePhase === "face"
+      ? t("scan.centre_face")
+      : capturePhase === "hair-front"
+        ? t("scan.hair_front")
+        : capturePhase === "hair-right"
+          ? t("scan.hair_right")
+          : t("scan.hair_left");
 
   // ══════════════════════════════════════════════════════════════════════════
   return (
     <div className="relative w-full max-w-4xl mx-auto min-h-[600px] overflow-hidden rounded-3xl bg-ponds-blush/10 border border-unilever-blue/20 shadow-2xl" dir={isUrdu ? "rtl" : "ltr"}>
       {privacyOpen && (
-        <PrivacyModal 
-          accepted={privacyAccepted} 
+        <PrivacyModal
+          accepted={privacyAccepted}
           onAccept={() => {
             setPrivacyAcceptedState(true);
             setPrivacyOpen(false);
-          }} 
+          }}
           onDecline={() => {
             window.location.href = "/";
           }}
@@ -595,15 +681,14 @@ export function Scanner() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 60, scale: 0.92, transition: { duration: 0.2 } }}
               transition={{ type: "spring", stiffness: 350, damping: 28 }}
-              className={`pointer-events-auto flex items-start gap-3 p-4 border shadow-2xl text-sm ${
-                toast.type === "success"
-                  ? "bg-[#0d1f19] border-green-700/60 text-green-200"
-                  : toast.type === "error"
+              className={`pointer-events-auto flex items-start gap-3 p-4 border shadow-2xl text-sm ${toast.type === "success"
+                ? "bg-[#0d1f19] border-green-700/60 text-green-200"
+                : toast.type === "error"
                   ? "bg-[#1f0d0d] border-red-700/60 text-red-200"
                   : toast.type === "warning"
-                  ? "bg-[#1f1706] border-amber-600/60 text-amber-200"
-                  : "bg-[#0d0f1f] border-blue-700/60 text-blue-200"
-              }`}
+                    ? "bg-[#1f1706] border-amber-600/60 text-amber-200"
+                    : "bg-[#0d0f1f] border-blue-700/60 text-blue-200"
+                }`}
             >
               <div className="shrink-0 mt-0.5">
                 {toast.type === "success" && <CheckCircle className="w-4 h-4 text-green-400" />}
@@ -654,7 +739,7 @@ export function Scanner() {
             <p className="text-sm font-bold tracking-tight uppercase text-unilever-blue/60 mb-2 max-w-sm">
               {t("upload.subtitle")}
             </p>
-            <ol className="text-xs uppercase tracking-tight text-unilever-blue/80 mb-8 space-y-1 font-bold">
+            <ol className="text-xs uppercase tracking-tight text-unilever-blue/80 mb-8 space-y-1 font-bold list-none">
               <li>{t("upload.step1")}</li>
               <li>{t("upload.step2")}</li>
               <li>{t("upload.step3")}</li>
@@ -665,7 +750,15 @@ export function Scanner() {
               <PrivacyBadge variant="default" />
             </div>
 
-            <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleUploadFiles} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              aria-hidden
+              onChange={handleUploadFiles}
+            />
             <motion.button
               whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
               onClick={() => fileInputRef.current?.click()}
@@ -710,16 +803,14 @@ export function Scanner() {
                 ))}
               </div>
 
-              {/* Lighting chip — face phase only */}
-              {capturePhase === "face"
-                ? (
-                  <div className="bg-black/60 text-white text-xs px-3 py-2 rounded-2xl flex items-center gap-2 backdrop-blur-md">
-                    <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${getLightingDotColor(lightingState)}`} />
-                    <span className="text-[10px] font-bold uppercase tracking-wider">{getLightingMsg(lightingState)}</span>
-                  </div>
-                )
-                : <div className="w-10" />
-              }
+              {capturePhase === "face" ? (
+                <div className="bg-black/60 text-white text-xs px-3 py-2 rounded-2xl flex items-center gap-2 backdrop-blur-md">
+                  <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${getLightingDotColor(lightingState)}`} />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">{getLightingMsg(lightingState)}</span>
+                </div>
+              ) : (
+                <div className="w-10" />
+              )}
             </div>
 
             {/* Viewfinder */}
@@ -754,25 +845,18 @@ export function Scanner() {
               {!previewBase64 && (
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-20">
                   {capturePhase === "face" ? (
-                    // Face: oval + dynamic glow based on lighting
                     <div className={`relative w-[70%] sm:w-[50%] md:w-[40%] lg:w-[35%] aspect-[3/4] border-2 rounded-[40px] transition-all duration-500 ${getBoundingBoxClass(lightingState) || "border-white/40"}`}>
-                      {/* Corner accent markers for premium look */}
                       <div className="absolute -top-[3px] -left-[3px] w-5 h-5 border-t-2 border-l-2 border-white/80 rounded-tl-[40px]" />
                       <div className="absolute -top-[3px] -right-[3px] w-5 h-5 border-t-2 border-r-2 border-white/80 rounded-tr-[40px]" />
                       <div className="absolute -bottom-[3px] -left-[3px] w-5 h-5 border-b-2 border-l-2 border-white/80 rounded-bl-[40px]" />
                       <div className="absolute -bottom-[3px] -right-[3px] w-5 h-5 border-b-2 border-r-2 border-white/80 rounded-br-[40px]" />
-
-                      {/* Scan line — visible while lighting is GOOD */}
                       {(lightingState === "GOOD" || lightingState === "BRIGHT") && (
                         <div className="absolute inset-0 overflow-hidden rounded-[40px]">
-                          <div
-                            className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-400/70 to-transparent scan-line"
-                          />
+                          <div className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-400/70 to-transparent scan-line" />
                         </div>
                       )}
                     </div>
                   ) : (
-                    // Hair phases: rectangular guide
                     <div className="relative w-[80%] sm:w-[65%] aspect-[3/4] border-2 border-scanner-cyan/60">
                       <div className="absolute -top-[2px] -left-[2px] w-5 h-5 border-t-2 border-l-2 border-scanner-cyan" />
                       <div className="absolute -top-[2px] -right-[2px] w-5 h-5 border-t-2 border-r-2 border-scanner-cyan" />
@@ -817,14 +901,13 @@ export function Scanner() {
                       transition={{ duration: 0.22 }}
                       className="text-white/80 text-xs uppercase tracking-tight mb-1 text-center max-w-xs font-bold"
                     >
-                      {capturePhase === "face" ? t("scan.centre_face") :
-                       capturePhase === "hair-front" ? t("scan.hair_front") :
-                       capturePhase === "hair-right" ? t("scan.hair_right") :
-                       t("scan.hair_left")}
+                      {captureInstruction}
                     </motion.p>
                   </AnimatePresence>
                   <p className="text-white/35 text-xs uppercase tracking-tight mb-6">
-                    {t("scan.step_of").replace("{n}", String(phaseIndex + 1)).replace("{total}", "4")}
+                    {t("scan.step_of")
+                      .replace("{n}", String(phaseIndex + 1))
+                      .replace("{total}", String(CAPTURE_PHASES.length))}
                   </p>
 
                   <motion.button
@@ -834,30 +917,28 @@ export function Scanner() {
                     disabled={capturePhase === "face" && !faceQualityPassed}
                     aria-label="Capture photo"
                     aria-disabled={capturePhase === "face" && !faceQualityPassed}
-                    className={`w-20 h-20 rounded-full relative flex items-center justify-center border-[4px] transition-colors duration-300 ${
-                      capturePhase === "face" && !faceQualityPassed
-                        ? "border-white/20 bg-black/20 cursor-not-allowed"
-                        : "border-[#c9a98a] bg-transparent"
-                    }`}
+                    className={`w-20 h-20 rounded-full relative flex items-center justify-center border-[4px] transition-colors duration-300 ${capturePhase === "face" && !faceQualityPassed
+                      ? "border-white/20 bg-black/20 cursor-not-allowed"
+                      : "border-[#c9a98a] bg-transparent"
+                      }`}
                   >
-                    <div className={`w-[66px] h-[66px] rounded-full transition-colors duration-300 ${
-                      capturePhase === "face" && !faceQualityPassed
-                        ? "bg-white/20"
-                        : "bg-[#c9a98a]"
-                    }`} />
+                    <div className={`w-[66px] h-[66px] rounded-full transition-colors duration-300 ${capturePhase === "face" && !faceQualityPassed
+                      ? "bg-white/20"
+                      : "bg-[#c9a98a]"
+                      }`} />
                   </motion.button>
 
                   <div className="flex items-center gap-10 mt-8">
-                      {hasMultipleCameras && (
-                        <button
-                          onClick={() => setFacingMode((prev) => (prev === "user" ? "environment" : "user"))}
-                          aria-label="Flip camera"
-                          className="text-white/50 hover:text-white/80 transition-colors p-2"
-                        >
-                          <FlipHorizontal className="w-5 h-5" />
-                        </button>
-                      )}
-                      
+                    {hasMultipleCameras && (
+                      <button
+                        onClick={() => setFacingMode((prev) => (prev === "user" ? "environment" : "user"))}
+                        aria-label="Flip camera"
+                        className="text-white/50 hover:text-white/80 transition-colors p-2"
+                      >
+                        <FlipHorizontal className="w-5 h-5" />
+                      </button>
+                    )}
+
                     <button
                       onClick={() => { stopCamera(); setMode("upload"); setStep("upload"); }}
                       className="text-xs tracking-tight uppercase font-bold text-white/50 hover:text-white/80 underline transition-all duration-200 ease-in-out"
@@ -973,6 +1054,21 @@ export function Scanner() {
               </Button>
             </div>
             <div className="mb-12 max-w-4xl mx-auto w-full">
+              {analysisDiagnostics.isMock && (
+                <div className="mb-6 rounded-2xl border border-amber-600/40 bg-amber-50/90 px-4 py-3 text-sm text-unilever-blue">
+                  <p className="font-bold uppercase tracking-tight text-xs text-amber-900 mb-1">{t("results.mock_banner")}</p>
+                  <p className="text-xs font-mono text-unilever-blue/90">
+                    <span className="font-bold">{t("results.mock_reason")}:</span>{" "}
+                    {analysisDiagnostics.mockReason ?? "unknown"}
+                    {analysisDiagnostics.mockDetail ? (
+                      <>
+                        <br />
+                        <span className="opacity-80">{analysisDiagnostics.mockDetail}</span>
+                      </>
+                    ) : null}
+                  </p>
+                </div>
+              )}
               <AnalysisDisplay result={analysis} />
             </div>
             <div className="bg-clinical-white rounded-2xl p-8 md:p-12 border border-unilever-blue/20">
@@ -1010,14 +1106,33 @@ export function Scanner() {
         {/* ── ERROR ────────────────────────────────────────────────────── */}
         {step === "error" && (
           <motion.div key="error" variants={fadeVariants} initial="hidden" animate="show" exit="exit"
-            className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] text-center bg-clinical-white border border-unilever-blue/20">
-            <div className="w-20 h-20 bg-ponds-blush/10 border border-unilever-blue/20 rounded-2xl flex items-center justify-center mb-8">
+            className="p-8 md:p-12 flex flex-col items-center justify-center min-h-[600px] bg-clinical-white border border-unilever-blue/20">
+            <div className="w-20 h-20 bg-ponds-blush/10 border border-unilever-blue/20 rounded-2xl flex items-center justify-center mb-6">
               <AlertCircle className="w-10 h-10 text-unilever-blue" />
             </div>
-            <h2 className="font-sans text-3xl uppercase tracking-tight text-unilever-blue mb-4">Analysis Interrupted</h2>
-            <p className="text-sm uppercase tracking-tight text-unilever-blue/80 font-bold max-w-sm mb-12 leading-relaxed">
-              {errorMessage ?? "Something went wrong during analysis."}
-            </p>
+            <h2 className="font-sans text-3xl uppercase tracking-tight text-unilever-blue mb-8 text-center">Analysis Interrupted</h2>
+
+            <div className="w-full max-w-md mb-10 space-y-3" dir={isUrdu ? "rtl" : "ltr"}>
+              {(analysisChatMessages.length > 0 ? analysisChatMessages : [{ id: "fallback", role: "agent" as const, text: errorMessage ?? "Something went wrong during analysis." }]).map((m) => (
+                <div
+                  key={m.id}
+                  className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-[92%] rounded-2xl px-4 py-3 text-left border text-sm leading-relaxed ${m.role === "agent"
+                      ? "bg-ponds-blush/20 border-unilever-blue/15 text-unilever-blue"
+                      : "bg-unilever-blue text-clinical-white border-unilever-blue"
+                      }`}
+                  >
+                    {m.role === "agent" && (
+                      <p className="text-[10px] uppercase tracking-tight font-bold text-unilever-blue/60 mb-1">{t("chat.ai_badge")}</p>
+                    )}
+                    {m.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <Button variant="primary" onClick={handleRetry} className="py-4 text-xs font-bold uppercase tracking-tight">
               Try again
             </Button>

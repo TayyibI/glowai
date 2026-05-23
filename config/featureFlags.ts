@@ -1,11 +1,10 @@
 /**
  * Feature flags for GlowAI.
- * Use USE_MOCK_ANALYSIS = true for MVP; switch to false when Perfect Corp (or other vendor) is integrated.
+ * `USE_MOCK_ANALYSIS`: when true, `/api/analyze-beauty` returns mock data immediately (`mockReason: "feature_flag"`).
  */
 
 export const featureFlags = {
-  /** When true, analysisService uses mock adapter; when false, uses Perfect Corp adapter */
-  USE_MOCK_ANALYSIS: true,
+  USE_MOCK_ANALYSIS: false,
 } as const;
 
 export type FeatureFlags = typeof featureFlags;

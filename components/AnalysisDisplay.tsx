@@ -2,16 +2,16 @@
 import React, { useEffect, useState } from "react";
 import type { AnalysisResult } from "@/types/AnalysisResult";
 import { motion } from "framer-motion";
+import { clampDisplayConfidence01, confidencePercentDisplayed } from "@/lib/displayConfidence";
 
 function formatLabel(s: string): string {
   return s.replace(/_/g, " ");
 }
 
-function getDots(score: number): string {
-  if (score < 0 || isNaN(score)) score = 0;
-  if (score > 1) score = 1;
+function getDots(score01: number): string {
+  const score = clampDisplayConfidence01(score01);
   const filled = Math.round(score * 5);
-  return '●'.repeat(filled) + '○'.repeat(5 - filled);
+  return "●".repeat(filled) + "○".repeat(5 - filled);
 }
 
 function getHydrationColor(score: number): string {
@@ -71,7 +71,10 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
     setTimestamp(dateStr);
   }, []);
 
-  const totalConfidence = result.hair ? (result.overallConfidence + result.hair.confidence) / 2 : result.overallConfidence;
+  const displayOverall01 = result.hair
+    ? (clampDisplayConfidence01(result.face.confidence) + clampDisplayConfidence01(result.hair.confidence)) / 2
+    : clampDisplayConfidence01(result.overallConfidence);
+  const overallConfidencePercent = confidencePercentDisplayed(displayOverall01);
 
   const arcRadius = 40;
   const arcCircumference = Math.PI * arcRadius;
@@ -150,24 +153,24 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
                 <tr>
                   <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue font-medium text-xs font-bold uppercase tracking-tight">{t("report.tone")}</td>
                   <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue capitalize">{formatLabel(result.face.skinTone)}</td>
-                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.face.confidence)}</td>
+                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.face.confidence)} <span className="text-unilever-blue/50 ml-1">{confidencePercentDisplayed(result.face.confidence)}%</span></td>
                 </tr>
                 <tr>
                   <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue font-medium text-xs font-bold uppercase tracking-tight">{t("report.type")}</td>
                   <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue capitalize">{formatLabel(result.face.skinType)}</td>
-                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.face.confidence)}</td>
+                  <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.face.confidence)} <span className="text-unilever-blue/50 ml-1">{confidencePercentDisplayed(result.face.confidence)}%</span></td>
                 </tr>
                 {result.hair && (
                   <>
                     <tr>
                       <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue font-medium text-xs font-bold uppercase tracking-tight">{t("report.hair_color")}</td>
                       <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue capitalize">{formatLabel(result.hair.color)}</td>
-                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.hair.confidence)}</td>
+                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.hair.confidence)} <span className="text-unilever-blue/50 ml-1">{confidencePercentDisplayed(result.hair.confidence)}%</span></td>
                     </tr>
                     <tr>
                       <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue font-medium text-xs font-bold uppercase tracking-tight">{t("report.hair_type")}</td>
                       <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue capitalize">{formatLabel(result.hair.type)}</td>
-                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.hair.confidence)}</td>
+                      <td className="py-4 border-b border-unilever-blue/10 text-unilever-blue/80 text-right md:text-left tracking-tight text-xs">{getDots(result.hair.confidence)} <span className="text-unilever-blue/50 ml-1">{confidencePercentDisplayed(result.hair.confidence)}%</span></td>
                     </tr>
                   </>
                 )}
@@ -220,7 +223,7 @@ export function AnalysisDisplay({ result }: { result: AnalysisResult }) {
         {/* BOTTOM SUMMARY */}
         <div className="border-t border-unilever-blue/20 p-6 md:p-8 bg-white flex flex-col items-start md:items-end text-left md:text-right">
           <p className="font-bold font-mono text-[13px] uppercase tracking-tight text-unilever-blue mb-2">
-            {t("report.overall_conf")} {Math.round(totalConfidence * 100)}%
+            {t("report.overall_conf")} {overallConfidencePercent}%
           </p>
           <p className="text-[11px] text-unilever-blue/50 uppercase tracking-wider max-w-sm leading-relaxed">
             {t("report.disclaimer")}

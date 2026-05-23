@@ -162,15 +162,15 @@ const translations: Record<string, Record<Lang, string>> = {
   "footer.contact":         { en: "Contact", ur: "رابطہ کریں" },
 
   // Upload Box
-  "upload.title":           { en: "Upload Photos", ur: "تصاویر اپلوڈ کریں" },
-  "upload.subtitle":        { en: "Select exactly 4 photos in this order:", ur: "اس ترتیب میں بالکل 4 تصاویر منتخب کریں:" },
-  "upload.step1":           { en: "① Face — straight on", ur: "① چہرہ — سیدھا سامنے" },
-  "upload.step2":           { en: "② Hair — front view", ur: "② بال — سامنے سے منظر" },
-  "upload.step3":           { en: "③ Hair — right side", ur: "③ بال — دائیں طرف" },
-  "upload.step4":           { en: "④ Hair — left side", ur: "④ بال — بائیں طرف" },
-  "upload.btn_label":       { en: "Select 4 photos", ur: "4 تصاویر منتخب کریں" },
-  "upload.btn_desc":        { en: "PNG, JPG · up to 10MB each", ur: "PNG, JPG · ہر ایک 10MB تک" },
-  "upload.use_camera":      { en: "Use camera instead", ur: "اس کے بجائے کیمرہ استعمال کریں" },
+  "upload.title":           { en: "Upload photos", ur: "تصاویر اپلوڈ کریں" },
+  "upload.subtitle":        { en: "Select 4 photos in order, or one face-only image.", ur: "4 تصاویر ترتیب سے، یا ایک چہرے کی تصویر۔" },
+  "upload.step1":           { en: "① Face — straight on, hair down", ur: "① چہرہ — سیدھا سامنے، بال نیچے" },
+  "upload.step2":           { en: "② Hair — front", ur: "② بال — سامنے" },
+  "upload.step3":           { en: "③ Hair — turn right", ur: "③ بال — دائیں مڑیں" },
+  "upload.step4":           { en: "④ Hair — turn left", ur: "④ بال — بائیں مڑیں" },
+  "upload.btn_label":       { en: "Take photo / Upload", ur: "تصویر لیں / اپلوڈ" },
+  "upload.btn_desc":        { en: "4 images (or 1 face) · JPG/PNG/WebP · max 10MB each", ur: "4 تصاویر (یا 1 چہرہ) · ہر ایک 10MB تک" },
+  "upload.use_camera":      { en: "Use live camera instead", ur: "لائیو کیمرہ استعمال کریں" },
 
   // Chat
   "chat.assistant":         { en: "GlowAI Assistant", ur: "گلو اے آئی اسسٹنٹ" },
